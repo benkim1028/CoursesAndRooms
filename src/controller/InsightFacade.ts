@@ -46,6 +46,20 @@ function findId(id: string, courses:string[]):boolean {
         }
     }
 }
+function createData(files: string[]):Promise<any>[] {
+    let promiseList:Promise<any>[] = [];
+    let zipContent: any = null;
+    for (let file of files ) {
+        fs.readFile(file, function(err, data) {
+            if (err) throw err
+            zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');;
+            promiseList.push(zipContent);
+            // promiseList.push(JSZip.loadAsync(data[, options.base64]));
+        });
+
+    }
+    return promiseList;
+}
 
 
 
@@ -57,26 +71,34 @@ export default class InsightFacade implements IInsightFacade {
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            fs.readFile("courses.zip", function(err, data) {
+            //var promiseList:Promise<any>[];
+            fs.readFile('courses.zip', function(err, data) {
                 if (err) throw err;
-                JSZip.loadAsync(data)
-                    .then(function (zip:any) {
-                        var files = zip['files'];
-                        let keys = Object.keys(files);
-                        //console.log(keys); //Object.keys(zip['files'])
-                        if(findId(id, keys)){
-                            console.log("1");
-                            fulfill(201);
-                        }
-                        else {
-                            fulfill(204);
+                zip.loadAsync(data)
+                    .then(function (contents:any) {
+                        //var keys = Object.keys(contents); // keys : [ 'files', 'comment', 'root', 'clone' ]
+                        var filepaths = Object.keys(contents.files);
+
+                        // zip.files['courses/AANB500'].async('string').then(function(data:any){
+                        //     console.log(data)
+                        // })
+
+                        for (let filepath of filepaths) {
+                        if (!fs.lstatSync(filepath).isDirectory()) {
+                            zip.files[filepath].async('string').then(function(data:any){
+                                console.log(data)
+                            })
 
                         }
-                     })
+                        }
+
+
+                    })
+
                     .catch(function () {
                         reject ('error: my text');
                     });
-            });
+        })
         });
 
     }
