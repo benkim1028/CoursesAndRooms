@@ -81,7 +81,7 @@ export default class InsightFacade implements IInsightFacade {
 
                         // zip.files['courses/AANB500'].async('string').then(function(data:any){
                         //     console.log(data)
-                        // })//
+                        // })
 
                         for (let filepath of filepaths) {
                         if (!fs.lstatSync(filepath).isDirectory()) {
