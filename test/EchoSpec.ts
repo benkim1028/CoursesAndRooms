@@ -5,16 +5,20 @@
 import Server from "../src/rest/Server";
 import {expect} from 'chai';
 import Log from "../src/Util";
+import InsightFacade from "../src/controller/InsightFacade";
 import {InsightResponse} from "../src/controller/IInsightFacade";
+import fs = require('fs');
 
 describe("EchoSpec", function () {
 
+    let zipContent: any = null;
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
         expect(response).to.have.property('body');
         expect(response.code).to.be.a('number');
     }
+    var insightFacade:InsightFacade = null; //added
 
     before(function () {
         Log.test('Before: ' + (<any>this).test.parent.title);
@@ -22,6 +26,8 @@ describe("EchoSpec", function () {
 
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
+        insightFacade = new InsightFacade(); //added
+        zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
     });
 
     after(function () {
@@ -30,6 +36,8 @@ describe("EchoSpec", function () {
 
     afterEach(function () {
         Log.test('AfterTest: ' + (<any>this).currentTest.title);
+        insightFacade = null; //added
+        //zipContent = null;
     });
 
     it("Should be able to echo", function () {
@@ -63,6 +71,37 @@ describe("EchoSpec", function () {
         expect(out.code).to.equal(400);
         expect(out.body).to.have.property('error');
         expect(out.body).to.deep.equal({error: 'Message not provided'});
+    });
+
+    it("Should be able to handle a null echo message sensibly", function () {
+        let out = Server.performEcho(null); // return type : InsightResponse
+        Log.test(JSON.stringify(out));
+        console.log(out);
+        console.log(JSON.stringify(out));
+        sanityCheck(out);
+        expect(out.code).to.equal(400);
+        expect(out.body).to.have.property('error');
+        expect(out.body).to.deep.equal({error: 'Message not provided'});
+    });
+
+    // it.only("For test purpose", function () {
+    //     return insightFacade.addDataset("1234", "average").then(value => {
+    //         Log.test('Value ' + value);
+    //         expect.fail();
+    //     }).catch(function (err:any) {
+    //         Log.test('Error: ' + err);
+    //         expect(err).to.equal('Error');
+    //     })
+    // }); //added
+
+    it.only("For test purpose", function () {
+        return insightFacade.addDataset("500", zipContent).then(function (value:any) {
+            Log.test('Value ' + value);
+            expect(value).to.equal(201);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
     });
 
 });

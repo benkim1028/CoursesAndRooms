@@ -39,13 +39,24 @@ const unzipResponse = require('unzip-response');
 //
 // }
 
-function findId(id: string, courses:string[]):boolean {
-    for(let course of courses) {
+function findId(id: string, info:any[]):boolean {
+    for(let course of info) {
         if (course.includes(id)) {
             return true
         }
     }
 }
+function finalObj (data:any):any {
+    let wholeData:any = JSON.parse(data);
+    //console.log(wholeData);
+    let dataKeys:any = Object.keys(wholeData);
+    for (let dataKey of dataKeys) {
+        if (dataKey == 'result') {
+            return wholeData[dataKey];
+        }
+    }
+}
+
 function createData(files: string[]):Promise<any>[] {
     let promiseList:Promise<any>[] = [];
     let zipContent: any = null;
@@ -60,6 +71,7 @@ function createData(files: string[]):Promise<any>[] {
     }
     return promiseList;
 }
+
 
 
 
@@ -79,18 +91,29 @@ export default class InsightFacade implements IInsightFacade {
                         //var keys = Object.keys(contents); // keys : [ 'files', 'comment', 'root', 'clone' ]
                         var filepaths = Object.keys(contents.files);
 
-                        // zip.files['courses/AANB500'].async('string').then(function(data:any){
-                        //     console.log(data)
+                        /*For debugging*/
+                        // zip.files['courses/AANB551'].async('string').then(function(data:any){
+                        //     // console.log(data)
+                        //     //let item:any = Object.keys(data["result"]);
+                        //
+                        //
+                        //     finalObj(data);
+                        //     console.log(finalObj(data));
+                        //
                         // })
 
-                        for (let filepath of filepaths) {
+
+                        for (let filepath of filepaths) { // {"result":[],"rank":0}
                         if (!fs.lstatSync(filepath).isDirectory()) {
                             zip.files[filepath].async('string').then(function(data:any){
-                                console.log(data)
+                                finalObj(data);
+                                console.log(finalObj(data));
                             })
 
                         }
                         }
+
+
 
 
                     })
