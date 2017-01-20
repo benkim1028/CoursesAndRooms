@@ -9,70 +9,7 @@ import fs = require('fs');
 var rp = require('request-promise-native');
 var JSZip = require('jszip');
 var zip = new JSZip();
-var extract = require('extract-zip')
-const http = require('http');
-const unzipResponse = require('unzip-response');
-
-
-// function getQueryValue(query:string, queryData:any[]): any[] {
-//     for(let item of queryData) {
-//         var keys = Object.keys(item);
-//         var valueList: any[] = [];
-//         for(let key of keys) {
-//             if (key == query) {
-//                 let value:any = item[key];
-//                 return value;
-//             }
-//         }
-//     }
-// }
-//
-// function createList (zip_file:any): any[] {
-//     var dataList: any[] = [];
-//     if (zip_file != undefined){
-//         for (let object of zip_file) {
-//             dataList.push(object);
-//         }
-//         return dataList;
-//     }
-//     else {"error"}
-//
-// }
-
-function findId(id: string, info:any[]):boolean {
-    for(let course of info) {
-        if (course.includes(id)) {
-            return true
-        }
-    }
-}
-function finalObj (data:any):any {
-    let wholeData:any = JSON.parse(data);
-    //console.log(wholeData);
-    let dataKeys:any = Object.keys(wholeData);
-    for (let dataKey of dataKeys) {
-        if (dataKey == 'result') {
-            return wholeData[dataKey];
-        }
-    }
-}
-
-function createData(files: string[]):Promise<any>[] {
-    let promiseList:Promise<any>[] = [];
-    let zipContent: any = null;
-    for (let file of files ) {
-        fs.readFile(file, function(err, data) {
-            if (err) throw err
-            zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');;
-            promiseList.push(zipContent);
-            // promiseList.push(JSZip.loadAsync(data[, options.base64]));
-        });
-
-    }
-    return promiseList;
-}
-
-
+var jsonfile = require('jsonfile')
 
 
 export default class InsightFacade implements IInsightFacade {
@@ -81,49 +18,39 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace('InsightFacadeImpl::init()');
     }
 
-    addDataset(id: string, content: string): Promise<InsightResponse> {
+    addDataset(id: string, content: string) : Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            //var promiseList:Promise<any>[];
-            fs.readFile('courses.zip', function(err, data) {
-                if (err) throw err;
-                zip.loadAsync(data)
-                    .then(function (contents:any) {
-                        //var keys = Object.keys(contents); // keys : [ 'files', 'comment', 'root', 'clone' ]
-                        var filepaths = Object.keys(contents.files);
+            let promiseList: Promise<any>[] =[];
+            zip.loadAsync(content,{base64: true})
+                .then(function (contents:any) {
+                    var filepaths = Object.keys(contents.files);
+                    for (let filepath of filepaths) {
+                        promiseList.push(zip.files[filepath].async('string'));
+                    }
+                    Promise.all(promiseList)
+                        .then(data => {
+                            var writeFile = require('write-file');
+                            writeFile('courses.json', data);
+                            fulfill({code: 204, body: {}});
+                        })
+                        .catch(function(){
+                            reject({code: 400, body: {}});
+                        });
+                    /*create all files in json format in folder[courses] without using Promise.all*/
+                    // for (let filepath of filepaths) { // {"result":[],"rank":0}
+                    //     zip.files[filepath].async('string').then(function(data:any){
+                    //         let wholeData:any = JSON.parse(data);
+                    //         fullData.push(JSON.stringify(data));
+                    //         var writeFile = require('write-file');
+                    //         writeFile(filepath + '.json', wholeData);
+                    //     });
+                    // }
+                })
+                .catch(function() {
+                   reject({code: 400, body: {"error": "my text"}});
+                });
 
-                        /*For debugging*/
-                        // zip.files['courses/AANB551'].async('string').then(function(data:any){
-                        //     // console.log(data)
-                        //     //let item:any = Object.keys(data["result"]);
-                        //
-                        //
-                        //     finalObj(data);
-                        //     console.log(finalObj(data));
-                        //
-                        // })
-
-
-                        for (let filepath of filepaths) { // {"result":[],"rank":0}
-                        if (!fs.lstatSync(filepath).isDirectory()) {
-                            zip.files[filepath].async('string').then(function(data:any){
-                                finalObj(data);
-                                console.log(finalObj(data));
-                            })
-
-                        }
-                        }
-
-
-
-
-                    })
-
-                    .catch(function () {
-                        reject ('error: my text');
-                    });
         })
-        });
-
     }
 
     removeDataset(id: string): Promise<InsightResponse> {
@@ -132,5 +59,66 @@ export default class InsightFacade implements IInsightFacade {
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return null;
+
+        // return new Promise(function (fulfill, reject) {
+        //     //var promiseList:Promise<any>[];
+        //     fs.readFile('courses.zip', function(err, data) {
+        //         if (err) throw err;
+        //         zip.loadAsync(data)
+        //             .then(function (contents:any) {
+        //                 //var keys = Object.keys(contents); // keys : [ 'files', 'comment', 'root', 'clone' ]
+        //                 var filepaths = Object.keys(contents.files);
+
+        /*For debugging*/
+        // zip.files['courses/AANB551'].async('string').then(function(data:any){
+        //
+        //     for (let finalObj of finalObjs(data)) {
+        //         // let keys = Object.keys(finalObj);
+        //         // console.log(keys);
+        //
+        //
+        //         let id_number:number = finalObj['id'];
+        //         let id_string:string = id_number.toString();
+        //         console.log(id_string);
+        //         if (id == id_string) {
+        //             reject("error: This dataset already contains the input id");
+        //         }
+        //         else {
+        //
+        //         }
+        //
+        //     }
+        //
+        //
+        //
+        // })
+        /*Real Code*/
+        // for (let filepath of filepaths) { // {"result":[],"rank":0}
+        //     if (!fs.lstatSync(filepath).isDirectory()) {
+        //         zip.files[filepath].async('string').then(function(data:any){
+        //
+        //             for (let finalObj of finalObjs(data)) {
+        //                 let id_number:number = finalObj['id'];
+        //                 let id_string:string = id_number.toString();
+        //
+        //                 //console.log(id_string);
+        //                 if (id == id_string) {
+        //                     fulfill(201); //  the operation was successful and the id already existed
+        //                     return;
+        //                 }
+        //                 // else {
+        //                 //
+        //                 //
+        //                 // }
+        //
+        //
+        //
+        //             }
+        //
+        //         })
+        //
+        //     }
+        // }
+
     }
 }

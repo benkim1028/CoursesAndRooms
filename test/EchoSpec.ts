@@ -95,9 +95,9 @@ describe("EchoSpec", function () {
     // }); //added
 
     it.only("For test purpose", function () {
-        return insightFacade.addDataset("500", zipContent).then(function (value:any) {
+        return insightFacade.addDataset("", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
-            expect(value).to.equal(201);
+            expect(value).to.equal({code: 204, body: {}});
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             expect.fail();
