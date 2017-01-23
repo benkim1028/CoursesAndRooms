@@ -37,8 +37,10 @@
     "@types/parse5": "^2.2.34",
     "@types/restify": "^2.0.35",
     "chai": "^3.5.0",
+    "ebnf": "^1.5.0",
     "extract-zip": "^1.6.0",
     "jszip": "^3.1.2",
+    "look-up": "^0.8.3",
     "mocha": "^3.2.0",
     "mochawesome": "^1.5.2",
     "nyc": "^10.0.0",
@@ -47,6 +49,7 @@
     "request-promise-native": "^1.0.3",
     "restify": "^4.0.3",
     "typescript": "^2.1.X",
+    "valid-filename": "^2.0.1",
     "write-file": "^1.0.0"
   }
 }

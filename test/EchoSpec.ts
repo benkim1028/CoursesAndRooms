@@ -94,10 +94,20 @@ describe("EchoSpec", function () {
     //     })
     // }); //added
 
-    it.only("For test purpose", function () {
-        return insightFacade.addDataset("", zipContent).then(function (value:any) {
+    it("Create a new dataset with unique id ", function () {
+        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             expect(value).to.equal({code: 204, body: {}});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it.only("Create a new dataset with non-unique id", function () {
+        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+            Log.test('Value ' + value);
+            expect(value).to.equal({ code: 201, body: {} });
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             expect.fail();
