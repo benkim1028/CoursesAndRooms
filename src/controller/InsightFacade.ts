@@ -6,6 +6,7 @@ import Log from "../Util";
 import fs = require('fs');
 
 
+
 var JSZip = require('jszip');
 var zip = new JSZip();
 var jsonfile = require('jsonfile');
@@ -70,6 +71,7 @@ export default class InsightFacade implements IInsightFacade {
                         var filepaths = Object.keys(contents.files);
                         for (let filepath of filepaths) {
                             promiseList.push(zip.files[filepath].async('string'));
+
                         }
                          Promise.all(promiseList)
                              .then(data => {
