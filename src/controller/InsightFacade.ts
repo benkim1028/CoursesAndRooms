@@ -9,7 +9,7 @@ import fs = require('fs');
 
 var JSZip = require('jszip');
 var zip = new JSZip();
-var jsonfile = require('jsonfile');
+//var jsonfile = require('jsonfile');
 var writeFile = require('write-file');
 //const validFilename = require('valid-filename');
 
@@ -62,12 +62,11 @@ export default class InsightFacade implements IInsightFacade {
     addDataset(id: string, content: string) : Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             let promiseList: Promise<any>[] =[];
-            let listofFileNames = getAllFileNamesFromFolder('/Users/mobileheo/cpsc310project_team35');
-            //console.log(listofFileNames);
+            // let listofFileNames = getAllFileNamesFromFolder('/Users/mobileheo/cpsc310project_team35');
             zip.loadAsync(content,{base64: true})
                 .then(function (contents:any) {
-                     if (isUniqueFileName(id +'.json', listofFileNames)) {
-                         console.log((isUniqueFileName(id +'.json', listofFileNames)));
+                     // if (isUniqueFileName(id +'.json', listofFileNames)) {
+                     //     console.log((isUniqueFileName(id +'.json', listofFileNames)));
                         var filepaths = Object.keys(contents.files);
                         for (let filepath of filepaths) {
                             promiseList.push(zip.files[filepath].async('string'));
@@ -81,10 +80,10 @@ export default class InsightFacade implements IInsightFacade {
                              .catch(function(){
                                  reject({code: 400, body: {"error": "my text"}});
                              });
-                    }
-                    else {
-                         fulfill({code: 201, body: {}});
-                    }
+                    // }
+                    // else {
+                    //      fulfill({code: 201, body: {}});
+                    // }
 
                 })
                 .catch(function() {
