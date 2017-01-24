@@ -5,15 +5,22 @@
   "author": "",
   "contributors": "N/A",
   "license": "GPL-3.0",
-  "repository": "N/A",
-  "bugs": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/n/A.git"
+  },
+  "bugs": {
+    "url": "https://github.com/n/A/issues"
+  },
   "keywords": [],
   "version": "0.0.1",
   "devDependencies": {
+    "@types/node": "^6.0.61",
     "bunyan": "^1.8.5",
     "icedfrisby": "^0.3.X",
     "joi": "^10.0.X",
     "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
     "tslint": "^4.1.X"
   },
   "scripts": {
@@ -33,11 +40,12 @@
     "@types/core-js": "^0.9.35",
     "@types/jszip": "0.0.31",
     "@types/mocha": "^2.2.33",
-    "@types/node": "^6.0.52",
+    "@types/node": "^6.0.61",
     "@types/parse5": "^2.2.34",
     "@types/restify": "^2.0.35",
     "chai": "^3.5.0",
     "ebnf": "^1.5.0",
+    "exists-file": "^3.0.0",
     "extract-zip": "^1.6.0",
     "jsonfile": "^2.4.0",
     "jszip": "^3.1.2",
@@ -46,6 +54,7 @@
     "mochawesome": "^1.5.2",
     "nyc": "^10.0.0",
     "parse5": "^3.0.1",
+    "path-exists": "^3.0.0",
     "project-name": "^0.2.6",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3",
@@ -53,5 +62,9 @@
     "typescript": "^2.1.X",
     "valid-filename": "^2.0.1",
     "write-file": "^1.0.0"
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
   }
 }

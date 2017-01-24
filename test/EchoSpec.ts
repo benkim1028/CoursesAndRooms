@@ -32,6 +32,7 @@ describe("EchoSpec", function () {
 
     after(function () {
         Log.test('After: ' + (<any>this).test.parent.title);
+        insightFacade = null; //added
     });
 
     afterEach(function () {
@@ -105,14 +106,15 @@ describe("EchoSpec", function () {
         })
     });
 
-    // it("Create a new dataset with non-unique id", function () {
-    //     return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
-    //         Log.test('Value ' + value);
-    //         expect(value).to.equal(201);
-    //     }).catch(function (err:any) {
-    //         Log.test('Error: ' + err);
-    //         expect.fail();
-    //     })
-    // });
+    it.only("Create a new dataset with non-unique id", function () {
+        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(201);
+            expect(value.body.value).to.equal(undefined);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
 
 });
