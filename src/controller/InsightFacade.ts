@@ -33,41 +33,39 @@ export default class InsightFacade implements IInsightFacade {
             let promiseList: Promise<any>[] =[];
             zip.loadAsync(content,{base64: true})
                 .then(function (contents:any) {
-                     if (isDuplicate(id)) {
-                         console.log(isDuplicate(id));
-                         fs.unlink(id + '.json', (err) =>{
-                             if (err) throw err;
-                         })
-                        var filepaths = Object.keys(contents.files);
-                        for (let filepath of filepaths) {
-                            promiseList.push(zip.files[filepath].async('string'));
+                    var filepaths = Object.keys(contents.files);
+                    for (let filepath of filepaths) {
+                        promiseList.push(zip.files[filepath].async('string'));
 
-                        }
-                         Promise.all(promiseList)
-                             .then(data => {
-                                 fs.writeFile(id + '.json', data);
-                                 fulfill({code: 201, body: {}});
-                             })
-                             .catch(function(){
-                                 reject({code: 400, body: {"error": "my text"}});
-                             });
                     }
-                    else {
-                         var filepaths = Object.keys(contents.files);
-                         for (let filepath of filepaths) {
-                             promiseList.push(zip.files[filepath].async('string'));
+                    fs.access(id + '.json', (err) => {
+                        if (!err) {
+                            fs.unlink(id + '.json', (err) =>{
+                                         if (err) throw err;
+                                     })
 
-                         }
-                         Promise.all(promiseList)
-                             .then(data => {
-                                 fs.writeFile(id + '.json', data);
-                                 fulfill({ code: 204, body: {} });
-                             })
-                             .catch(function(){
-                                 reject({code: 400, body: {"error": "my text"}});
-                             });
-                    }
+                                     Promise.all(promiseList)
+                                         .then(data => {
+                                             fs.writeFile(id + '.json', data);
+                                             fulfill({code: 201, body: {}});
+                                         })
+                                         .catch(function(){
+                                             reject({code: 400, body: {"error": "my text"}});
+                                         });
+                                }
 
+                        else {
+                                     Promise.all(promiseList)
+                                         .then(data => {
+                                             fs.writeFile(id + '.json', data);
+                                             fulfill({code: 204, body: {}});
+                                         })
+                                         .catch(function(){
+                                             reject({code: 400, body: {"error": "my text"}});
+                                         });
+                                }
+
+                        });
                 })
                 .catch(function() {
                    reject({code: 400, body: {"error": "my text"}});
