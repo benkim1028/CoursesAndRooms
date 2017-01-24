@@ -10,7 +10,6 @@ import fs = require('fs');
 var JSZip = require('jszip');
 var zip = new JSZip();
 //var jsonfile = require('jsonfile');
-var writeFile = require('write-file');
 //var name = require('project-name');
 //const validFilename = require('valid-filename');
 
@@ -57,7 +56,7 @@ function isUniqueFileName(id:string, fileNames:string[]):boolean {
 export default class InsightFacade implements IInsightFacade {
 
     constructor() {
-        Log.trace('InsightFacadeImpl::init()');
+        Log.trace('InsightFacadeImpl::init()')
     }
 
     addDataset(id: string, content: string) : Promise<InsightResponse> {
@@ -76,8 +75,7 @@ export default class InsightFacade implements IInsightFacade {
                         }
                          Promise.all(promiseList)
                              .then(data => {
-                                 writeFile(id + '.json', data);
-                                 //var iResponse:InsightResponse = {code: 204, body: {}};
+                                 fs.writeFile(id + '.json', data);
                                  fulfill({code: 204, body: {}});
                              })
                              .catch(function(){
@@ -112,8 +110,9 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
-        //query.courses_dept ==
-        return null;
+        return new Promise(function (fulfill, reject) {
+            let promiseList: Promise<any>[] =[];
+        })
 
 
 
