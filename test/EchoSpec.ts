@@ -12,6 +12,7 @@ import fs = require('fs');
 describe("EchoSpec", function () {
 
     let zipContent: any = null;
+    let fakezipContent: any = null;
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -28,6 +29,7 @@ describe("EchoSpec", function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insightFacade = new InsightFacade(); //added
         zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
+        fakezipContent = Buffer.from(fs.readFileSync("courses.zip"));
     });
 
     after(function () {
@@ -85,16 +87,6 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    // it.only("For test purpose", function () {
-    //     return insightFacade.addDataset("1234", "average").then(value => {
-    //         Log.test('Value ' + value);
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         Log.test('Error: ' + err);
-    //         expect(err).to.equal('Error');
-    //     })
-    // }); //added
-
     it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
@@ -117,7 +109,7 @@ describe("EchoSpec", function () {
         })
     });
     it("Create a new dataset with non-unique id", function () {
-        return insightFacade.addDataset("coursess", zipContent).then(function (value:any) {
+        return insightFacade.addDataset("hello", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             expect(value.code).to.equal(201);
             expect(value.body.value).to.equal(undefined);
@@ -126,5 +118,17 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
+
+    it("For test purpose", function () {
+        return insightFacade.addDataset("1234", "average").then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+            expect(err.body.error).to.equal("my text");
+        })
+    }); //added
+
 
 });
