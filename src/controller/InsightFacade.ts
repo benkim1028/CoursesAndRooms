@@ -11,6 +11,7 @@ var JSZip = require('jszip');
 var zip = new JSZip();
 //var jsonfile = require('jsonfile');
 var writeFile = require('write-file');
+//var name = require('project-name');
 //const validFilename = require('valid-filename');
 
 
@@ -63,6 +64,7 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             let promiseList: Promise<any>[] =[];
             // let listofFileNames = getAllFileNamesFromFolder('/Users/mobileheo/cpsc310project_team35');
+            //console.log(name());
             zip.loadAsync(content,{base64: true})
                 .then(function (contents:any) {
                      // if (isUniqueFileName(id +'.json', listofFileNames)) {
@@ -75,14 +77,27 @@ export default class InsightFacade implements IInsightFacade {
                          Promise.all(promiseList)
                              .then(data => {
                                  writeFile(id + '.json', data);
-                                 fulfill({ code: 204, body: {} });
+                                 //var iResponse:InsightResponse = {code: 204, body: {}};
+                                 fulfill({code: 204, body: {}});
                              })
                              .catch(function(){
                                  reject({code: 400, body: {"error": "my text"}});
                              });
                     // }
                     // else {
-                    //      fulfill({code: 201, body: {}});
+                    //      var filepaths = Object.keys(contents.files);
+                    //      for (let filepath of filepaths) {
+                    //          promiseList.push(zip.files[filepath].async('string'));
+                    //
+                    //      }
+                    //      Promise.all(promiseList)
+                    //          .then(data => {
+                    //              writeFile(id + '.json', data);
+                    //              fulfill({ code: 201, body: {} });
+                    //          })
+                    //          .catch(function(){
+                    //              reject({code: 400, body: {"error": "my text"}});
+                    //          });
                     // }
 
                 })

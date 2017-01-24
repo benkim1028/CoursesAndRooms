@@ -46,6 +46,7 @@
     "mochawesome": "^1.5.2",
     "nyc": "^10.0.0",
     "parse5": "^3.0.1",
+    "project-name": "^0.2.6",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3",
     "restify": "^4.0.3",
