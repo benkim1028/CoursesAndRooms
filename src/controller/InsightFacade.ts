@@ -62,13 +62,27 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
             let promiseList: Promise<any>[] =[];
-            var test = fs.readFileSync('courses1.json', 'utf-8');
+            var test = fs.readFileSync('testfile.json', 'utf-8');
             var k:any = JSON.parse(test);
             // console.log(k);
             for (let t of k) {
                 // console.log(t);
                 var keys = Object.keys(t);
-                console.log(keys);
+                var course_info = t[keys[0]];
+                // console.log(course_info);
+                for (let each of course_info){
+                    var keys = Object.keys(each);
+                    // console.log(keys);
+                    for (let key of keys) {
+                        if (key == 'Avg') {
+                            console.log(each[key]);
+                        }
+                    }
+                    // console.log(each['Avg']);
+                    // console.log(each[])
+                    // console.log(each['avg']);
+                }
+
             }
 
 

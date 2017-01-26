@@ -6,7 +6,7 @@ import Server from "../src/rest/Server";
 import {expect} from 'chai';
 import Log from "../src/Util";
 import InsightFacade from "../src/controller/InsightFacade";
-import {InsightResponse} from "../src/controller/IInsightFacade";
+import {InsightResponse, QueryRequest} from "../src/controller/IInsightFacade";
 import fs = require('fs');
 
 describe("EchoSpec", function () {
@@ -20,8 +20,9 @@ describe("EchoSpec", function () {
         expect(response.code).to.be.a('number');
     }
     var insightFacade:InsightFacade = null; //added
+    var query:QueryRequest = null; //added
 
-    before(function () {
+        before(function () {
         Log.test('Before: ' + (<any>this).test.parent.title);
     });
 
@@ -88,7 +89,7 @@ describe("EchoSpec", function () {
     });
 
     it("Create a new dataset with unique id ", function () {
-        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+        return insightFacade.addDataset("testfile", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
             expect(value.body.value).to.equal(undefined);
@@ -127,6 +128,28 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(400);
             expect(err.body.error).to.equal("my text");
+        })
+    }); //added
+
+    it("For test purpose", function () {
+        return insightFacade.performQuery(query).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+            expect(err.body.error).to.equal("my text");
+        })
+    }); //added
+
+    it.only("For test purpose", function () {
+        return insightFacade.performQuery(query).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(201);
+            expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
         })
     }); //added
 

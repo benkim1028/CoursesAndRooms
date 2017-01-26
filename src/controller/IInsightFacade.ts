@@ -20,6 +20,52 @@ export interface QueryRequest {
     courses_fail: number;           //Fail: number
     courses_audit: number;          //Audit: number
 
+    // QUERY ::='{'BODY ', ' OPTIONS '}'
+    //
+    // BODY ::= 'WHERE:{'  FILTER '}'
+    // OPTIONS ::= 'OPTIONS:{' COLUMNS ', ' ('ORDER:' key ', ')? VIEW '}'
+    //
+    // FILTER ::= (LOGICCOMPARISON | MCOMPARISON | SCOMPARISON | NEGATION)
+    //
+    // LOGICCOMPARISON ::= LOGIC ':[{' FILTER ('}, {' FILTER )* '}]'
+    // MCOMPARISON ::= MCOMPARATOR ':{' key ':' number '}'
+    // SCOMPARISON ::= 'IS:{' key ':' [*]? string [*]? '}'
+    // NEGATION ::= 'NOT :{' FILTER '}'
+    //
+    // LOGIC ::= 'AND' | 'OR'
+    // MCOMPARATOR ::= 'LT' | 'GT' | 'EQ'
+    //
+    // COLUMNS ::= 'COLUMNS:[' (key ',')* key ']'
+    // VIEW ::= 'FORM : TABLE'
+    //
+    // key ::= string '_' string
+
+    "WHERE": {
+        'FILTER':{
+            'LOGICCOMPARISON': {
+                'LOGIC'
+                    : [
+                        {' FILTER (':any}, {' FILTER )* ':any}
+                        ];
+            };
+            'MCOMPARISON' : {
+                'MCOMPARATOR'
+                    : {' key ':' number '};
+            };
+            'SCOMPARISON' : {
+                'IS'
+                    : {' key ':' [*]? string [*]? '};
+            };
+            'NEGATION' : {
+                'NOT'
+                    : {' FILTER '};
+            }
+
+
+
+        };
+    };
+
 
 }
 
