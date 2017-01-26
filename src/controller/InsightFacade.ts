@@ -5,8 +5,11 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import Log from "../Util";
 import fs = require('fs');
 
+
 var JSZip = require('jszip');
 var zip = new JSZip();
+
+
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -38,7 +41,8 @@ export default class InsightFacade implements IInsightFacade {
                         }
                         Promise.all(promiseList)
                             .then(data => {
-                                fs.writeFile(id + '.json', data);
+                                data.shift();
+                                fs.writeFile(id + '.json', '[' + data + ']');
                                 fulfill({code: code, body: {}});
                             })
                             .catch(function(){
@@ -57,7 +61,19 @@ export default class InsightFacade implements IInsightFacade {
     }
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            //let promiseList: Promise<any>[] =[];
+            let promiseList: Promise<any>[] =[];
+            var test = fs.readFileSync('courses1.json', 'utf-8');
+            var k:any = JSON.parse(test);
+            // console.log(k);
+            for (let t of k) {
+                // console.log(t);
+                var keys = Object.keys(t);
+                console.log(keys);
+            }
+
+
+            // reject({code: 400, body: {"error": "my text"}});
+            fulfill({code: 201, body: {}})
         })
 
 
