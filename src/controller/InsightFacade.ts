@@ -6,10 +6,10 @@ import Log from "../Util";
 import fs = require('fs');
 
 
-var JSZip = require('jszip');
-var zip = new JSZip();
+const JSZip = require('jszip');
+const zip = new JSZip();
 
-var query:QueryRequest = {"WHERE":
+let query:QueryRequest = {"WHERE":
     {"GT":
         {"courses_avg":97
         }
@@ -22,80 +22,102 @@ var query:QueryRequest = {"WHERE":
         "ORDER":"courses_avg",
         "FORM":"TABLE"
     }
-}
+};
+
 function string_to_op(s_op:string, k:number):boolean {
-    var x = Number(s_op.substring(1));
-    if (s_op.charAt(0) == '>') {
+    let x = Number(s_op.substring(2));
+    if (s_op.charAt(1) == '>') {
         return k > x;
     }
-    else if (s_op.charAt(0) == '<') {
+    else if (s_op.charAt(1) == '<') {
         return k < x;
     }
 
-    else if (s_op.charAt(0) == '=') {
+    else if (s_op.charAt(1) == '=') {
         return k == x;
     }
 }
 
+function classify(s_op:string):string {
+    let creiterion = s_op.charAt(0);
+    if (creiterion == 'a') {
+        return 'Avg';
+    }
+    else if  (creiterion == 'p') {
+        return 'Pass';
+    }
+    else if  (creiterion == 'f') {
+        return 'Fail';
+    }
+    else if  (creiterion == 't') {
+        return 'Audt';
+    }
+
+}
+
+
+
+
 function q(query:any) {
-    var keys = Object.keys(query);
+    let keys = Object.keys(query);
     for (let key of keys) {
         if (key == "WHERE") {
-            var whereVal = query[key];
-            var whereKeys = Object.keys(whereVal);
+            let whereVal = query[key];
+            let whereKeys = Object.keys(whereVal);
             for (let wherekey of whereKeys){
-                var gtVal = whereVal[wherekey];
-                var gtKeys = Object.keys(gtVal);
+                let gtVal = whereVal[wherekey];
+                let gtKeys = Object.keys(gtVal);
                 for (let gtKey of gtKeys) {
                     if (gtKey == "courses_avg"){
-                        var avg = gtVal[gtKey];
+                        let avg = gtVal[gtKey];
                         if (wherekey == 'GT'){
-                            return '>' + avg;
+                            return 'a' + '>' + avg;
                         }
                         else if (wherekey == 'LT') {
-                            return '<' + avg;
+                            return 'a' + '<' + avg;
                         }
                         else if (wherekey == 'EQ') {
-                            return '=' + avg;
+                            return 'a' + '=' + avg;
                         }
                     }
 
                     else if (gtKey == "courses_pass"){
-                        var pass = gtVal[gtKey];
+                        let pass = gtVal[gtKey];
                         if (wherekey == 'GT'){
-                            return '>' + pass;
+                            return 'p' + '>' + pass;
                         }
                         else if (wherekey == 'LT') {
-                            return '<' + pass;
+                            return 'p' + '<' + pass;
                         }
                         else if (wherekey == 'EQ') {
-                            return '=' + pass;
+                            return 'p' + '=' + pass;
                         }
                     }
 
                     else if (gtKey == "courses_fail"){
-                        var fail = gtVal[gtKey];
+                        let fail = gtVal[gtKey];
+                        console.log('cf');
                         if (wherekey == 'GT'){
-                            return '>' + fail;
+                            return 'f' + '>' + fail;
                         }
                         else if (wherekey == 'LT') {
-                            return '<' + fail;
+                            return 'f' + '<' + fail;
                         }
                         else if (wherekey == 'EQ') {
-                            return '=' + fail;
+                            return 'f' + '=' + fail;
                         }
                     }
 
                     else if (gtKey == "courses_audit"){
-                        var audit = gtVal[gtKey];
+                        let audit = gtVal[gtKey];
                         if (wherekey == 'GT'){
-                            return '>' + audit;
+                            return 't' + '>' + audit;
                         }
                         else if (wherekey == 'LT') {
-                            return '<' + audit;
+                            return 't' + '<' + audit;
                         }
                         else if (wherekey == 'EQ') {
-                            return '=' + audit;
+                            return 't' + '=' + audit;
                         }
                     }
                 }
@@ -119,7 +141,7 @@ export default class InsightFacade implements IInsightFacade {
             let code:number = 0;
             zip.loadAsync(content,{base64: true})
                 .then(function (contents:any) {
-                    var filepaths = Object.keys(contents.files);
+                    let filepaths = Object.keys(contents.files);
                     for (let filepath of filepaths) {
                         promiseList.push(zip.files[filepath].async('string'));
 
@@ -148,7 +170,7 @@ export default class InsightFacade implements IInsightFacade {
                     });
                 })
                 .catch(function() {
-                   reject({code: 400, body: {"error": "my text"}});
+                    reject({code: 400, body: {"error": "my text"}});
                 });
         })
     }
@@ -160,30 +182,50 @@ export default class InsightFacade implements IInsightFacade {
             var foo = q(query);
             console.log(foo);
             let promiseList: Promise<any>[] =[];
-            var test = fs.readFileSync('testfile.json', 'utf-8');
-            var k:any = JSON.parse(test);
+            var data = fs.readFileSync('testfile.json', 'utf-8');
+            var parse_data:any = JSON.parse(data);
             // console.log(k);
-            for (let t of k) {
+            for (let item of parse_data) {
                 // console.log(t);
-                var keys = Object.keys(t);
-                var course_info = t[keys[0]];
+                var keys = Object.keys(item);
+                var course_info = item[keys[0]];
                 // console.log(course_info);
                 for (let each of course_info){
                     var keys = Object.keys(each);
                     // console.log(keys);
+                    let output: any = {'result': []};
                     for (let key of keys) {
-                        if (key == 'Avg' && string_to_op(foo, each[key])) {
-                            console.log(each[key]);
+                        if (classify(foo) == 'Avg') {
+                            if (key == 'Avg' && string_to_op(foo, each['Avg'])) {
+                                // console.log(each['Avg']);
+                                output['result'].push({courses_avg: each[key]});
+                                console.log(output);
+                            }
                         }
-                        else if (key == 'Fail' && string_to_op(foo, each[key])) {
-                            console.log(each[key]);
+                        else if (classify(foo) == 'Pass') {
+                            if (key == 'Pass' && string_to_op(foo, each[key])) {
+                                // let output:any = {'result': []};
+                                output['result'].push({courses_pass: each[key]});
+                                console.log(output);
+                            }
                         }
-                        else if (key == 'Pass' && string_to_op(foo, each[key])) {
-                            console.log(each[key]);
+                        else if (classify(foo) == 'Fail') {
+                            if (key == 'Fail' && string_to_op(foo, each['Fail'])) {
+                                // let output:any = {'result': []};
+                                output['result'].push({courses_fail: each[key]});
+                                console.log(output);
+                            }
                         }
-                        else if (key == 'Audit' && string_to_op(foo, each[key])) {
-                            console.log(each[key]);
+                        else if (classify(foo) == 'Audit') {
+                            if (key == 'Audit' && string_to_op(foo, each['Audit'])) {
+                                // let output:any = {'result': []};
+                                output['result'].push({courses_audit: each[key]});
+                                console.log(output);
+                            }
                         }
+
+
+
                     }
                 }
 
