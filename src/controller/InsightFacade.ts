@@ -175,6 +175,15 @@ export default class InsightFacade implements IInsightFacade {
                         if (key == 'Avg' && string_to_op(foo, each[key])) {
                             console.log(each[key]);
                         }
+                        else if (key == 'Fail' && string_to_op(foo, each[key])) {
+                            console.log(each[key]);
+                        }
+                        else if (key == 'Pass' && string_to_op(foo, each[key])) {
+                            console.log(each[key]);
+                        }
+                        else if (key == 'Audit' && string_to_op(foo, each[key])) {
+                            console.log(each[key]);
+                        }
                     }
                 }
 
