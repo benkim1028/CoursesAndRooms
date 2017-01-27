@@ -181,7 +181,8 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             var foo = q(query);
             console.log(foo);
-            let promiseList: Promise<any>[] =[];
+            let output: any = {'result': []};
+            // let promiseList: Promise<any>[] =[];
             var data = fs.readFileSync('testfile.json', 'utf-8');
             var parse_data:any = JSON.parse(data);
             // console.log(k);
@@ -193,7 +194,6 @@ export default class InsightFacade implements IInsightFacade {
                 for (let each of course_info){
                     var keys = Object.keys(each);
                     // console.log(keys);
-                    let output: any = {'result': []};
                     for (let key of keys) {
                         if (classify(foo) == 'Avg') {
                             if (key == 'Avg' && string_to_op(foo, each['Avg'])) {
@@ -206,7 +206,7 @@ export default class InsightFacade implements IInsightFacade {
                             if (key == 'Pass' && string_to_op(foo, each[key])) {
                                 // let output:any = {'result': []};
                                 output['result'].push({courses_pass: each[key]});
-                                console.log(output);
+
                             }
                         }
                         else if (classify(foo) == 'Fail') {
@@ -223,15 +223,12 @@ export default class InsightFacade implements IInsightFacade {
                                 console.log(output);
                             }
                         }
-
-
-
                     }
-                }
 
+                }
             }
 
-
+            console.log(output);
             // reject({code: 400, body: {"error": "my text"}});
             fulfill({code: 201, body: {}})
         })
