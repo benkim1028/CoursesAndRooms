@@ -210,8 +210,6 @@ function return_Form(query:any) {
     }
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            let foo = mathComparison(query);
-            console.log(foo);
             let columns = return_columns(query);
             console.log(columns);
             let order = return_Order(query);
