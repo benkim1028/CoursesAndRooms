@@ -9,10 +9,40 @@ import InsightFacade from "../src/controller/InsightFacade";
 import {InsightResponse, QueryRequest} from "../src/controller/IInsightFacade";
 import fs = require('fs');
 
+var query:any = {"WHERE":
+    {"GT":
+        {"courses_avg":97
+        }
+    },
+    "OPTIONS":{
+        "COLUMNS":[
+            "courses_dept",
+            "courses_avg"
+        ],
+        "ORDER":"courses_avg",
+        "FORM":"TABLE"
+    }
+}
+
 describe("EchoSpec", function () {
 
     let zipContent: any = null;
     let fakezipContent: any = null;
+    var query:QueryRequest =
+        {"WHERE":
+            {"GT":
+                {"courses_avg":97
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -142,8 +172,25 @@ describe("EchoSpec", function () {
         })
     }); //added
 
+
     it.only("For test purpose", function () {
-        return insightFacade.performQuery(query).then(value => {
+        return insightFacade.performQuery(    {"WHERE":
+            {"GT":
+                {"courses_avg":97
+                }
+            },
+            "OPTIONS":{
+                "COLUMNS":[
+                    "courses_dept",
+                    "courses_avg",
+                    "courses_uuid",
+                    "courses_fail",
+                    "courses_pass",
+                ],
+                "ORDER":"courses_avg",
+                "FORM":"TABLE"
+            }
+        }).then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(201);
             expect(value.body).to.equal({});

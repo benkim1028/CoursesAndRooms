@@ -401,9 +401,10 @@ function return_Form(query:any) {
                             if (mcomparion == 'LT') {
                                 if (mcomparison_Key_Value > each[convtered_code]) {
                                     for (let column of columns) {
-                                        Object.assign(total, {[column]: each[convert_to_code(column)]});
-                                        output['result'].push(total);
+                                        let obj = Object.assign(total, {[column]: each[convert_to_code(column)]});
+                                        output['result'].push(obj);
                                     }
+                                    total = {};
 
                                 }
                                 // output['result'].push(total);
@@ -412,27 +413,31 @@ function return_Form(query:any) {
                             else if (mcomparion == 'GT') {
                                 if (mcomparison_Key_Value < each[convtered_code]) {
                                     for (let column of columns) {
-                                        Object.assign(total, {[column]: each[convert_to_code(column)]});
-                                        // output['result'].push(total);
+                                        let obj = Object.assign(total, {[column]: each[convert_to_code(column)]});
+                                        output['result'].push(obj);
                                     }
+                                    total = {};
 
                                 }
-                                // output['result'].push(total);
+
                             }
-                            else if (mcomparion == 'QT') {
+                            else if (mcomparion == 'EQ') {
                                 if (mcomparison_Key_Value == each[convtered_code]) {
                                     for (let column of columns) {
-                                        Object.assign(total, {[column]: each[convert_to_code(column)]});
-                                        output['result'].push(total);
+                                        let obj = Object.assign(total, {[column]: each[convert_to_code(column)]});
+                                        output['result'].push(obj);
                                     }
+                                    total = {};
                                 }
                             }
-                            output['result'].push(total);
+
                         }
                     }
                 }
+
             }
-            // output['result'].push(total);
+            //output['result'].push(total);
+
             console.log(output);
             // reject({code: 400, body: {"error": "my text"}});
             fulfill({code: 201, body: {}})
