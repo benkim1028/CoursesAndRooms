@@ -50,7 +50,7 @@ function classify(s_op:string):string {
         return 'Fail';
     }
     else if  (creiterion == 't') {
-        return 'Audt';
+        return 'Audit';
     }
 
 }
@@ -199,7 +199,7 @@ export default class InsightFacade implements IInsightFacade {
                             if (key == 'Avg' && string_to_op(foo, each['Avg'])) {
                                 // console.log(each['Avg']);
                                 output['result'].push({courses_avg: each[key]});
-                                console.log(output);
+
                             }
                         }
                         else if (classify(foo) == 'Pass') {
@@ -213,14 +213,14 @@ export default class InsightFacade implements IInsightFacade {
                             if (key == 'Fail' && string_to_op(foo, each['Fail'])) {
                                 // let output:any = {'result': []};
                                 output['result'].push({courses_fail: each[key]});
-                                console.log(output);
+
                             }
                         }
                         else if (classify(foo) == 'Audit') {
                             if (key == 'Audit' && string_to_op(foo, each['Audit'])) {
                                 // let output:any = {'result': []};
                                 output['result'].push({courses_audit: each[key]});
-                                console.log(output);
+
                             }
                         }
                     }
