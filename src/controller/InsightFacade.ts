@@ -9,6 +9,102 @@ import fs = require('fs');
 var JSZip = require('jszip');
 var zip = new JSZip();
 
+var query:QueryRequest = {"WHERE":
+    {"GT":
+        {"courses_avg":97
+        }
+    },
+    "OPTIONS":{
+        "COLUMNS":[
+            "courses_dept",
+            "courses_avg"
+        ],
+        "ORDER":"courses_avg",
+        "FORM":"TABLE"
+    }
+}
+function string_to_op(s_op:string, k:number):boolean {
+    var x = Number(s_op.substring(1));
+    if (s_op.charAt(0) == '>') {
+        return k > x;
+    }
+    else if (s_op.charAt(0) == '<') {
+        return k < x;
+    }
+
+    else if (s_op.charAt(0) == '=') {
+        return k == x;
+    }
+}
+
+function q(query:any) {
+    var keys = Object.keys(query);
+    for (let key of keys) {
+        if (key == "WHERE") {
+            var whereVal = query[key];
+            var whereKeys = Object.keys(whereVal);
+            for (let wherekey of whereKeys){
+                var gtVal = whereVal[wherekey];
+                var gtKeys = Object.keys(gtVal);
+                for (let gtKey of gtKeys) {
+                    if (gtKey == "courses_avg"){
+                        var avg = gtVal[gtKey];
+                        if (wherekey == 'GT'){
+                            return '>' + avg;
+                        }
+                        else if (wherekey == 'LT') {
+                            return '<' + avg;
+                        }
+                        else if (wherekey == 'EQ') {
+                            return '=' + avg;
+                        }
+                    }
+
+                    else if (gtKey == "courses_pass"){
+                        var pass = gtVal[gtKey];
+                        if (wherekey == 'GT'){
+                            return '>' + pass;
+                        }
+                        else if (wherekey == 'LT') {
+                            return '<' + pass;
+                        }
+                        else if (wherekey == 'EQ') {
+                            return '=' + pass;
+                        }
+                    }
+
+                    else if (gtKey == "courses_fail"){
+                        var fail = gtVal[gtKey];
+                        if (wherekey == 'GT'){
+                            return '>' + fail;
+                        }
+                        else if (wherekey == 'LT') {
+                            return '<' + fail;
+                        }
+                        else if (wherekey == 'EQ') {
+                            return '=' + fail;
+                        }
+                    }
+
+                    else if (gtKey == "courses_audit"){
+                        var audit = gtVal[gtKey];
+                        if (wherekey == 'GT'){
+                            return '>' + audit;
+                        }
+                        else if (wherekey == 'LT') {
+                            return '<' + audit;
+                        }
+                        else if (wherekey == 'EQ') {
+                            return '=' + audit;
+                        }
+                    }
+                }
+
+            }
+
+        }
+    }
+}
 
 
 export default class InsightFacade implements IInsightFacade {
@@ -61,6 +157,8 @@ export default class InsightFacade implements IInsightFacade {
     }
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
+            var foo = q(query);
+            console.log(foo);
             let promiseList: Promise<any>[] =[];
             var test = fs.readFileSync('testfile.json', 'utf-8');
             var k:any = JSON.parse(test);
@@ -74,13 +172,10 @@ export default class InsightFacade implements IInsightFacade {
                     var keys = Object.keys(each);
                     // console.log(keys);
                     for (let key of keys) {
-                        if (key == 'Avg') {
+                        if (key == 'Avg' && string_to_op(foo, each[key])) {
                             console.log(each[key]);
                         }
                     }
-                    // console.log(each['Avg']);
-                    // console.log(each[])
-                    // console.log(each['avg']);
                 }
 
             }
