@@ -57,7 +57,6 @@ function classify(s_op:string):string {
 
 
 
-
 function q(query:any) {
     let keys = Object.keys(query);
     for (let key of keys) {
@@ -69,28 +68,28 @@ function q(query:any) {
                 let gtKeys = Object.keys(gtVal);
                 for (let gtKey of gtKeys) {
                     if (gtKey == "courses_avg"){
-                        let avg = gtVal[gtKey];
+                        let avg_number:number = gtVal[gtKey];
                         if (wherekey == 'GT'){
-                            return 'a' + '>' + avg;
+                            return 'a' + '>' + avg_number;
                         }
                         else if (wherekey == 'LT') {
-                            return 'a' + '<' + avg;
+                            return 'a' + '<' + avg_number;
                         }
                         else if (wherekey == 'EQ') {
-                            return 'a' + '=' + avg;
+                            return 'a' + '=' + avg_number;
                         }
                     }
 
                     else if (gtKey == "courses_pass"){
-                        let pass = gtVal[gtKey];
+                        let pass_number:number = gtVal[gtKey];
                         if (wherekey == 'GT'){
-                            return 'p' + '>' + pass;
+                            return 'p' + '>' + pass_number;
                         }
                         else if (wherekey == 'LT') {
-                            return 'p' + '<' + pass;
+                            return 'p' + '<' + pass_number;
                         }
                         else if (wherekey == 'EQ') {
-                            return 'p' + '=' + pass;
+                            return 'p' + '=' + pass_number;
                         }
                     }
 
@@ -120,6 +119,26 @@ function q(query:any) {
                             return 't' + '=' + audit;
                         }
                     }
+                }
+
+            }
+
+        }
+    }
+}
+
+function return_columns(query:any) {
+    let keys = Object.keys(query);
+    for (let key of keys) {
+        if (key == "OPTIONS") {
+            let optionsVal = query[key]; // { COLUMNS: [ 'courses_dept', 'courses_avg' ],ORDER: 'courses_avg', FORM: 'TABLE' }
+            // console.log(optionsVal);
+            let optionsKeys = Object.keys(optionsVal);
+            console.log(optionsKeys);
+            for (let optionsKey of optionsKeys){
+                if (optionsKey == "COLUMNS"){
+                    let optionVal = optionsVal[optionsKey]; //[ 'courses_dept', 'courses_avg' ]
+                    return optionVal;
                 }
 
             }
@@ -181,44 +200,42 @@ export default class InsightFacade implements IInsightFacade {
         return new Promise(function (fulfill, reject) {
             var foo = q(query);
             console.log(foo);
+            var columns = return_columns(query);
+            console.log(columns);
             let output: any = {'result': []};
             // let promiseList: Promise<any>[] =[];
             var data = fs.readFileSync('testfile.json', 'utf-8');
             var parse_data:any = JSON.parse(data);
-            // console.log(k);
             for (let item of parse_data) {
-                // console.log(t);
                 var keys = Object.keys(item);
                 var course_info = item[keys[0]];
-                // console.log(course_info);
                 for (let each of course_info){
                     var keys = Object.keys(each);
-                    // console.log(keys);
                     for (let key of keys) {
-                        if (classify(foo) == 'Avg') {
-                            if (key == 'Avg' && string_to_op(foo, each['Avg'])) {
-                                // console.log(each['Avg']);
+                        if (classify(foo) == 'Avg' ) {
+                            if (key == 'Avg' && string_to_op(foo, each['Avg']) && columns == undefined) {
                                 output['result'].push({courses_avg: each[key]});
-
+                            }
+                            else if (key == 'Avg' && string_to_op(foo, each['Avg']) && columns != undefined) {
+                                for (let column of columns) {
+                                    if (column == "courses_dept") {
+                                        output['result'].push({courses_dept: each['Subject'], courses_avg: each[key]});
+                                    }
+                                }
                             }
                         }
                         else if (classify(foo) == 'Pass') {
                             if (key == 'Pass' && string_to_op(foo, each[key])) {
-                                // let output:any = {'result': []};
                                 output['result'].push({courses_pass: each[key]});
-
                             }
                         }
                         else if (classify(foo) == 'Fail') {
                             if (key == 'Fail' && string_to_op(foo, each['Fail'])) {
-                                // let output:any = {'result': []};
                                 output['result'].push({courses_fail: each[key]});
-
                             }
                         }
                         else if (classify(foo) == 'Audit') {
                             if (key == 'Audit' && string_to_op(foo, each['Audit'])) {
-                                // let output:any = {'result': []};
                                 output['result'].push({courses_audit: each[key]});
 
                             }
