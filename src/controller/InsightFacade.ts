@@ -9,22 +9,6 @@ import fs = require('fs');
 const JSZip = require('jszip');
 const zip = new JSZip();
 
-let query:QueryRequest = {"WHERE":
-    {"GT":
-        {"courses_avg":97
-        }
-    },
-    "OPTIONS":{
-        "COLUMNS":[
-            "courses_dept",
-            "courses_avg"
-        ],
-        "ORDER":"courses_avg",
-        "FORM":"TABLE"
-    }
-};
-
-
 
 function convert_to_code(key:string ):string {
     if (key == 'courses_avg') {
@@ -140,7 +124,6 @@ function return_Form(query:any) {
     for (let key of keys) {
         if (key == "OPTIONS") {
             let optionsVal = query[key]; // { COLUMNS: [ 'courses_dept', 'courses_avg' ],ORDER: 'courses_avg', FORM: 'TABLE' }
-            // console.log(optionsVal);
             let optionsKeys = Object.keys(optionsVal);
             console.log(optionsKeys);
             for (let optionsKey of optionsKeys){
@@ -155,12 +138,7 @@ function return_Form(query:any) {
     }
 }
 
-
-
-
-
-
-        export default class InsightFacade implements IInsightFacade {
+export default class InsightFacade implements IInsightFacade {
 
     constructor() {
         Log.trace('InsightFacadeImpl::init()')
@@ -190,6 +168,7 @@ function return_Form(query:any) {
                         }
                         Promise.all(promiseList)
                             .then(data => {
+
                                 data.shift();
                                 fs.writeFile(id + '.json', '[' + data + ']');
                                 fulfill({code: code, body: {}});
@@ -206,7 +185,25 @@ function return_Form(query:any) {
         })
     }
     removeDataset(id: string): Promise<InsightResponse> {
-        return null;
+        return new Promise(function (fulfill, reject){
+            fs.access(id + '.json', (err) => {
+                if (err) {
+                    reject({code: 404, body: {}});
+                }
+                else if (!err) {
+                    fs.unlink(id + '.json', (err) => {
+                        if (err) {
+                            reject({code: 404, body: {}});
+                        }
+                        else {
+                            fulfill({code: 204, body: {}});
+                        }
+
+                    })
+                }
+
+            })
+        })
     }
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
@@ -224,19 +221,17 @@ function return_Form(query:any) {
             if (form != undefined) {
                 output['render'] = form;
             }
-            var data = fs.readFileSync('testfile.json', 'utf-8');
-            var parse_data:any = JSON.parse(data);
+            let data = fs.readFileSync('testfile.json', 'utf-8');
+            let parse_data:any = JSON.parse(data);
             let total:any= {};
             for (let item of parse_data) {
-                var keys = Object.keys(item);
-                var course_info = item[keys[0]];
-                //console.log(course_info);
+                let keys = Object.keys(item);
+                let course_info = item[keys[0]];
                 for (let each of course_info) {
-                    var keys = Object.keys(each);
+                    let keys = Object.keys(each);
                     for (let item of keys) {
                         //console.log(item);
                         if(item == convtered_code) {
-                            // console.log(item);
                             if (mcomparion == 'LT') {
                                 if (mcomparison_Key_Value > each[convtered_code]) {
                                     for (let column of columns) {
@@ -246,9 +241,7 @@ function return_Form(query:any) {
                                     total = {};
 
                                 }
-                                // output['result'].push(total);
                             }
-
                             else if (mcomparion == 'GT') {
                                 if (mcomparison_Key_Value < each[convtered_code]) {
                                     for (let column of columns) {
@@ -269,15 +262,19 @@ function return_Form(query:any) {
                                     total = {};
                                 }
                             }
+                            else {
+                                reject({code: 400, body: {"error": "my text"}});
+                            }
 
                         }
                     }
+
                 }
 
             }
             //output['result'].push(total);
 
-            console.log(output);
+            //console.log(output);
             // reject({code: 400, body: {"error": "my text"}});
             fulfill({code: 201, body: {}})
         })

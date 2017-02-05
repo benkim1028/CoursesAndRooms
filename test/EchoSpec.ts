@@ -193,10 +193,33 @@ describe("EchoSpec", function () {
         }).then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(201);
-            expect(value.body).to.equal({});
+            // expect(value.body).to.equal({});
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             expect.fail();
+        })
+    }); //added
+
+    it("removeDataset with existing file", function () {
+        return insightFacade.removeDataset('hello').then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(204);
+            //expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
+
+
+    it("removeDataset with non-existing file", function () {
+        return insightFacade.removeDataset('hello1').then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(404);
+            expect(err.body).to.equal({});
         })
     }); //added
 
