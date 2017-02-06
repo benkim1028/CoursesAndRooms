@@ -215,6 +215,7 @@ function createGTList(key: string, value: number, dataList: any[]): any[] {
         }
     }
     return sortedList;
+
 }
 function createLTList(key: string, value: number, dataList: any[]): any[] {
     var sortedList: any[] = [];
