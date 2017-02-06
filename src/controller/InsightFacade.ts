@@ -11,6 +11,7 @@ export default class InsightFacade implements IInsightFacade {
         Log.trace('InsightFacadeImpl::init()');
     }
 
+
     addDataset(id: string, content: string) : Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             let promiseList: Promise<any>[] =[];
@@ -30,7 +31,7 @@ export default class InsightFacade implements IInsightFacade {
             zip.loadAsync(content,{base64: true})
                 .then(function (contents:any) {
                     let filepaths = Object.keys(contents.files);
-                    if (filepaths.length  == 0) {
+                    if (filepaths.length  == 1) {
                         reject({code: 400, body: {"error": "my text"}});
                     }
                     else {
@@ -40,11 +41,8 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     Promise.all(promiseList)
                         .then(data => {
-                            // console.log(Object.keys(data));
-                            // console.log(data[0]);
                             for (let each of data) {
                                 let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
-                                // console.log(result);
                                 if (result != 'result') {
                                     var index = data.indexOf(each, 0);
                                     if (index > -1) {
@@ -52,9 +50,16 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                             }
-                            data.shift();
-                            fs.writeFile(id + '.json', '[' + data + ']');
-                            fulfill({code: code, body: {}});
+                            if (data.length == 0) {
+                                reject({code: 400, body: {"error": "my text"}});
+                            }
+                            else {
+                                data.shift();
+                                fs.writeFile(id + '.json', '[' + data + ']');
+
+                                fulfill({code: code, body: {}});
+                            }
+
                         })
                         .catch(function(){
                             reject({code: 400, body: {"error": "my text"}});
@@ -65,7 +70,6 @@ export default class InsightFacade implements IInsightFacade {
                 });
         })
     }
-
     removeDataset(id: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             fs.access(id + '.json', (err) => {
@@ -243,28 +247,28 @@ function createEQList(key: string, value: number, dataList: any[]): any[] {
 function createISList(key: string, value: string, dataList: any[]): any[] {
     var sortedList: any[] = [];
     var realKey = findKey(key);
+    var firstcase = new RegExp("^\\*([a-z]+|(\\;|\\-|\\,))([a-z]|(\\;|\\-|\\s|\\,))*$");
+    var secondcase = new RegExp("^([a-z]|(\\;|\\-|\\s|\\,))*([a-z]|(\\;|\\-|\\,))+\\*$");
+    var thirdcase = new RegExp("^\\*([a-z]|(\\;|\\-|\\,))+([a-z]|(\\;|\\-|\\,|\\s))*\\*$");
     //var regex = /[a-z]+(\\;|\\-|\\s)?[a-z]*(\\,[a-z]+(\\;|\\-|\\s)?[a-z]*)*/
     for(let i = 0; i < dataList.length; i++){
         if (typeof (dataList[i][realKey]) === 'string') {
-            if (/^\\*.*$/.test(value)){
-                var patt = new RegExp("[a-z]+(\\;|\\-|\\s)?[a-z]*(\\,[a-z]+(\\;|\\-|\\s)?[a-z]*)*");
-                var res = patt.exec(value);// getting only strings from *....*
-                var newregex = new RegExp ("^.*" + (res[0]));
+            if (firstcase.test(value)){
+                var res = firstcase.exec(value);// getting only strings from *....*
+                var newregex = new RegExp ("^.*" + (res[1]) + "$");
                 if(newregex.test(dataList[i][realKey]))
                     sortedList.push(dataList[i]);
             }
-            else if (/^.*\\*$/.test(value)){
-                var patt = new RegExp("[a-z]+(\\;|\\-|\\s)?[a-z]*(\\,[a-z]+(\\;|\\-|\\s)?[a-z]*)*");
-                var res = patt.exec(value);// getting only strings from *....*
-                var newregex = new RegExp ((res[0]) + ".*$")
+            else if (secondcase.test(value)){
+                var res = secondcase.exec(value);// getting only strings from *....*
+                var newregex = new RegExp ("^" +(res[3]) + ".*$")
                 if(newregex.test(dataList[i][realKey]))
                     sortedList.push(dataList[i]);
             }
 
-            else if (/\\*.*\\*/.test(value)){
-                var patt = new RegExp("[a-z]+(\\;|\\-|\\s)?[a-z]*(\\,[a-z]+(\\;|\\-|\\s)?[a-z]*)*");
-                var res = patt.exec(value);// getting only strings from *....*
-                var newregex = new RegExp ("^.*" + (res[0]) + ".*$")
+            else if (thirdcase.test(value)) {
+                var res = thirdcase.exec(value);// getting only strings from *....*
+                var newregex = new RegExp ("^.*" + (res[1]) + ".*$")
                 if(newregex.test(dataList[i][realKey]))
                     sortedList.push(dataList[i]);
             }
@@ -317,8 +321,8 @@ function findKey(key: string) : string {
         return "Audit";
     if(key == "courses_uuid")
         return "id";
-    else
-        throw "error";
+    // else
+    //     throw "error";
 }
 
 function createModifiedList(list: any, options: any): any {

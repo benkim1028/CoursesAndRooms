@@ -13,7 +13,7 @@ import fs = require('fs');
 describe("EchoSpec", function () {
 
     let zipContent: any = null;
-    let fakezipContent: any = null;
+    let zipContent2: any = null;
 
     let queryy: QueryRequest = {
         "WHERE":{
@@ -250,6 +250,68 @@ describe("EchoSpec", function () {
         }
     }
 
+    let query7: QueryRequest = {
+        "WHERE":{
+
+            "AND":[
+                {
+                    "GT":{
+                        "courses_avg":90
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_instructor" : "a*"
+                    }
+                }
+            ]
+
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg" ,
+                "courses_instructor"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
+    let query8: QueryRequest = {
+        "WHERE":{
+
+            "AND":[
+                {
+                    "LT":{
+                        "courses_avg":10
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_instructor" : "*a"
+                    }
+                }
+            ]
+
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_audit",
+                "courses_uuid",
+                "courses_avg" ,
+                "courses_pass",
+                "courses_title",
+                "courses_fail"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
+
+
+
+
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
         expect(response).to.have.property('body');
@@ -267,6 +329,7 @@ describe("EchoSpec", function () {
         insightFacade = new InsightFacade(); //added
         // zipContent = Buffer.from(fs.readFileSync("courses1.zip")).toString('base64');
         zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
+        zipContent2 = Buffer.from(fs.readFileSync("course2.zip")).toString('base64');
         // zipContent = Buffer.from(fs.readFileSync("fewinvalid.zip")).toString('base64');
 
     });
@@ -346,7 +409,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("Create a new dataset with unique id", function () { //PASS
+    it("Create an empty dataset with unique id", function () { //PASS
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
@@ -363,6 +426,18 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             expect.fail();
+        })
+    });
+
+    it("Create a new dataset with unique id", function () { //PASS
+        return insightFacade.addDataset("courses2", zipContent2).then(function (value:any) {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+            expect(err.body.error).to.equal("my text");
+
         })
     });
 
@@ -1026,7 +1101,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('querya', function() {
         return insightFacade.performQuery(querya).then (function (value: any) {
             expect.fail();
@@ -1037,7 +1112,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('queryb', function() {
         return insightFacade.performQuery(queryb).then (function (value: any) {
             expect.fail();
@@ -1048,7 +1123,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('queryc', function() {
         return insightFacade.performQuery(queryc).then (function (value: any) {
             expect.fail();
@@ -1059,7 +1134,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('queryd', function() {
         return insightFacade.performQuery(queryd).then (function (value: any) {
             expect.fail();
@@ -1070,7 +1145,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('query1', function() {
         return insightFacade.performQuery(query1).then (function (value: any) {
             expect(value).to.eql(sampleResponse);
@@ -1089,7 +1164,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query4', function() {
         return insightFacade.performQuery(query4).then (function (value: any) {
 
@@ -1102,7 +1177,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('query5', function() {
         return insightFacade.performQuery(query5).then (function (value: any) {
             var response : InsightResponse = {
@@ -1113,7 +1188,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
 
     it('queryEQ', function() {
         return insightFacade.performQuery(queryEQ).then (function (value: any) {
@@ -1136,7 +1211,32 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
+
+
+    it('query7', function() {
+        return insightFacade.performQuery(query7).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it('query8', function() {
+        return insightFacade.performQuery(query8).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
 
 
 
