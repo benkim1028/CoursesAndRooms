@@ -561,11 +561,10 @@ describe("EchoSpec", function () {
                 }
             }).then(value => {
             Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
+            expect.fail();
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
-            expect.fail();
+            expect(err.code).to.equal(400);
         })
     }); //added
 

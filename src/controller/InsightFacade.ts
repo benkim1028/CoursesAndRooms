@@ -3,8 +3,7 @@ import Log from "../Util";
 import fs = require('fs');
 
 var JSZip = require('jszip');
-
-
+let fail:boolean = false;
 export default class InsightFacade implements IInsightFacade {
 
     constructor() {
@@ -20,7 +19,7 @@ export default class InsightFacade implements IInsightFacade {
             fs.access(id + '.json', (err) => {
                 if (!err) {
                     fs.unlink(id + '.json', (err) =>{
-                        if (err) throw err;
+                        //if (err) throw err;
                         code = 201; // id already existed
                     })
                 }
@@ -95,7 +94,10 @@ export default class InsightFacade implements IInsightFacade {
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
             var globallist = dataFromLocal();
-            try {
+            if (fail) {
+                reject({code: 400, body: {"error": "my text"}});
+            }
+            else {
                 //parse QueryRequest using EBFN and create a list = todoList
                 let names: any[] = Object.keys(query);
                 let body     = query[names[0]];
@@ -105,10 +107,7 @@ export default class InsightFacade implements IInsightFacade {
                 let options = query[names[1]];
                 let response = createModifiedList(list, options);
                 console.log(response);
-
                 fulfill({code: 200, body: response});
-            } catch (e) {
-                reject({code: 400, body: {"error": "my text"}});
             }
         })
     }
@@ -118,11 +117,11 @@ function whatKindofFilter(input: any, value: any, preList: any = []) {
     // this takes filter and its
     if (input == "OR") {             //logic comparison
         if (value.length == 0)
-            throw "error";
+            fail = true;
         return createORList(value, preList);
     } else if (input == "AND") {
         if (value.length == 0)
-            throw "error";
+            fail = true;
         return createANDList(value, preList);
     }
     var subKey: any = Object.keys(value);
@@ -211,7 +210,7 @@ function createGTList(key: string, value: number, dataList: any[]): any[] {
             sortedList.push(dataList[i]);
         }
         else if (typeof (dataList[i][realKey]) !== 'number' ) {
-            throw "error";
+            fail = true;
         }
     }
     return sortedList;
@@ -225,7 +224,7 @@ function createLTList(key: string, value: number, dataList: any[]): any[] {
             sortedList.push(dataList[i]);
         }
         else if (typeof (dataList[i][realKey]) !== 'number' ) {
-            throw "error";
+            fail = true;
         }
     }
     return sortedList;
@@ -239,7 +238,7 @@ function createEQList(key: string, value: number, dataList: any[]): any[] {
             sortedList.push(dataList[i]);
         }
         else if (typeof (dataList[i][realKey]) !== 'number' ) {
-            throw "error";
+            fail = true;
         }
     }
     return sortedList;
@@ -279,7 +278,7 @@ function createISList(key: string, value: string, dataList: any[]): any[] {
             }
         }
         else if (typeof (dataList[i][realKey]) !== 'string' ) {
-            throw "error";
+            fail = true;
         }
     }
     return sortedList;
@@ -322,8 +321,8 @@ function findKey(key: string) : string {
         return "Audit";
     if(key == "courses_uuid")
         return "id";
-    // else
-    //     throw "error";
+    else
+        fail = true;
 }
 
 function createModifiedList(list: any, options: any): any {
@@ -334,7 +333,7 @@ function createModifiedList(list: any, options: any): any {
     let columnsKey = Object.keys(options)[0];
     let columnsValue = options[columnsKey];
     if (columnsValue == 0){
-        throw "error";
+        fail = true;
     }
     for(let i = 0; i < list.length; i++){
         let element: any = {};
