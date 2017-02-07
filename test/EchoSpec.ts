@@ -508,7 +508,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(response.code);
         })
     })
-    it('queryb', function() {
+    it.only('queryb', function() {
         return insightFacade.performQuery(queryb).then (function (value: any) {
             expect.fail();
         }).catch(function (err:any) {

@@ -386,8 +386,5 @@ export default class InsightFacade implements IInsightFacade {
             }
         })
     }
-
-
-
 }
 
