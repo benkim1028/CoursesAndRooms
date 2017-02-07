@@ -227,6 +227,7 @@ class DoEveryThing {
             return "id";
         else
             this.fail = true;
+        return "";
     }
 
     createModifiedList(list: any, options: any): any {
@@ -359,25 +360,30 @@ export default class InsightFacade implements IInsightFacade {
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            if(counter) {
-                Doeverything = new DoEveryThing;
-                counter = false;
-            }
-            var globallist = Doeverything.data;
+            try {
+                if (counter) {
+                    Doeverything = new DoEveryThing;
+                    counter = false;
+                }
+                var globallist = Doeverything.data;
                 //parse QueryRequest using EBFN and create a list = todoList
-            let names: any[] = Object.keys(query);
-            let body     = query[names[0]];
-            let filterKey = Object.keys(body)[0];
-            let filterValue = body[filterKey];
-            let list = Doeverything.whatKindofFilter(filterKey, filterValue, globallist);
-            let options = query[names[1]];
-            let response = Doeverything.createModifiedList(list, options);
-            if (Doeverything.fail) {
-                Doeverything.fail = false;
-                reject({code: 400, body: {"error": "my text"}});
+                let names: any[] = Object.keys(query);
+                let body = query[names[0]];
+                let filterKey = Object.keys(body)[0];
+                let filterValue = body[filterKey];
+                let list = Doeverything.whatKindofFilter(filterKey, filterValue, globallist);
+                let options = query[names[1]];
+                let response = Doeverything.createModifiedList(list, options);
+                if (Doeverything.fail) {
+                    Doeverything.fail = false;
+                    reject({code: 400, body: {"error": "my text"}});
+                }
+                console.log(response);
+                fulfill({code: 200, body: response});
             }
-            console.log(response);
-            fulfill({code: 200, body: response});
+            catch(e){
+                reject({code: 400, body: {"error": ["courses"]}});
+            }
         })
     }
 
