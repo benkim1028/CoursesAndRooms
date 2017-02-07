@@ -16,13 +16,13 @@ class DoEveryThing {
         // this takes filter and its
         if (input == "OR") {//logic comparison
             if (value.length == 0){
-                this.fail == true;
+                this.fail = true;
                 return [];
             }
             return this.createORList(value, preList);
         } else if (input == "AND") {
             if (value.length == 0){
-                this.fail == true;
+                this.fail = true;
                 return [];
             }
             return this.createANDList(value, preList);
