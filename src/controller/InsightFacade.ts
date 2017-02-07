@@ -70,25 +70,38 @@ export default class InsightFacade implements IInsightFacade {
         })
     }
     removeDataset(id: string): Promise<InsightResponse> {
-        return new Promise(function (fulfill, reject) {
-            fs.access(id + '.json', (err) => {
-                if (err) {
+            var newPromise = new Promise(function (fulfill, reject){
+                var isFail: boolean = true;
+                try {
+                    fs.unlinkSync(id + '.json');
+                } catch (e) {
+                    isFail = false;
+                }
+                if(isFail) {
+                    fulfill({code: 204, body: {}});
+                } else{
                     reject({code: 404, body: {}});
-                    return;
-                } else if (!err) {
-                    fs.unlink(id + '.json', (err) => {
-                        if (!err) {
-                            fulfill({code: 204, body: {}});
-                            return;
-                        }
-                        else {
-                            reject({code: 404, body: {}});
-                            return;
-                        }
-                    })
                 }
             })
-        })
+        return newPromise;
+        //     fs.access(id + '.json', (err) => {
+        //         if (err) {
+        //             reject({code: 404, body: {}});
+        //             return;
+        //         } else if (!err) {
+        //             fs.unlink(id + '.json', (err) => {
+        //                 if (!err) {
+        //                     fulfill({code: 204, body: {}});
+        //                     return;
+        //                 }
+        //                 else {
+        //                     reject({code: 404, body: {}});
+        //                     return;
+        //                 }
+        //             })
+        //         }
+        //     })
+        // })
     }
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
@@ -205,7 +218,12 @@ function createANDList(list: any[], preList: any[]): any[]{
 function createGTList(key: string, value: number, dataList: any[]): any[] {
     var sortedList: any[] = [];
     var realKey = findKey(key);
+    if(value < 0) {
+        fail = true;
+        return sortedList;
+    }
     for(let i = 0; i < dataList.length; i++){
+
         if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] > value) {
             sortedList.push(dataList[i]);
         }
@@ -218,6 +236,10 @@ function createGTList(key: string, value: number, dataList: any[]): any[] {
 }
 function createLTList(key: string, value: number, dataList: any[]): any[] {
     var sortedList: any[] = [];
+    if(value < 0) {
+        fail = true;
+        return sortedList;
+    }
     var realKey = findKey(key);
     for(let i = 0; i < dataList.length; i++){
         if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] < value) {
@@ -248,7 +270,7 @@ function createISList(key: string, value: string, dataList: any[]): any[] {
     var sortedList: any[] = [];
     var realKey = findKey(key);
     var firstcase = new RegExp("^\\*([a-z]+|(\\;|\\-|\\,))([a-z]|(\\;|\\-|\\s|\\,))*$");
-    var secondcase = new RegExp("^([a-z]|(\\;|\\-|\\s|\\,))*([a-z]|(\\;|\\-|\\,))+\\*$");
+    var secondcase = new RegExp("^([a-z]|(\\;|\\-|\\s|\\,))*([a-z]+|(\\;|\\-|\\,))\\*$");
     var thirdcase = new RegExp("^\\*([a-z]|(\\;|\\-|\\,))+([a-z]|(\\;|\\-|\\,|\\s))*\\*$");
     //var regex = /[a-z]+(\\;|\\-|\\s)?[a-z]*(\\,[a-z]+(\\;|\\-|\\s)?[a-z]*)*/
     for(let i = 0; i < dataList.length; i++){
@@ -261,7 +283,7 @@ function createISList(key: string, value: string, dataList: any[]): any[] {
             }
             else if (secondcase.test(value)){
                 var res = secondcase.exec(value);// getting only strings from *....*
-                var newregex = new RegExp ("^" +(res[3]) + ".*$")
+                var newregex = new RegExp ("^" +(res[3]) + ".*$");
                 if(newregex.test(dataList[i][realKey]))
                     sortedList.push(dataList[i]);
             }

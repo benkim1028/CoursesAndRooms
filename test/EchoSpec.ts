@@ -278,6 +278,77 @@ describe("EchoSpec", function () {
             "FORM":"TABLE"
         }
     }
+    let query10: QueryRequest = {
+    //     "WHERE":{
+    //         "AND": [
+    //             {
+    //                 "GT": {
+    //                     "courses_avg": 90
+    //                 }
+    //             },
+    //             {
+    //                 "IS": {
+    //                     "courses_instructor": "a*"
+    //                 }
+    //             }
+    //         ]
+    //
+    //     },
+    //     "OPTIONS":{
+    //         "COLUMNS":[
+    //             "courses_dept",
+    //             "courses_id",
+    //             "courses_avg" ,
+    //             "courses_instructor"
+    //         ],
+    //         "ORDER":"courses_avg",
+    //         "FORM":"TABLE"
+    //     }
+    // }
+        "WHERE":{"AND":[{
+
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 80.32
+                    }
+                },
+                {
+                    "IS": {
+                        "courses_dept": "comm"
+                    }
+                }
+            ]
+        },
+            {
+
+                "AND": [
+                    {
+                        "LT": {
+                            "courses_avg": 84.11
+                        }
+                    },
+                    {
+                        "IS": {
+                            "courses_dept": "comm"
+                        }
+                    }
+                ]
+            }
+            ]
+
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg" ,
+                "courses_instructor"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
     let query8: QueryRequest = {
         "WHERE":{
 
@@ -329,7 +400,7 @@ describe("EchoSpec", function () {
         insightFacade = new InsightFacade(); //added
         // zipContent = Buffer.from(fs.readFileSync("courses1.zip")).toString('base64');
         zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
-        zipContent2 = Buffer.from(fs.readFileSync("course2.zip")).toString('base64');
+        // zipContent2 = Buffer.from(fs.readFileSync("course2.zip")).toString('base64');
         // zipContent = Buffer.from(fs.readFileSync("fewinvalid.zip")).toString('base64');
 
     });
@@ -420,7 +491,7 @@ describe("EchoSpec", function () {
     });
 
     it("Create a new dataset with unique id", function () { //PASS
-        return insightFacade.addDataset("courses10", zipContent).then(function (value:any) {
+        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
         }).catch(function (err:any) {
@@ -1179,6 +1250,17 @@ describe("EchoSpec", function () {
     });
     it('query5', function() {
         return insightFacade.performQuery(query5).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+    it('query10', function() {
+        return insightFacade.performQuery(query10).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
             };
