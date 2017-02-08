@@ -13,14 +13,13 @@ class DoEveryThing {
     }
     whatKindofFilter(input: any, value: any, preList: any = []) {
         // this takes filter and its
-        // if (input == "OR") {//logic comparison
-        //     if (value.length == 0){
-        //         this.fail = true;
-        //         return [];
-        //     }
-        //     return this.createORList(value, preList);
-        // } else
-            if (input == "AND") {
+        if (input == "OR") {//logic comparison
+            if (value.length == 0){
+                this.fail = true;
+                return [];
+            }
+            return this.createORList(value, preList);
+        } else if (input == "AND") {
             if (value.length == 0){
                 this.fail = true;
                 return [];
@@ -59,29 +58,29 @@ class DoEveryThing {
     //     }
     //     return sortedList;
     // }
-    // createORList(list: any[], preList: any[]): any[]{
-    //     var sortedList: any[] = [];
-    //     for(let i = 0; i < list.length; i++){
-    //         var keysOfObject = Object.keys(list[i]);
-    //         let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList);
-    //         if(sortedList.length == 0){
-    //             sortedList = response;
-    //         } else {
-    //             for (var j = 0; j < response.length; j++) {
-    //                 var counter = 0;
-    //                 for (var k = 0; k < sortedList.length; k++) {
-    //                     if (sortedList[k]["id"] == response[j]["id"]) {
-    //                         counter = 1;
-    //                         break;
-    //                     }
-    //                 }
-    //                 if (counter == 0)
-    //                     sortedList.push(response[j])
-    //             }
-    //         }
-    //     }
-    //     return sortedList;
-    // }
+    createORList(list: any[], preList: any[]): any[]{
+        var sortedList: any[] = [];
+        for(let i = 0; i < list.length; i++){
+            var keysOfObject = Object.keys(list[i]);
+            let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList);
+            if(sortedList.length == 0){
+                sortedList = response;
+            } else {
+                for (var j = 0; j < response.length; j++) {
+                    var counter = 0;
+                    for (var k = 0; k < sortedList.length; k++) {
+                        if (sortedList[k]["id"] == response[j]["id"]) {
+                            counter = 1;
+                            break;
+                        }
+                    }
+                    if (counter == 0)
+                        sortedList.push(response[j])
+                }
+            }
+        }
+        return sortedList;
+    }
 
     createANDList(list: any[], preList: any[]): any[]{
         var Initialized = false;

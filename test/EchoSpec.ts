@@ -180,36 +180,36 @@ describe("EchoSpec", function () {
     };
     let query1: QueryRequest = {
         "WHERE":{
-            "AND":[
+            "OR":[
                 {
-                    "AND":[
+                    "OR":[
                         {
                             "GT":{
-                                "courses_avg":85
+                                "courses_avg":95
                             }
                         },
                         {
                             "LT":{
-                                "courses_fail":10
+                                "courses_fail":2
                             }
                         }
                     ]
                 },
                 {
-                    "AND":[
+                    "OR":[
                         {
                             "EQ":{
-                                "courses_avg": 90
+                                "courses_avg": 44
                             }
                         },
                         {
                             "IS":{
-                                "courses_dept": "a*"
+                                "courses_dept": "cpsc"
                             }
                         },
                         {
                             "GT": {
-                                "courses_pass": 10
+                                "courses_pass": 200
                             }
                         }
                     ]
