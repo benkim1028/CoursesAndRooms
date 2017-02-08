@@ -311,7 +311,11 @@ export default class InsightFacade implements IInsightFacade {
                             var isObject = new RegExp("^\\{.*\\}$")
                             for(let each of data) {
                                 if (isObject.test(each)) {
-                                    var element: any = JSON.parse(<any>each);
+                                    try {
+                                        var element: any = JSON.parse(<any>each);
+                                    }catch(e) {
+                                        console.log(e);
+                                    }
                                     //let keys = Object.keys(element);  // keys = ["result", "rank"]
                                     var course_info = element["result"];  // course_info = value of result = [{....}]
                                     for (let each1 of course_info) {// each = each object in result
@@ -399,8 +403,12 @@ export default class InsightFacade implements IInsightFacade {
             if('courses' in DataList){
                 list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList['courses']);
             } else {
-                let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
-                list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
+                try {
+                    let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
+                    list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
+                }catch(e){
+                    reject({code: 400, body: {"error": "my text"}});
+                }
             }
             if (Doeverything.fail) {
                 Doeverything.fail = false;
