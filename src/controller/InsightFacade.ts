@@ -319,12 +319,16 @@ export default class InsightFacade implements IInsightFacade {
                                 for (let each of data) {
                                     let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
                                     if (result == 'result') {
-                                        DataList.push(each);
+
+                                        DataList.push(JSON.parse(each));
                                     }
                                 }
                             }
+
+                            data.shift();
                             fs.writeFile(id + '.json', DataList);
                             fulfill({code: code, body: {}});
+                            // console.log(DataList);
 
                         })
                         .catch(function(){
