@@ -43,6 +43,10 @@ class DoEveryThing {
         // else if (input == "NOT") {
         //     return this.createNOTList(value, preList);
         // }
+        else {
+            this.fail = true;
+            return [];
+        }
     }
     //
     // createNOTList(value: any, dataList: any[]): any[] {
@@ -108,13 +112,14 @@ class DoEveryThing {
     createGTList(key: string, value: number, dataList: any[]): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
+        if(typeof value !== 'number'){
+            this.fail= true;
+            return [];
+        }
         for(let i = 0; i < dataList.length; i++){
 
             if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] > value) {
                 sortedList.push(dataList[i]);
-            }
-            else if (typeof (dataList[i][realKey]) !== 'number' ) {
-                this.fail = true;
             }
         }
         return sortedList;
@@ -123,12 +128,13 @@ class DoEveryThing {
     createLTList(key: string, value: number, dataList: any[]): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
+        if(typeof value !== 'number'){
+            this.fail= true;
+            return [];
+        }
         for(let i = 0; i < dataList.length; i++){
             if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] < value) {
                 sortedList.push(dataList[i]);
-            }
-            else if (typeof (dataList[i][realKey]) !== 'number' ) {
-                this.fail = true;
             }
         }
         return sortedList;
@@ -137,12 +143,13 @@ class DoEveryThing {
     createEQList(key: string, value: number, dataList: any[]): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
+        if(typeof value !== 'number'){
+            this.fail= true;
+            return [];
+        }
         for(let i = 0; i < dataList.length; i++){
             if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] == value) {
                 sortedList.push(dataList[i]);
-            }
-            else if (typeof (dataList[i][realKey]) !== 'number' ) {
-                this.fail = true;
             }
         }
         return sortedList;
@@ -151,6 +158,10 @@ class DoEveryThing {
     createISList(key: string, value: string, dataList: any[]): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
+        if(typeof value !== 'string'){
+            this.fail= true;
+            return [];
+        }
         var firstcase = new RegExp("^\\*([a-z]+|(\\;|\\-|\\,))([a-z]|(\\;|\\-|\\s|\\,))*$");
         var secondcase = new RegExp("^([a-z]|(\\;|\\-|\\s|\\,))*([a-z]+|(\\;|\\-|\\,))\\*$");
         var thirdcase = new RegExp("^\\*([a-z]|(\\;|\\-|\\,))+([a-z]|(\\;|\\-|\\,|\\s))*\\*$");
@@ -180,9 +191,6 @@ class DoEveryThing {
                 else if (dataList[i][realKey] == value) {
                     sortedList.push(dataList[i]);
                 }
-            }
-            else if (typeof (dataList[i][realKey]) !== 'string' ) {
-                this.fail = true;
             }
         }
         return sortedList;
@@ -225,19 +233,26 @@ class DoEveryThing {
             return "Audit";
         if(key == "courses_uuid")
             return "id";
-        else
+        else {
             this.fail = true;
+            return "";
+        }
     }
 
     createModifiedList(list: any, options: any){
         let output: any = {'render': '','result': []};
         let newlist: any[] = [];
         let form = Object.keys(options)[2];
+        if(options[form] != "TABLE"){
+            this.fail = true;
+            return [];
+        }
         output['render'] = options[form];
         let columnsKey = Object.keys(options)[0];
         let columnsValue = options[columnsKey];
         if (columnsValue.length == 0){
             this.fail = true;
+            return [];
         }
         for(let i = 0; i < list.length; i++){
             let element: any = {};
@@ -249,6 +264,9 @@ class DoEveryThing {
         }
         let order = Object.keys(options)[1];
         let orderValue = options[order];
+        if(this.findKey(orderValue) == ""){
+            return [];
+        }
         newlist.sort(this.sort_by(orderValue, false, parseFloat));
         for(let i = 0; i < newlist.length; i++)
             output['result'].push(newlist[i]);
@@ -319,14 +337,6 @@ export default class InsightFacade implements IInsightFacade {
                                     if (each1 != [])
                                         list.push(each1);
                                 }
-                                // if (data.length == 0) {
-                                //     reject({code: 400, body: {"error": "my text"}});
-                                // }
-                                // else {
-                                //     data.shift();
-                                //     fs.writeFile(id + '.json', '[' + data + ']');
-                                //     fulfill({code: code, body: {}});
-                                // }
                             }
                         }
                         if(list.length == 0){
@@ -344,27 +354,6 @@ export default class InsightFacade implements IInsightFacade {
                 });
         })
     }
-    // removeDataset(id: string): Promise<InsightResponse> {
-    //     return new Promise(function (fulfill, reject) {
-    //         fs.access(id + '.json', (err) => {
-    //             if (err) {
-    //                 reject({code: 404, body: {}});
-    //                 return;
-    //             } else if (!err) {
-    //                 fs.unlink(id + '.json', (err) => {
-    //                     if (!err) {
-    //                         fulfill({code: 204, body: {}});
-    //                         return;
-    //                     }
-    //                     else {
-    //                         reject({code: 404, body: {}});
-    //                         return;
-    //                     }
-    //                 })
-    //             }
-    //         })
-    //     })
-    // }
     removeDataset(id: string): Promise<InsightResponse> {
         var newPromise = new Promise(function (fulfill, reject){
             var isFail: boolean = true;
@@ -393,8 +382,10 @@ export default class InsightFacade implements IInsightFacade {
             }
             //parse QueryRequest using EBFN and create a list = todoList
             let names: any[] = Object.keys(query);
+            if(names[0] != "WHERE" && names[1] !="OPTIONS")
+                reject({code: 400, body: {"error": "my text"}});
             let body = query[names[0]];
-            let filterKey = Object.keys(body)[0];
+            let filterKey: any = Object.keys(body)[0];
             let filterValue = body[filterKey];
             let list: any = [];
             if('courses' in DataList){
@@ -404,7 +395,7 @@ export default class InsightFacade implements IInsightFacade {
                     let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
                     list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
                 }catch(e){
-                    reject({code: 400, body: {"error":["courses"]}});
+                    reject({code: 424, body: {"error":["courses"]}});
                 }
             }
             if (Doeverything.fail) {
