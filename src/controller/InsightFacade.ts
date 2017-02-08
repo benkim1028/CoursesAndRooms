@@ -284,17 +284,12 @@ export default class InsightFacade implements IInsightFacade {
             let promiseList: Promise<any>[] =[];
             let code:number = 0;
             let zip = new JSZip();
-            fs.access(id + '.json', (err) => {
-                if (!err) {
-                    fs.unlink(id + '.json', (err) =>{
-                        //if (err) throw err;
-                        code = 201; // id already existed
-                    })
-                }
-                else {
-                    code = 204; // id is new
-                }
-            });
+            try {
+                fs.unlinkSync(id + '.json')
+                code = 201; // id already existed
+            }catch(e){
+                code = 204; // id is new
+            }
             zip.loadAsync(content,{base64: true})
                 .then(function (contents:any) {
                     let filepaths = Object.keys(contents.files);
@@ -336,7 +331,11 @@ export default class InsightFacade implements IInsightFacade {
                                 reject({code: 400, body: {"error": "this two"}});
                             }
                             DataList[id] = list;
-                            fs.writeFile(id + '.json', JSON.stringify(list));
+                            try {
+                                fs.writeFile(id + '.json', JSON.stringify(list));
+                            } catch(e){
+                                console.log(e);
+                            }
                             fulfill({code: code, body: {}});
                         }).catch(function(){
                         reject({code: 400, body: {"error": "this three"}});
