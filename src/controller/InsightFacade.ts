@@ -372,6 +372,15 @@ export default class InsightFacade implements IInsightFacade {
                 let filterKey = Object.keys(body)[0];
                 let filterValue = body[filterKey];
                 let list = Doeverything.whatKindofFilter(filterKey, filterValue, globallist);
+                if (Doeverything.fail) {
+                    Doeverything.fail = false;
+                    reject({code: 400, body: {"error": "my text"}});
+                    return;
+                }
+                if (list.length == 0){
+                    fulfill({code: 200, body: {}});
+                    return;
+                }
                 let options = query[names[1]];
                 let response = Doeverything.createModifiedList(list, options);
                 if (Doeverything.fail) {
