@@ -390,6 +390,170 @@ describe("EchoSpec", function () {
         }
     }
 
+    let query10: QueryRequest = {
+        "WHERE":{
+            "OR":[
+                {
+                    "AND": [
+                        {
+                            "OR": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 95
+                                    },
+                                    "LT": {
+                                        "courses_fail": 2
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "GT":{
+                        "courses_avg":90
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_dept":"adhe"
+                    }
+                }
+                ,
+                {
+                    "EQ":{
+                        "courses_avg":95
+                    }
+                }
+            ]
+        },
+
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
+
+    let query11: QueryRequest = {
+        "WHERE":{
+            "OR":[
+                {
+                    "AND": [
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 95
+                                    },
+                                    "LT": {
+                                        "courses_fail": 2
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "GT":{
+                        "courses_avg":90
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_dept":"adhe"
+                    }
+                }
+                ,
+                {
+                    "EQ":{
+                        "courses_avg":95
+                    }
+                }
+            ]
+        },
+
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
+
+    let query12: QueryRequest = {
+        "WHERE":{
+            "AND":[
+                {
+                    "AND": [
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 87.5
+                                    },
+                                    "LT": {
+                                        "courses_fail": 2
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 87.6
+                                    },
+                                    "LT": {
+                                        "courses_fail": 10
+                                    }
+                                }
+                            ]
+                        }
+
+
+
+                    ]
+                },
+                {
+                    "GT":{
+                        "courses_avg":87
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_instructor":""
+                    }
+                }
+                ,
+                {
+                    "LT":{
+                        "courses_avg":88
+                    }
+                }
+            ]
+        },
+
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg",
+                "courses_instructor"
+
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    }
+
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
         expect(response).to.have.property('body');
@@ -474,7 +638,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('querya', function() {
         return insightFacade.performQuery(querya).then (function (value: any) {
             expect.fail();
@@ -485,7 +649,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('queryb', function() {
         return insightFacade.performQuery(queryb).then (function (value: any) {
             expect.fail();
@@ -496,7 +660,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('queryc', function() {
         return insightFacade.performQuery(queryc).then (function (value: any) {
             expect.fail();
@@ -507,7 +671,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('queryd', function() {
         return insightFacade.performQuery(queryd).then (function (value: any) {
             expect.fail();
@@ -518,7 +682,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('query1', function() {
         return insightFacade.performQuery(query1).then (function (value: any) {
             expect(value).to.eql(sampleResponse);
@@ -526,7 +690,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query3', function() {
         return insightFacade.performQuery(query3).then (function (value: any) {
             var response : InsightResponse = {
@@ -537,7 +701,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query4', function() {
         return insightFacade.performQuery(query4).then (function (value: any) {
             expect.fail();
@@ -548,7 +712,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
         })
-    })
+    });
     it('query5', function() {
         return insightFacade.performQuery(query5).then (function (value: any) {
             var response : InsightResponse = {
@@ -559,7 +723,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
 
     it('queryEQ', function() {
         return insightFacade.performQuery(queryEQ).then (function (value: any) {
@@ -571,7 +735,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query2', function() {
         return insightFacade.performQuery(query2).then (function (value: any) {
             var response : InsightResponse = {
@@ -582,7 +746,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query6', function() {
         return insightFacade.performQuery(query6).then (function (value: any) {
             var response : InsightResponse = {
@@ -593,7 +757,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query7', function() {
         return insightFacade.performQuery(query7).then (function (value: any) {
             var response : InsightResponse = {
@@ -604,7 +768,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query8', function() {
         return insightFacade.performQuery(query8).then (function (value: any) {
             var response : InsightResponse = {
@@ -615,7 +779,7 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
     it('query9', function() {
         return insightFacade.performQuery(query9).then (function (value: any) {
             var response : InsightResponse = {
@@ -626,7 +790,44 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
         })
-    })
+    });
+
+    it('query10', function() {
+        return insightFacade.performQuery(query10).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it('query11', function() {
+        return insightFacade.performQuery(query11).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it.only('query12', function() {
+        return insightFacade.performQuery(query12).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
 
     it("For test purpose", function () {
         return insightFacade.performQuery(
@@ -881,6 +1082,35 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     }); //added
+
+
+    it("Colunms empty with simple query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"GT":
+                    {"courses_dept": "lol"
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+
+
 
 
     it("LT error with simple query", function () {

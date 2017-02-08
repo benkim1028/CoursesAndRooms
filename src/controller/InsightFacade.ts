@@ -283,59 +283,59 @@ export default class InsightFacade implements IInsightFacade {
 
     addDataset(id: string, content: string) : Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            // let promiseList: Promise<any>[] =[];
-            // let code:number = 0;
-            // let zip = new JSZip();
-            // fs.access(id + '.json', (err) => {
-            //     if (!err) {
-            //         fs.unlink(id + '.json', (err) =>{
-            //             //if (err) throw err;
-            //             code = 201; // id already existed
-            //         })
-            //     }
-            //     else {
-            //         code = 204; // id is new
-            //     }
-            // });
-            // zip.loadAsync(content,{base64: true})
-            //     .then(function (contents:any) {
-            //         let filepaths = Object.keys(contents.files);
-            //         if (filepaths.length  == 1) {
-            //             reject({code: 400, body: {"error": "my text"}});
-            //         }
-            //         else {
-            //             for (let filepath of filepaths) {
-            //                 promiseList.push(zip.files[filepath].async('string'));
-            //             }
-            //         }
-            //         Promise.all(promiseList)
-            //             .then(data => {
-            //                 for (let each of data) {
-            //                     let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
-            //                     if (result != 'result') {
-            //                         var index = data.indexOf(each, 0);
-            //                         if (index > -1) {
-            //                             data.splice(index, 1);
-            //                         }
-            //                     }
-            //                 }
-            //                 if (data.length == 0) {
-            //                     reject({code: 400, body: {"error": "my text"}});
-            //                 }
-            //                 else {
-            //                     data.shift();
-            //                     fs.writeFile(id + '.json', '[' + data + ']');
-            //                     fulfill({code: code, body: {}});
-            //                 }
-            //
-            //             })
-            //             .catch(function(){
-            //                 reject({code: 400, body: {"error": "my text"}});
-            //             });
-            //     })
-            //     .catch(function() {
-            //         reject({code: 400, body: {"error": "my text"}});
-            //     });
+            let promiseList: Promise<any>[] =[];
+            let code:number = 0;
+            let zip = new JSZip();
+            fs.access(id + '.json', (err) => {
+                if (!err) {
+                    fs.unlink(id + '.json', (err) =>{
+                        //if (err) throw err;
+                        code = 201; // id already existed
+                    })
+                }
+                else {
+                    code = 204; // id is new
+                }
+            });
+            zip.loadAsync(content,{base64: true})
+                .then(function (contents:any) {
+                    let filepaths = Object.keys(contents.files);
+                    if (filepaths.length  == 1) {
+                        reject({code: 400, body: {"error": "my text"}});
+                    }
+                    else {
+                        for (let filepath of filepaths) {
+                            promiseList.push(zip.files[filepath].async('string'));
+                        }
+                    }
+                    Promise.all(promiseList)
+                        .then(data => {
+                            for (let each of data) {
+                                let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
+                                if (result != 'result') {
+                                    var index = data.indexOf(each, 0);
+                                    if (index > -1) {
+                                        data.splice(index, 1);
+                                    }
+                                }
+                            }
+                            if (data.length == 0) {
+                                reject({code: 400, body: {"error": "my text"}});
+                            }
+                            else {
+                                data.shift();
+                                fs.writeFile(id + '.json', '[' + data + ']');
+                                fulfill({code: code, body: {}});
+                            }
+
+                        })
+                        .catch(function(){
+                            reject({code: 400, body: {"error": "my text"}});
+                        });
+                })
+                .catch(function() {
+                    reject({code: 400, body: {"error": "my text"}});
+                });
         })
     }
 
