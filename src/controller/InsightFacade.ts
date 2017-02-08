@@ -19,13 +19,14 @@ class DoEveryThing {
         //         return [];
         //     }
         //     return this.createORList(value, preList);
-        // } else if (input == "AND") {
-        //     if (value.length == 0){
-        //         this.fail = true;
-        //         return [];
-        //     }
-        //     return this.createANDList(value, preList);
-        // }
+        // } else
+            if (input == "AND") {
+            if (value.length == 0){
+                this.fail = true;
+                return [];
+            }
+            return this.createANDList(value, preList);
+        }
         var subKey: any = Object.keys(value);
         var subValue: any = value[subKey[0]];
         if (input == 'GT') {    // MComparison
@@ -81,30 +82,30 @@ class DoEveryThing {
     //     }
     //     return sortedList;
     // }
-    //
-    // createANDList(list: any[], preList: any[]): any[]{
-    //     var Initialized = false;
-    //     var resultlist: any[] = [];
-    //     for(let i = 0; i < list.length; i++){
-    //         var sortedList: any[] = [];
-    //         var keysOfObject = Object.keys(list[i]);
-    //         let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList);
-    //         if (!Initialized) {
-    //             resultlist = response;
-    //             Initialized = true;
-    //         } else {
-    //             for (var j = 0; j < response.length; j++) {
-    //                 for (var k = 0; k < resultlist.length; k++) {
-    //                     if (resultlist[k]["id"] == response[j]["id"]) {
-    //                         sortedList.push(response[j]);
-    //                     }
-    //                 }
-    //             }
-    //             resultlist = sortedList;
-    //         }
-    //     }
-    //     return resultlist;
-    // }
+
+    createANDList(list: any[], preList: any[]): any[]{
+        var Initialized = false;
+        var resultlist: any[] = [];
+        for(let i = 0; i < list.length; i++){
+            var sortedList: any[] = [];
+            var keysOfObject = Object.keys(list[i]);
+            let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList);
+            if (!Initialized) {
+                resultlist = response;
+                Initialized = true;
+            } else {
+                for (var j = 0; j < response.length; j++) {
+                    for (var k = 0; k < resultlist.length; k++) {
+                        if (resultlist[k]["id"] == response[j]["id"]) {
+                            sortedList.push(response[j]);
+                        }
+                    }
+                }
+                resultlist = sortedList;
+            }
+        }
+        return resultlist;
+    }
     createGTList(key: string, value: number, dataList: any[]): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
@@ -400,8 +401,12 @@ export default class InsightFacade implements IInsightFacade {
             if('courses' in DataList){
                 list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList['courses']);
             } else {
-                let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
-                list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
+                try {
+                    let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
+                    list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
+                }catch(e){
+                    reject({code: 400, body: {"error":["courses"]}});
+                }
             }
             if (Doeverything.fail) {
                 Doeverything.fail = false;

@@ -180,25 +180,39 @@ describe("EchoSpec", function () {
     };
     let query1: QueryRequest = {
         "WHERE":{
-            "OR":[
+            "AND":[
                 {
                     "AND":[
                         {
                             "GT":{
-                                "courses_avg":90
+                                "courses_avg":85
                             }
                         },
                         {
-                            "IS":{
-                                "courses_dept":"adhe"
+                            "LT":{
+                                "courses_fail":10
                             }
                         }
                     ]
                 },
                 {
-                    "EQ":{
-                        "courses_avg":95
-                    }
+                    "AND":[
+                        {
+                            "EQ":{
+                                "courses_avg": 90
+                            }
+                        },
+                        {
+                            "IS":{
+                                "courses_dept": "a*"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "courses_pass": 10
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -206,7 +220,8 @@ describe("EchoSpec", function () {
             "COLUMNS":[
                 "courses_dept",
                 "courses_id",
-                "courses_avg"
+                "courses_avg",
+                "courses_pass"
             ],
             "ORDER":"courses_avg",
             "FORM":"TABLE"
@@ -237,12 +252,10 @@ describe("EchoSpec", function () {
     }
     let query3: QueryRequest ={
         "WHERE": {
-            "OR": [{
+
                 "IS": {
                     "courses_dept": "adhe"
-                }},
-                {"IS" : {"courses_dept": "comm"}
-                }]
+                }
 
         },
         "OPTIONS":{
@@ -469,7 +482,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -633,7 +646,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(response.code);
         })
     })
-    it('query1', function() {
+    it.only('query1', function() {
         return insightFacade.performQuery(query1).then (function (value: any) {
             expect(value).to.eql(sampleResponse);
         }).catch(function (err:any) {
