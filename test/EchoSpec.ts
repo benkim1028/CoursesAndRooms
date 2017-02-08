@@ -570,6 +570,7 @@ describe("EchoSpec", function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insightFacade = new InsightFacade(); //added
         zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
+        // zipContent = Buffer.from(fs.readFileSync("courese1.zip")).toString('base64');
 
     });
 
@@ -816,7 +817,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only('query12', function() {
+    it('query12', function() {
         return insightFacade.performQuery(query12).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -900,6 +901,16 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
+
+    // it.only("Create an empty dataset with unique id", function () { //PASS
+    //     return insightFacade.addDataset("courses11", zipContent).then(function (value:any) {
+    //         Log.test('Value ' + value);
+    //         expect(value.code).to.equal(204);
+    //     }).catch(function (err:any) {
+    //         Log.test('Error: ' + err);
+    //         expect.fail();
+    //     })
+    // });
 
 
     it("addDataset with non-zip file", function () {
