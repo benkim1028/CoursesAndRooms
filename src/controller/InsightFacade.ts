@@ -338,35 +338,36 @@ export default class InsightFacade implements IInsightFacade {
 
 
     addDataset(id: string, content: string) : Promise<InsightResponse> {
-        return new Promise(function (fulfill, reject) {
-            let promiseList: Promise<any>[] =[];
-            let code:number = 0;
-            let zip = new JSZip();
-            try {
-                fs.unlinkSync(id + '.json')
-                code = 201; // id already existed
-            }catch(e){
-                code = 204; // id is new
-            }
-            zip.loadAsync(content,{base64: true})
-                .then(function (contents:any) {
-                    let filepaths = Object.keys(contents.files);
-                    if (filepaths.length  == 1) {
-                        reject({code: 400, body: {"error": "my text"}});
-                    }
-                    else {
-                        for (let filepath of filepaths) {
-                            promiseList.push(zip.files[filepath].async('string'));
+        try {
+            return new Promise(function (fulfill, reject) {
+                let promiseList: Promise<any>[] = [];
+                let code: number = 0;
+                let zip = new JSZip();
+                try {
+                    fs.unlinkSync(id + '.json')
+                    code = 201; // id already existed
+                } catch (e) {
+                    code = 204; // id is new
+                }
+                zip.loadAsync(content, {base64: true})
+                    .then(function (contents: any) {
+                        let filepaths = Object.keys(contents.files);
+                        if (filepaths.length == 1) {
+                            reject({code: 400, body: {"error": "my text"}});
                         }
-                    }
+                        else {
+                            for (let filepath of filepaths) {
+                                promiseList.push(zip.files[filepath].async('string'));
+                            }
+                        }
                         Promise.all(promiseList).then(data => {
                             var list: any [] = [];
                             var isObject = new RegExp("^\\{.*\\}$")
-                            for(let each of data) {
+                            for (let each of data) {
                                 if (isObject.test(each)) {
                                     try {
                                         var element: any = JSON.parse(<any>each);
-                                    }catch(e) {
+                                    } catch (e) {
                                         console.log(e);
                                     }
                                     //let keys = Object.keys(element);  // keys = ["result", "rank"]
@@ -385,24 +386,28 @@ export default class InsightFacade implements IInsightFacade {
                                     // }
                                 }
                             }
-                            if(list.length == 0){
+                            if (list.length == 0) {
                                 reject({code: 400, body: {"error": "this two"}});
                             }
                             DataList[id] = list;
                             try {
                                 fs.writeFile(id + '.json', JSON.stringify(list));
-                            } catch(e){
+                            } catch (e) {
                                 console.log(e);
                             }
                             fulfill({code: code, body: {}});
-                        }).catch(function(){
-                        reject({code: 400, body: {"error": "this three"}});
+                        }).catch(function () {
+                            reject({code: 400, body: {"error": "this three"}});
+                        });
+                    })
+                    .catch(function () {
+                        reject({code: 400, body: {"error": "this one"}});
                     });
-                })
-                .catch(function() {
-                    reject({code: 400, body: {"error": "this one"}});
-                });
-        })
+            })
+        }
+        catch(e) {
+            console.log(e);
+        }
     }
     // removeDataset(id: string): Promise<InsightResponse> {
     //     return new Promise(function (fulfill, reject) {
@@ -426,60 +431,70 @@ export default class InsightFacade implements IInsightFacade {
     //     })
     // }
     removeDataset(id: string): Promise<InsightResponse> {
-        var newPromise = new Promise(function (fulfill, reject){
-            var isFail: boolean = true;
-            try {
-                fs.unlinkSync(id + '.json');
-                delete DataList[id];
-                counter = true;
-            } catch (e) {
-                isFail = false;
-            }
-            if(isFail) {
-                fulfill({code: 204, body: {}});
-            } else{
-                reject({code: 404, body: {}});
-            }
-        })
-        return newPromise;
+        try {
+            var newPromise = new Promise(function (fulfill, reject) {
+                var isFail: boolean = true;
+                try {
+                    fs.unlinkSync(id + '.json');
+                    delete DataList[id];
+                    counter = true;
+                } catch (e) {
+                    isFail = false;
+                }
+                if (isFail) {
+                    fulfill({code: 204, body: {}});
+                } else {
+                    reject({code: 404, body: {}});
+                }
+            })
+            return newPromise;
+        }
+        catch(e) {
+            console.log(e);
+        }
     }
 
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
-        return new Promise(function (fulfill, reject) {
-            if (counter) {
-                Doeverything = new DoEveryThing;
-                counter = false;
-            }
-            //parse QueryRequest using EBFN and create a list = todoList
-            let names: any[] = Object.keys(query);
-            let body = query[names[0]];
-            let filterKey = Object.keys(body)[0];
-            let filterValue = body[filterKey];
-            let list: any = [];
-            if('courses' in DataList){
-                list = whatKindofFilter(filterKey, filterValue, DataList['courses']);
-            } else {
-                try {
-                    let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
-                    list = whatKindofFilter(filterKey, filterValue, datalist);
-                }catch(e){
+        try {
+            return new Promise(function (fulfill, reject) {
+                if (counter) {
+                    Doeverything = new DoEveryThing;
+                    counter = false;
+                }
+                //parse QueryRequest using EBFN and create a list = todoList
+                let names: any[] = Object.keys(query);
+                let body = query[names[0]];
+                let filterKey = Object.keys(body)[0];
+                let filterValue = body[filterKey];
+                let list: any = [];
+                if ('courses' in DataList) {
+                    list = whatKindofFilter(filterKey, filterValue, DataList['courses']);
+                } else {
+                    try {
+                        let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
+                        list = whatKindofFilter(filterKey, filterValue, datalist);
+                    } catch (e) {
+                        reject({code: 400, body: {"error": "my text"}});
+                    }
+                }
+                if (Doeverything.fail) {
+                    Doeverything.fail = false;
                     reject({code: 400, body: {"error": "my text"}});
                 }
-            }
-            if (Doeverything.fail) {
-                Doeverything.fail = false;
-                reject({code: 400, body: {"error": "my text"}});
-            }
-            let options = query[names[1]];
-            let response = createModifiedList(list, options);
-            if (Doeverything.fail) {
-                Doeverything.fail = false;
-                reject({code: 400, body: {"error": "my text"}});
-            }
-            console.log(response);
-            fulfill({code: 200, body: response});
-        })
+                let options = query[names[1]];
+                let response = createModifiedList(list, options);
+                if (Doeverything.fail) {
+                    Doeverything.fail = false;
+                    reject({code: 400, body: {"error": "my text"}});
+                }
+                console.log(response);
+                fulfill({code: 200, body: response});
+            })
+        }
+        catch(e) {
+            console.log(e);
+        }
     }
 }
 
