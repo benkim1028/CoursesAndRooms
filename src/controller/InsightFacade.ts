@@ -4,13 +4,12 @@ import fs = require('fs');
 
 var JSZip = require('jszip');
 
+let DataList: any = {};
 class DoEveryThing {
     fail :boolean;
-    data: any;
     constructor() {
         Log.trace('Doeverything::init()');
         this.fail = false;
-        this.data = this.dataFromLocal();
     }
     whatKindofFilter(input: any, value: any, preList: any = []) {
         // this takes filter and its
@@ -188,22 +187,22 @@ class DoEveryThing {
         return sortedList;
     }
 
-    dataFromLocal(): any {
-        // return data's from local file
-        var test = fs.readFileSync('courses.json', 'utf-8');
-        var parsed: any = JSON.parse(test);
-        var list: any [] = [];
-        // console.log(k);
-        for (let element of parsed) {           // element = {"result":[...] , "rank":0}
-            let keys = Object.keys(element);  // keys = ["result", "rank"]
-            var course_info = element[keys[0]];  // course_info = value of result = [{....}]
-            for (let each of course_info) {// each = each object in result
-                if (each != [])
-                    list.push(each);
-            }
-        }
-        return list;
-    }
+    // dataFromLocal(): any {
+    //     // return data's from local file
+    //     var test = fs.readFileSync('courses.json', "utf8");
+    //     var parsed: any = JSON.parse(test);
+    //     var list: any [] = [];
+    //     // console.log(k);
+    //     for (let element of parsed) {           // element = {"result":[...] , "rank":0}
+    //         let keys = Object.keys(element);  // keys = ["result", "rank"]
+    //         var course_info = element[keys[0]];  // course_info = value of result = [{....}]
+    //         for (let each of course_info) {// each = each object in result
+    //             if (each != [])
+    //                 list.push(each);
+    //         }
+    //     }
+    //     return list;
+    // }
 
 
     findKey(key: string) : string {
@@ -227,7 +226,6 @@ class DoEveryThing {
             return "id";
         else
             this.fail = true;
-        return "";
     }
 
     createModifiedList(list: any, options: any): any {
@@ -308,113 +306,116 @@ export default class InsightFacade implements IInsightFacade {
                             promiseList.push(zip.files[filepath].async('string'));
                         }
                     }
-                    Promise.all(promiseList)
-                        .then(data => {
-                            for (let each of data) {
-                                let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
-                                if (result != 'result') {
-                                    var index = data.indexOf(each, 0);
-                                    if (index > -1) {
-                                        data.splice(index, 1);
+                        Promise.all(promiseList).then(data => {
+                            var list: any [] = [];
+                            var isObject = new RegExp("^\\{.*\\}$")
+                            for(let each of data) {
+                                if (isObject.test(each)) {
+                                    var element: any = JSON.parse(<any>each);
+                                    //let keys = Object.keys(element);  // keys = ["result", "rank"]
+                                    var course_info = element["result"];  // course_info = value of result = [{....}]
+                                    for (let each1 of course_info) {// each = each object in result
+                                        if (each1 != [])
+                                            list.push(each1);
                                     }
+                                    // if (data.length == 0) {
+                                    //     reject({code: 400, body: {"error": "my text"}});
+                                    // }
+                                    // else {
+                                    //     data.shift();
+                                    //     fs.writeFile(id + '.json', '[' + data + ']');
+                                    //     fulfill({code: code, body: {}});
+                                    // }
                                 }
                             }
-                            if (data.length == 0) {
-                                reject({code: 400, body: {"error": "my text"}});
+                            if(list.length == 0){
+                                reject({code: 400, body: {"error": "this two"}});
                             }
-                            else {
-                                data.shift();
-                                fs.writeFile(id + '.json', '[' + data + ']');
-                                fulfill({code: code, body: {}});
-                            }
-
-                        })
-                        .catch(function(){
-                            reject({code: 400, body: {"error": "my text"}});
-                        });
+                            DataList[id] = list;
+                            fs.writeFile(id + '.json', JSON.stringify(list));
+                            fulfill({code: code, body: {}});
+                        }).catch(function(){
+                        reject({code: 400, body: {"error": "this three"}});
+                    });
                 })
                 .catch(function() {
-                    reject({code: 400, body: {"error": "my text"}});
+                    reject({code: 400, body: {"error": "this one"}});
                 });
         })
     }
-    removeDataset(id: string): Promise<InsightResponse> {
-        return new Promise(function (fulfill, reject) {
-            fs.access(id + '.json', (err) => {
-                if (err) {
-                    reject({code: 404, body: {}});
-                    return;
-                } else if (!err) {
-                    fs.unlink(id + '.json', (err) => {
-                        if (!err) {
-                            fulfill({code: 204, body: {}});
-                            return;
-                        }
-                        else {
-                            reject({code: 404, body: {}});
-                            return;
-                        }
-                    })
-                }
-            })
-        })
-    }
     // removeDataset(id: string): Promise<InsightResponse> {
-    //     var newPromise = new Promise(function (fulfill, reject){
-    //         var isFail: boolean = true;
-    //         try {
-    //             fs.unlinkSync(id + '.json');
-    //             Doeverything.data = null;
-    //             counter = true;
-    //         } catch (e) {
-    //             isFail = false;
-    //         }
-    //         if(isFail) {
-    //             fulfill({code: 204, body: {}});
-    //         } else{
-    //             reject({code: 404, body: {}});
-    //         }
+    //     return new Promise(function (fulfill, reject) {
+    //         fs.access(id + '.json', (err) => {
+    //             if (err) {
+    //                 reject({code: 404, body: {}});
+    //                 return;
+    //             } else if (!err) {
+    //                 fs.unlink(id + '.json', (err) => {
+    //                     if (!err) {
+    //                         fulfill({code: 204, body: {}});
+    //                         return;
+    //                     }
+    //                     else {
+    //                         reject({code: 404, body: {}});
+    //                         return;
+    //                     }
+    //                 })
+    //             }
+    //         })
     //     })
-    //     return newPromise;
     // }
+    removeDataset(id: string): Promise<InsightResponse> {
+        var newPromise = new Promise(function (fulfill, reject){
+            var isFail: boolean = true;
+            try {
+                fs.unlinkSync(id + '.json');
+                delete DataList[id];
+                counter = true;
+            } catch (e) {
+                isFail = false;
+            }
+            if(isFail) {
+                fulfill({code: 204, body: {}});
+            } else{
+                reject({code: 404, body: {}});
+            }
+        })
+        return newPromise;
+    }
 
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            try {
-                if (counter) {
-                    Doeverything = new DoEveryThing;
-                    counter = false;
-                }
-                var globallist = Doeverything.data;
-                //parse QueryRequest using EBFN and create a list = todoList
-                let names: any[] = Object.keys(query);
-                let body = query[names[0]];
-                let filterKey = Object.keys(body)[0];
-                let filterValue = body[filterKey];
-                let list = Doeverything.whatKindofFilter(filterKey, filterValue, globallist);
-                if (Doeverything.fail) {
-                    Doeverything.fail = false;
-                    reject({code: 400, body: {"error": "my text"}});
-                    return;
-                }
-                if (list.length == 0){
-                    fulfill({code: 200, body: {}});
-                    return;
-                }
-                let options = query[names[1]];
-                let response = Doeverything.createModifiedList(list, options);
-                if (Doeverything.fail) {
-                    Doeverything.fail = false;
-                    reject({code: 400, body: {"error": "my text"}});
-                }
-                console.log(response);
-                fulfill({code: 200, body: response});
+            if (counter) {
+                Doeverything = new DoEveryThing;
+                counter = false;
             }
-            catch(e){
-                reject({code: 400, body: {"error": ["courses"]}});
+            //parse QueryRequest using EBFN and create a list = todoList
+            let names: any[] = Object.keys(query);
+            let body = query[names[0]];
+            let filterKey = Object.keys(body)[0];
+            let filterValue = body[filterKey];
+            let list: any = [];
+            if('courses' in DataList){
+                list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList['courses']);
+            } else {
+                let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
+                list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
             }
+            if (Doeverything.fail) {
+                Doeverything.fail = false;
+                reject({code: 400, body: {"error": "my text"}});
+            }
+            let options = query[names[1]];
+            let response = Doeverything.createModifiedList(list, options);
+            if (Doeverything.fail) {
+                Doeverything.fail = false;
+                reject({code: 400, body: {"error": "my text"}});
+            }
+            console.log(response);
+            fulfill({code: 200, body: response});
         })
     }
 }
+
 
