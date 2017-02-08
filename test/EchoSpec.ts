@@ -406,13 +406,7 @@ describe("EchoSpec", function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insightFacade = new InsightFacade(); //added
         zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
-        // emptyfolder = Buffer.from(fs.readFileSync("course2.zip")).toString('base64');
-        // invalidfiletxt = Buffer.from(fs.readFileSync("course3.zip")).toString('base64');
-        // invalidzip = Buffer.from(fs.readFileSync("courses.txt")).toString('base64');
-        // invalidDataPicture = Buffer.from(fs.readFileSync("courses2.zip")).toString('base64');
-        // fewinvalid = Buffer.from(fs.readFileSync("fewinvalid.zip")).toString('base64');
-        // zipinzip = Buffer.from(fs.readFileSync("zipinzip.zip")).toString('base64');
-        // zipContentnot64 = Buffer.from(fs.readFileSync("courses.zip")).toString();
+
     });
 
     after(function () {
@@ -469,114 +463,6 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
-        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
-            Log.test('Value ' + value);
-            var response: InsightResponse = {
-                code: 204,
-                body: {}
-            };
-            expect(value.code).to.equal(response.code);
-        })
-    });
-
-    it("Create a new dataset with non-unique id", function () {
-        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
-            Log.test('Value ' + value);
-            var response : InsightResponse = { code: 201, body: {} };
-            expect(value.code).to.equal(response.code);
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    });
-    // it('adddatasetEmptyFolder', function() {
-    //     return insightFacade.addDataset("emptyfolder", emptyfolder).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
-    // it('adddatasetnot64', function() {
-    //     return insightFacade.addDataset("emptyfolder", zipContentnot64).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
-    // it('adddatasetNoPath', function() {
-    //     return insightFacade.addDataset("nopath", nopath).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
-    // it('adddatasetInvalidfiletxt', function() {
-    //     return insightFacade.addDataset("invalidfiletxt", invalidfiletxt).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
-    // it('adddatasetinvalidzip', function() {
-    //     return insightFacade.addDataset("invalidzip", invalidzip).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
-    // it('adddatasetFailinvalidDatapicture', function() {
-    //     return insightFacade.addDataset("invalidDataPicture", invalidDataPicture ).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
-    // //problem
-    // it('adddatasetFailFewInvalid', function() {
-    //     return insightFacade.addDataset("fewinvalid", fewinvalid).then (function (value: any) {
-    //         var response : InsightResponse = {
-    //             code: 204, body: {}
-    //         };
-    //         expect(value.code).to.equal(response.code);
-    //     })
-    // });
-    // it('adddatasetzipinzip', function() {
-    //     return insightFacade.addDataset("zipinzip", zipinzip).then (function (value: any) {
-    //         expect.fail();
-    //     }).catch(function (err:any) {
-    //         console.log(zipinzip);
-    //         var response : InsightResponse = {
-    //             code: 400, body: {"error": "fail"}
-    //         };
-    //         Log.test('Error: ' + err);
-    //         expect(err.code).to.equal(response.code);
-    //     })
-    // });
 
     it('query', function() {
         return insightFacade.performQuery(query).then (function (value: any) {
@@ -769,14 +655,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it('removedataset', function(){
-        return insightFacade.removeDataset('courses').then(function (value: any){
-            var response : InsightResponse = {
-                code: 204, body: {}
-            };
-            expect(value.code).to.equal(response.code);
-        })
-    })
+
     it('removedatasetfail', function(){
         return insightFacade.removeDataset('couresssssssssss').then (function (value: any) {
             expect.fail();
@@ -789,5 +668,594 @@ describe("EchoSpec", function () {
         })
     })
     //added
+
+    it("Create a new dataset with non-unique id ", function () {
+        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(201);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+    
+
+    it("removeDataset with existing file", function () {
+        return insightFacade.removeDataset('courses').then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(204);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
+
+    it("Create an empty dataset with unique id", function () { //PASS
+        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(204);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+
+    it("addDataset with non-zip file", function () {
+        return insightFacade.addDataset("1234", "average").then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+            expect(err.body.error).to.equal("my text");
+        })
+    }); //added
+
+    it("removeDataset with non-existing file", function () {
+        return insightFacade.removeDataset('courses10000').then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(404);
+        })
+    }); //added
+
+
+
+    it("Basic query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"GT":
+                    {"courses_avg":97
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
+
+    it("Basic query wiht invalid input", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"GT":
+                    {"courses_av":97
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("Basic query with dep", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"IS":
+                    {"courses_dept": "aanb"
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg"
+                        // "courses_uuid",
+                        // "courses_fail",
+                        // "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
+
+    it("Complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "GT":{
+                                        "courses_avg":90
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "courses_dept":"adhe"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "EQ":{
+                                "courses_avg":95
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
+
+    it("GT error with simple query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"GT":
+                    {"courses_dept": "lol"
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+
+    it("LT error with simple query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"LT":
+                    {"courses_dept": "lol"
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("EQ error with simple query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"EQ":
+                    {"courses_dept": "lol"
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("IS error with simple query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"IS":
+                    {"courses_avg":97
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass",
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("GT error with complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "GT":{
+                                        "courses_dept": 80
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "courses_dept":"adhe"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "EQ":{
+                                "courses_avg":95
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("GT error without complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "GT":{
+                                        "courses_avg":95
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "courses_instructor":"*a*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "GT":{
+                                "courses_fail":5
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            // expect.fail();
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            // expect(err.code).to.equal(400);
+            expect.fail();
+        })
+    }); //added
+
+    it("GT GT error with complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "GT":{
+                                        "course_dept": "adhe"
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "courses_instructor":"*a*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "GT":{
+                                "courses_fail":5
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("LT error with complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "LT":{
+                                        "course_dept": "adhe"
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "courses_instructor":"*a*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "GT":{
+                                "courses_fail":5
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("EQT error with complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "EQ":{
+                                        "course_dept": "adhe"
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "courses_instructor":"*a*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "GT":{
+                                "courses_fail":5
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("IS error with complex query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "GT":{
+                                        "course_avg": 95
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "course_avg": 95
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "GT":{
+                                "courses_fail":5
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
+        })
+    }); //added
 
 });

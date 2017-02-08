@@ -348,40 +348,20 @@ export default class InsightFacade implements IInsightFacade {
                     fs.unlink(id + '.json', (err) => {
                         if (!err) {
                             fulfill({code: 204, body: {}});
-                            return;
                         }
                         else {
                             reject({code: 404, body: {}});
-                            return;
                         }
                     })
                 }
             })
         })
     }
-    // removeDataset(id: string): Promise<InsightResponse> {
-    //     var newPromise = new Promise(function (fulfill, reject){
-    //         var isFail: boolean = true;
-    //         try {
-    //             fs.unlinkSync(id + '.json');
-    //             Doeverything.data = null;
-    //             counter = true;
-    //         } catch (e) {
-    //             isFail = false;
-    //         }
-    //         if(isFail) {
-    //             fulfill({code: 204, body: {}});
-    //         } else{
-    //             reject({code: 404, body: {}});
-    //         }
-    //     })
-    //     return newPromise;
-    // }
 
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
-            try {
+
                 if (counter) {
                     Doeverything = new DoEveryThing;
                     counter = false;
@@ -393,15 +373,6 @@ export default class InsightFacade implements IInsightFacade {
                 let filterKey = Object.keys(body)[0];
                 let filterValue = body[filterKey];
                 let list = Doeverything.whatKindofFilter(filterKey, filterValue, globallist);
-                if (Doeverything.fail) {
-                    Doeverything.fail = false;
-                    reject({code: 400, body: {"error": "my text"}});
-                    return;
-                }
-                if (list.length == 0){
-                    fulfill({code: 200, body: {}});
-                    return;
-                }
                 let options = query[names[1]];
                 let response = Doeverything.createModifiedList(list, options);
                 if (Doeverything.fail) {
@@ -410,10 +381,7 @@ export default class InsightFacade implements IInsightFacade {
                 }
                 console.log(response);
                 fulfill({code: 200, body: response});
-            }
-            catch(e){
-                reject({code: 400, body: {"error": ["courses"]}});
-            }
+
         })
     }
 }
