@@ -338,24 +338,24 @@ export default class InsightFacade implements IInsightFacade {
                 });
         })
     }
-    removeDataset(id: string): Promise<InsightResponse> {
-        var newPromise = new Promise(function (fulfill, reject){
-            var isFail: boolean = true;
-            try {
-                fs.unlinkSync(id + '.json');
-                Doeverything.data = null;
-                counter = true;
-            } catch (e) {
-                isFail = false;
-            }
-            if(isFail) {
-                fulfill({code: 204, body: {}});
-            } else{
-                reject({code: 404, body: {}});
-            }
-        })
-        return newPromise;
-    }
+    // removeDataset(id: string): Promise<InsightResponse> {
+    //     var newPromise = new Promise(function (fulfill, reject){
+    //         var isFail: boolean = true;
+    //         try {
+    //             fs.unlinkSync(id + '.json');
+    //             Doeverything.data = null;
+    //             counter = true;
+    //         } catch (e) {
+    //             isFail = false;
+    //         }
+    //         if(isFail) {
+    //             fulfill({code: 204, body: {}});
+    //         } else{
+    //             reject({code: 404, body: {}});
+    //         }
+    //     })
+    //     return newPromise;
+    // }
 
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
