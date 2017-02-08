@@ -3,6 +3,7 @@ import Log from "../Util";
 import fs = require('fs');
 
 var JSZip = require('jszip');
+let DataList:any[] = [];
 
 class DoEveryThing {
     fail :boolean;
@@ -10,7 +11,7 @@ class DoEveryThing {
     constructor() {
         Log.trace('Doeverything::init()');
         this.fail = false;
-        this.data = this.dataFromLocal();
+        this.data = DataList;
     }
     whatKindofFilter(input: any, value: any, preList: any = []) {
         // this takes filter and its
@@ -190,7 +191,7 @@ class DoEveryThing {
 
     dataFromLocal(): any {
         // return data's from local file
-        var test = fs.readFileSync('courses.json', 'utf-8');
+        var test = fs.readFileSync('courese1.json', 'utf-8');
         var parsed: any = JSON.parse(test);
         var list: any [] = [];
         // console.log(k);
@@ -306,27 +307,24 @@ export default class InsightFacade implements IInsightFacade {
                     else {
                         for (let filepath of filepaths) {
                             promiseList.push(zip.files[filepath].async('string'));
+
                         }
                     }
                     Promise.all(promiseList)
                         .then(data => {
-                            for (let each of data) {
-                                let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
-                                if (result != 'result') {
-                                    var index = data.indexOf(each, 0);
-                                    if (index > -1) {
-                                        data.splice(index, 1);
-                                    }
-                                }
-                            }
-                            if (data.length == 0) {
+                            if (data.length == 1) {
                                 reject({code: 400, body: {"error": "my text"}});
                             }
                             else {
-                                data.shift();
-                                fs.writeFile(id + '.json', '[' + data + ']');
-                                fulfill({code: code, body: {}});
+                                for (let each of data) {
+                                    let result:string = each[2] + each[3] + each[4] + each[5] + each[6] + each[7];
+                                    if (result == 'result') {
+                                        DataList.push(each);
+                                    }
+                                }
                             }
+                            fs.writeFile(id + '.json', DataList);
+                            fulfill({code: code, body: {}});
 
                         })
                         .catch(function(){
