@@ -38,7 +38,7 @@ describe("EchoSpec", function () {
                 "courses_avg"
             ],
             "ORDER":"courses_avg",
-            "FOR":"TABLE"
+            "FORM":"TABLE"
         }
     };
     let querya: QueryRequest = {
@@ -220,10 +220,13 @@ describe("EchoSpec", function () {
             "AND": [{
                 "EQ": {
                     "courses_dept": "adhe"
-                }},
-                {"GT" : {"courses_avg": 90}
+                }
+            },
+                {
+                    "GT": {
+                        "courses_avg": 90
+                    }
                 }]
-
         },
         "OPTIONS":{
             "COLUMNS":[
@@ -231,7 +234,7 @@ describe("EchoSpec", function () {
                 "courses_id",
                 "courses_avg"
             ],
-            "ORDER":"courses_avg",
+            "ORDER": "invalid",
             "FORM":"TABLE"
         }
     }
@@ -259,7 +262,7 @@ describe("EchoSpec", function () {
     let query6: QueryRequest = {
         "WHERE":{
                     "IS":{
-                        "courses_instructor" : "jor*"
+                        "courses_title" : "* anat"
                     }
         },
         "OPTIONS":{
@@ -436,7 +439,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -611,7 +614,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     })
-    it('query3', function() {
+    it('successquery3', function() {
         return insightFacade.performQuery(query3).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -622,7 +625,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     })
-    it('query4', function() {
+    it.only('InvalidOrderquery4', function() {
         return insightFacade.performQuery(query4).then (function (value: any) {
             expect.fail();
         }).catch(function (err:any) {
@@ -738,12 +741,24 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it('removedataset', function(){
+    it.only('removedataset', function(){
         return insightFacade.removeDataset('courses').then(function (value: any){
             var response : InsightResponse = {
                 code: 204, body: {}
             };
             expect(value.code).to.equal(response.code);
+        })
+    })
+    it.only('test perfrom query after data is removed', function() {
+        return insightFacade.performQuery(query).then (function (value: any) {
+            expect.fail();
+        }).catch(function (err:any) {
+            var response : InsightResponse = {
+                code: 424, body: {"missing": ["courses"]}
+            };
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(response.code);
+            expect(err.body).to.eql(response.body);
         })
     })
     it('removedatasetfail', function(){
@@ -757,6 +772,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(response.code);
         })
     })
+
     //added
 
 });

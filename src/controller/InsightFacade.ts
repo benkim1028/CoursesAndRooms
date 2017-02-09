@@ -192,21 +192,21 @@ class DoEveryThing {
             this.fail= true;
             return [];
         }
-        var firstcase = new RegExp("^\\*([a-z]+|(\\;|\\-|\\,))([a-z]|(\\;|\\-|\\s|\\,))*$");
-        var secondcase = new RegExp("^([a-z]|(\\;|\\-|\\s|\\,))*([a-z]+|(\\;|\\-|\\,))\\*$");
-        var thirdcase = new RegExp("^\\*([a-z]|(\\;|\\-|\\,))+([a-z]|(\\;|\\-|\\,|\\s))*\\*$");
+        var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
+        var secondcase = new RegExp("^(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
+        var thirdcase = new RegExp("^^\\*(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
         var testcase = new RegExp("\\*");
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'string') {
                     if (firstcase.test(value)) {
-                        let res = value.replace(testcase, "");
+                        let res = value.replace(testcase, "");      //"*...."
                         var newregex = new RegExp("^.*" + res + "$");
                         if (newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
                     }
                     else if (secondcase.test(value)) {
-                        let res = value.replace(testcase, "");// getting only strings from *....*
+                        let res = value.replace(testcase, "");// ".....*"
                         var newregex = new RegExp("^" + res + ".*$");
                         if (newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
@@ -214,7 +214,7 @@ class DoEveryThing {
 
                     else if (thirdcase.test(value)) {
                         let res = value.replace(testcase, "");
-                        res = res.replace(testcase, "");// getting only strings from *....*
+                        res = res.replace(testcase, "");//  *....*
                         var newregex = new RegExp("^.*" + res + ".*$")
                         if (newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
@@ -260,24 +260,6 @@ class DoEveryThing {
 
     }
 
-    // dataFromLocal(): any {
-    //     // return data's from local file
-    //     var test = fs.readFileSync('courses.json', "utf8");
-    //     var parsed: any = JSON.parse(test);
-    //     var list: any [] = [];
-    //     // console.log(k);
-    //     for (let element of parsed) {           // element = {"result":[...] , "rank":0}
-    //         let keys = Object.keys(element);  // keys = ["result", "rank"]
-    //         var course_info = element[keys[0]];  // course_info = value of result = [{....}]
-    //         for (let each of course_info) {// each = each object in result
-    //             if (each != [])
-    //                 list.push(each);
-    //         }
-    //     }
-    //     return list;
-    // }
-
-
     findKey(key: string){
         if(key == "courses_dept")
             return "Subject";
@@ -307,9 +289,16 @@ class DoEveryThing {
         let output: any = {'render': '','result': []};
         let newlist: any[] = [];
         let optionsKey = Object.keys(options);
-        if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "ORDER" || optionsKey[2] != "FORM"){
-            this.fail = true;
-            return [];
+        if (optionsKey.length == 3) {
+            if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "ORDER" || optionsKey[2] != "FORM") {
+                this.fail = true;
+                return [];
+            }
+        } else if (optionsKey.length == 2){
+            if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "FORM"){
+                this.fail = true;
+                return [];
+            }
         }
         let form = Object.keys(options)[2];
         if(options[form] != "TABLE"){
@@ -331,12 +320,14 @@ class DoEveryThing {
             }
             newlist.push(element);
         }
-        let order = Object.keys(options)[1];
-        let orderValue = options[order];
-        if(this.findKey(orderValue) == ""){
-            return [];
+        if(optionsKey.length == 3) {
+            let order = Object.keys(options)[1];
+            let orderValue = options[order];
+            if (this.findKey(orderValue) == "") {
+                return [];
+            }
+            newlist.sort(this.sort_by(orderValue, false, parseFloat));
         }
-        newlist.sort(this.sort_by(orderValue, false, parseFloat));
         for(let i = 0; i < newlist.length; i++)
             output['result'].push(newlist[i]);
         return output;
@@ -396,7 +387,7 @@ export default class InsightFacade implements IInsightFacade {
                     }
                     Promise.all(promiseList).then(data => {
                         var list: any [] = [];
-                        var isObject = new RegExp("^\\{.*\\}$")
+                        var isObject = new RegExp("^\\{.*\\}$");
                         for(let each of data) {
                             if (isObject.test(each)) {
                                 var element: any = JSON.parse(<any>each);
@@ -466,7 +457,7 @@ export default class InsightFacade implements IInsightFacade {
                     let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
                     list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
                 }catch(e){
-                    reject({code: 424, body: {"error":["courses"]}});
+                    reject({code: 424, body: {"missing":["courses"]}});
                 }
             }
             if (Doeverything.fail) {
