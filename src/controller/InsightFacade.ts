@@ -126,7 +126,8 @@ class DoEveryThing {
                 }
             }
             return sortedList;
-        } else{
+        }
+        else{
             for (let i = 0; i < dataList.length; i++) {
 
                 if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] <= value) {
