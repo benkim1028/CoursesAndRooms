@@ -519,6 +519,145 @@ describe("EchoSpec", function () {
         }
     };
 
+    let query13: QueryRequest = {
+        "WHERE":{
+            "AND":[
+                {
+                    "AND": [
+                        {
+                            "AND": [
+                                {
+                                    "NOT" : {
+                                        "GT": {
+                                            "courses_avg": 87.5
+                                        }
+                                    } ,
+                                    "LT": {
+                                        "courses_fail": 2
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 87.6
+                                    },
+                                    "LT": {
+                                        "courses_fail": 10
+                                    }
+                                }
+                            ]
+                        }
+
+
+
+                    ]
+                },
+                {
+                    "GT":{
+                        "courses_avg":87
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_instructor":""
+                    }
+                }
+                ,
+                {
+                    "LT":{
+                        "courses_avg":88
+                    }
+                }
+            ]
+        },
+
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg",
+                "courses_instructor"
+
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+
+    let query14: QueryRequest = {
+        "WHERE":{
+            "AND":[
+                {
+                    "AND": [
+                        {
+                            "AND": [
+                                {
+                                    "NOT" : {
+                                        "NOT": {
+                                            "GT": {
+                                                "courses_avg": 87.5
+                                            }
+                                        }
+                                    },
+                                    "LT": {
+                                        "courses_fail": 2
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 87.6
+                                    },
+                                    "LT": {
+                                        "courses_fail": 10
+                                    }
+                                }
+                            ]
+                        }
+
+
+
+                    ]
+                },
+                {
+                    "GT":{
+                        "courses_avg":87
+                    }
+                },
+                {
+                    "IS":{
+                        "courses_instructor":""
+                    }
+                }
+                ,
+                {
+                    "LT":{
+                        "courses_avg":88
+                    }
+                }
+            ]
+        },
+
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg",
+                "courses_instructor"
+
+            ],
+            "ORDER":"courses_avg",
+            "FORM":"TABLE"
+        }
+    };
+
+
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
         expect(response).to.have.property('body');
@@ -598,7 +737,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -814,6 +953,30 @@ describe("EchoSpec", function () {
 
     it('query12', function() {
         return insightFacade.performQuery(query12).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it.only('query13', function() {
+        return insightFacade.performQuery(query11).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it.only('query14', function() {
+        return insightFacade.performQuery(query11).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
             };
@@ -1493,7 +1656,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("removeDataset with existing file", function () {
+    it.only("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
