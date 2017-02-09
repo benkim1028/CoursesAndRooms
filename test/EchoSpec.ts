@@ -737,7 +737,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -963,7 +963,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only('query13', function() {
+    it('query13', function() {
         return insightFacade.performQuery(query11).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -975,7 +975,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only('query14', function() {
+    it('query14', function() {
         return insightFacade.performQuery(query11).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -1656,7 +1656,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
