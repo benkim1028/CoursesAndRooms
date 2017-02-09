@@ -11,62 +11,63 @@ class DoEveryThing {
         Log.trace('Doeverything::init()');
         this.fail = false;
     }
-    whatKindofFilter(input: any, value: any, preList: any = []) {
+    whatKindofFilter(key: any, value: any, preList: any = [], not: boolean = true) {
         // this takes filter and its
+        var input = key;
+        if(input == "OR" && not == false)
+            input = "AND";
+        if(input == "AND" && not == false)
+            input = "OR";
         if (input == "OR") {//logic comparison
             if (value.length == 0){
                 this.fail = true;
                 return [];
             }
-            return this.createORList(value, preList);
+            return this.createORList(value, preList, not);
         } else if (input == "AND") {
             if (value.length == 0){
                 this.fail = true;
                 return [];
             }
-            return this.createANDList(value, preList);
+            return this.createANDList(value, preList, not);
         }
         var subKey: any = Object.keys(value);
         var subValue: any = value[subKey[0]];
         if (input == 'GT') {    // MComparison
-            return this.createGTList(subKey[0], subValue, preList);
+            return this.createGTList(subKey[0], subValue, preList, not);
         }
         else if (input == 'LT') {
-            return this.createLTList(subKey[0], subValue, preList);
+            return this.createLTList(subKey[0], subValue, preList, not);
         }
         else if (input == 'EQ') {     //SComparison
-            return this.createEQList(subKey[0], subValue, preList);
+            return this.createEQList(subKey[0], subValue, preList, not);
         }
         else if (input == "IS") {
-            return this.createISList(subKey[0], subValue, preList);
+            return this.createISList(subKey[0], subValue, preList, not);
         }
-        // else if (input == "NOT") {
-        //     return this.createNOTList(value, preList);
-        // }
+        else if (input == "NOT") {
+            return this.createNOTList(value, preList, not);
+        }
         else {
             this.fail = true;
             return [];
         }
     }
-    //
-    // createNOTList(value: any, dataList: any[]): any[] {
-    //     var key = Object.keys(value)[0];
-    //     var keyValue = value[key];
-    //     var response = this.whatKindofFilter(key, keyValue, dataList);
-    //     var sortedList: any[] = [];
-    //     for (var k = 0; k < response.length; k++) {
-    //         for(var j= 0; j < dataList.length; j++) {
-    //             if (response[k]["id"] != dataList[j]["id"])
-    //                 sortedList.push(response[k]);
-    //         }
-    //     }
-    //     return sortedList;
-    // }
-    createORList(list: any[], preList: any[]): any[]{
+    createNOTList(value: any, dataList: any[], not:boolean): any[] {
+        var key = Object.keys(value)[0];
+        var keyValue = value[key];
+        if(not) {
+            var response = this.whatKindofFilter(key, keyValue, dataList, false);
+        } else {
+            var response = this.whatKindofFilter(key, keyValue, dataList, true);
+        }
+        return response;
+    }
+    createORList(list: any[], preList: any[], not:boolean): any[]{
         var sortedList: any[] = [];
         for(let i = 0; i < list.length; i++){
             var keysOfObject = Object.keys(list[i]);
-            let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList);
+            let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList, not);
             if(sortedList.length == 0){
                 sortedList = response;
             } else {
@@ -86,13 +87,13 @@ class DoEveryThing {
         return sortedList;
     }
 
-    createANDList(list: any[], preList: any[]): any[]{
+    createANDList(list: any[], preList: any[],not:boolean): any[]{
         var Initialized = false;
         var resultlist: any[] = [];
         for(let i = 0; i < list.length; i++){
             var sortedList: any[] = [];
             var keysOfObject = Object.keys(list[i]);
-            let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList);
+            let response = this.whatKindofFilter(keysOfObject[0], list[i][keysOfObject[0]], preList, not);
             if (!Initialized) {
                 resultlist = response;
                 Initialized = true;
@@ -109,53 +110,82 @@ class DoEveryThing {
         }
         return resultlist;
     }
-    createGTList(key: string, value: number, dataList: any[]): any[] {
+    createGTList(key: string, value: number, dataList: any[],not:boolean): any[] {
+        var sortedList: any[] = [];
+        var realKey = this.findKey(key);
+
+        if(typeof value !== 'number'){
+            this.fail= true;
+            return [];
+        }
+        if (not) {
+            for (let i = 0; i < dataList.length; i++) {
+
+                if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] > value) {
+                    sortedList.push(dataList[i]);
+                }
+            }
+            return sortedList;
+        } else{
+            for (let i = 0; i < dataList.length; i++) {
+
+                if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] <= value) {
+                    sortedList.push(dataList[i]);
+                }
+            }
+            return sortedList;
+        }
+
+    }
+    createLTList(key: string, value: number, dataList: any[], not:boolean): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if(typeof value !== 'number'){
             this.fail= true;
             return [];
         }
-        for(let i = 0; i < dataList.length; i++){
-
-            if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] > value) {
-                sortedList.push(dataList[i]);
+        if(not) {
+            for (let i = 0; i < dataList.length; i++) {
+                if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] < value) {
+                    sortedList.push(dataList[i]);
+                }
             }
+            return sortedList;
+        } else{
+            for (let i = 0; i < dataList.length; i++) {
+                if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] >= value) {
+                    sortedList.push(dataList[i]);
+                }
+            }
+            return sortedList;
         }
-        return sortedList;
-
     }
-    createLTList(key: string, value: number, dataList: any[]): any[] {
+
+    createEQList(key: string, value: number, dataList: any[],not:boolean): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if(typeof value !== 'number'){
             this.fail= true;
             return [];
         }
-        for(let i = 0; i < dataList.length; i++){
-            if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] < value) {
-                sortedList.push(dataList[i]);
+        if(not) {
+            for (let i = 0; i < dataList.length; i++) {
+                if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] == value) {
+                    sortedList.push(dataList[i]);
+                }
             }
+            return sortedList;
+        } else{
+            for (let i = 0; i < dataList.length; i++) {
+                if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] != value) {
+                    sortedList.push(dataList[i]);
+                }
+            }
+            return sortedList;
         }
-        return sortedList;
     }
 
-    createEQList(key: string, value: number, dataList: any[]): any[] {
-        var sortedList: any[] = [];
-        var realKey = this.findKey(key);
-        if(typeof value !== 'number'){
-            this.fail= true;
-            return [];
-        }
-        for(let i = 0; i < dataList.length; i++){
-            if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] == value) {
-                sortedList.push(dataList[i]);
-            }
-        }
-        return sortedList;
-    }
-
-    createISList(key: string, value: string, dataList: any[]): any[] {
+    createISList(key: string, value: string, dataList: any[], not:boolean): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if(typeof value !== 'string'){
@@ -165,35 +195,69 @@ class DoEveryThing {
         var firstcase = new RegExp("^\\*([a-z]+|(\\;|\\-|\\,))([a-z]|(\\;|\\-|\\s|\\,))*$");
         var secondcase = new RegExp("^([a-z]|(\\;|\\-|\\s|\\,))*([a-z]+|(\\;|\\-|\\,))\\*$");
         var thirdcase = new RegExp("^\\*([a-z]|(\\;|\\-|\\,))+([a-z]|(\\;|\\-|\\,|\\s))*\\*$");
-        //var regex = /[a-z]+(\\;|\\-|\\s)?[a-z]*(\\,[a-z]+(\\;|\\-|\\s)?[a-z]*)*/
-        for(let i = 0; i < dataList.length; i++){
-            if (typeof (dataList[i][realKey]) === 'string') {
-                if (firstcase.test(value)){
-                    var res = firstcase.exec(value);// getting only strings from *....*
-                    var newregex = new RegExp ("^.*" + (res[1]) + "$");
-                    if(newregex.test(dataList[i][realKey]))
-                        sortedList.push(dataList[i]);
-                }
-                else if (secondcase.test(value)){
-                    var res = secondcase.exec(value);// getting only strings from *....*
-                    var newregex = new RegExp ("^" +(res[3]) + ".*$");
-                    if(newregex.test(dataList[i][realKey]))
-                        sortedList.push(dataList[i]);
-                }
+        var testcase = new RegExp("\\*");
+        if(not) {
+            for (let i = 0; i < dataList.length; i++) {
+                if (typeof (dataList[i][realKey]) === 'string') {
+                    if (firstcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        var newregex = new RegExp("^.*" + res + "$");
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
+                    else if (secondcase.test(value)) {
+                        let res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^" + res + ".*$");
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
 
-                else if (thirdcase.test(value)) {
-                    var res = thirdcase.exec(value);// getting only strings from *....*
-                    var newregex = new RegExp ("^.*" + (res[1]) + ".*$")
-                    if(newregex.test(dataList[i][realKey]))
-                        sortedList.push(dataList[i]);
-                }
+                    else if (thirdcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        res = res.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^.*" + res + ".*$")
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
 
-                else if (dataList[i][realKey] == value) {
-                    sortedList.push(dataList[i]);
+                    else if (dataList[i][realKey] == value) {
+                        sortedList.push(dataList[i]);
+                    }
                 }
             }
+            return sortedList;
+        } else{
+            for (let i = 0; i < dataList.length; i++) {
+                if (typeof (dataList[i][realKey]) === 'string') {
+                    if (firstcase.test(value)) {
+                        let res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^.*" + res + "$");
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
+                    else if (secondcase.test(value)) {
+                        let res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^" + res + ".*$");
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
+
+                    else if (thirdcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^.*" + res + ".*$")
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
+
+                    else if (dataList[i][realKey] != value) {
+                        sortedList.push(dataList[i]);
+                    }
+                }
+            }
+            return sortedList;
         }
-        return sortedList;
+
     }
 
     // dataFromLocal(): any {
@@ -242,6 +306,11 @@ class DoEveryThing {
     createModifiedList(list: any, options: any){
         let output: any = {'render': '','result': []};
         let newlist: any[] = [];
+        let optionsKey = Object.keys(options);
+        if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "ORDER" || optionsKey[2] != "FORM"){
+            this.fail = true;
+            return [];
+        }
         let form = Object.keys(options)[2];
         if(options[form] != "TABLE"){
             this.fail = true;
@@ -250,7 +319,7 @@ class DoEveryThing {
         output['render'] = options[form];
         let columnsKey = Object.keys(options)[0];
         let columnsValue = options[columnsKey];
-        if (columnsValue.length == 0){
+        if (columnsValue.length <= 1){
             this.fail = true;
             return [];
         }
@@ -382,8 +451,10 @@ export default class InsightFacade implements IInsightFacade {
             }
             //parse QueryRequest using EBFN and create a list = todoList
             let names: any[] = Object.keys(query);
-            if(names[0] != "WHERE" && names[1] !="OPTIONS")
-                reject({code: 400, body: {"error": "my text"}});
+            if(names[0] != "WHERE" || names[1] !="OPTIONS") {
+                reject({code: 400, body: {"error": "not valid query(Where, options)"}});
+                return;
+            }
             let body = query[names[0]];
             let filterKey: any = Object.keys(body)[0];
             let filterValue = body[filterKey];

@@ -27,7 +27,7 @@ describe("EchoSpec", function () {
         "WHERE":{
 
             "GT":{
-                "courses_avg": 96
+                "courses_avg": 90
             }
 
         },
@@ -37,8 +37,8 @@ describe("EchoSpec", function () {
                 "courses_id",
                 "courses_avg"
             ],
-            "ORDER":"courses_ag",
-            "FORM":"TABLE"
+            "ORDER":"courses_avg",
+            "FOR":"TABLE"
         }
     };
     let querya: QueryRequest = {
@@ -168,12 +168,20 @@ describe("EchoSpec", function () {
     }
     let query2: QueryRequest =  {
         "WHERE": {
-            "AND": [{
-                "IS": {
-                    "courses_dept": "adhe"
-                }},
-                {"GT" : {"courses_avg": 80}
-                }]
+            "NOT": {
+                "AND": [
+                    {
+                        "IS": {
+                            "courses_dept": "adhe"
+                    }
+                },
+                    {
+                        "GT": {
+                            "courses_avg": 80
+                        }
+                    }
+                    ]
+            }
 
         },
         "OPTIONS":{
@@ -229,13 +237,20 @@ describe("EchoSpec", function () {
     }
     let query5: QueryRequest ={
         "WHERE": {
-            "IS": {
-                "courses_dept": "adhe"
+            "NOT" :{
+                "NOT": {
+                    "GT": {
+                        "courses_avg": 98
+                    }
+                }
             }
+
         },
         "OPTIONS":{
             "COLUMNS":[
-                "courses_id"
+                "courses_dept",
+                "courses_id",
+                "courses_avg"
             ],
             "ORDER":"courses_avg",
             "FORM":"TABLE"
@@ -243,20 +258,9 @@ describe("EchoSpec", function () {
     }
     let query6: QueryRequest = {
         "WHERE":{
-
-            "AND":[
-                {
-                    "GT":{
-                        "courses_avg":90
-                    }
-                },
-                {
                     "IS":{
-                        "courses_instructor" : "*a*"
+                        "courses_instructor" : "jor*"
                     }
-                }
-            ]
-
         },
         "OPTIONS":{
             "COLUMNS":[
@@ -329,19 +333,30 @@ describe("EchoSpec", function () {
     }
     let query9: QueryRequest ={
         "WHERE": {
-            "NOT" : {"GT": {
-                "courses_avg": "98"
-            }}
+            "AND": [
+                {
+                    "GT": {
+                        "courses_avg": 90
+                    }
+                },
+                {
+                    "NOT": {
+                        "GT": {
+                            "courses_avg": 90
+                        }
+                    }
+                }
+            ]
         },
-        "OPTIONS":{
-            "COLUMNS":[
-                "courses_id"
+        "OPTIONS": {
+            "COLUMNS": [
+                "courses_avg",
+                "courses_instructor"
             ],
-            "ORDER":"courses_avg",
-            "FORM":"TABLE"
+            "ORDER": "courses_avg",
+            "FORM": "TABLE"
         }
     }
-
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
         expect(response).to.have.property('body');
@@ -530,7 +545,7 @@ describe("EchoSpec", function () {
     //     })
     // });
 
-    it.only('query', function() {
+    it('query', function() {
         return insightFacade.performQuery(query).then (function (value: any) {
             expect.fail();
         }).catch(function (err:any) {
@@ -652,7 +667,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     })
-    it('query6', function() {
+    it.only('query6', function() {
         return insightFacade.performQuery(query6).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -696,7 +711,6 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     })
-
     it("For test purpose", function () {
         return insightFacade.performQuery(
             {"WHERE":
