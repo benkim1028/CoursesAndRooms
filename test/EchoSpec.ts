@@ -34,6 +34,7 @@ describe("EchoSpec", function () {
             "FORM":"TABLE"
         }
     };
+    
     let querya: QueryRequest = {
         "WHERE":{
 
