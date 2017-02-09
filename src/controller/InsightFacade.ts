@@ -471,7 +471,7 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error": "my text"}});
             }
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
