@@ -779,7 +779,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -867,7 +867,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it.only('successquery3', function() {
+    it('successquery3', function() {
         return insightFacade.performQuery(query3).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}

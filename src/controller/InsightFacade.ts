@@ -283,8 +283,8 @@ class DoEveryThing {
         }
     }
 
-    createModifiedList(list: any, options: any){
-        let output: any = {'render': '','result': []};
+    createModifiedList(list: any, options: any) {
+        let output: any = {'render': '', 'result': []};
         let newlist: any[] = [];
         let optionsKey = Object.keys(options);
         if (optionsKey.length == 3) {
@@ -292,46 +292,52 @@ class DoEveryThing {
                 this.fail = true;
                 return [];
             }
-        } else if (optionsKey.length == 2){
-            if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "FORM"){
+        } else if (optionsKey.length == 2) {
+            if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "FORM") {
                 this.fail = true;
                 return [];
             }
         }
         let form = Object.keys(options)[2];
-        if(options[form] != "TABLE"){
+        if (options[form] != "TABLE") {
             this.fail = true;
             return [];
         }
         output['render'] = options[form];
         let columnsKey = Object.keys(options)[0];
         let columnsValue = options[columnsKey];
-        if (columnsValue.length <= 1){
+        if (columnsValue.length <= 1) {
             this.fail = true;
             return [];
         }
-        for(let i = 0; i < list.length; i++){
+        for (let i = 0; i < list.length; i++) {
             let element: any = {};
-            for(let j = 0; j < columnsValue.length; j++){
+            for (let j = 0; j < columnsValue.length; j++) {
                 let key = this.findKey(columnsValue[j]);
                 element[columnsValue[j]] = list[i][key];
             }
             newlist.push(element);
         }
 
-        if(optionsKey.length == 3) {
+        if (optionsKey.length == 3) {
 
             let order = Object.keys(options)[1];
             let orderValue = options[order];
             if (!columnsValue.includes(orderValue)) {
                 this.fail = true;
+                return [];
             }
-
-            newlist.sort(this.sort_by(orderValue, false, parseFloat));
+            if (orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit") {
+                newlist.sort(this.sort_by(orderValue, false, parseFloat));
+            } else {
+                newlist.sort(this.sort_by(orderValue, false, function (a: any) {
+                    return a.toUpperCase()
+                }));
+            }
+            for (let i = 0; i < newlist.length; i++)
+                output['result'].push(newlist[i]);
+            return output;
         }
-        for(let i = 0; i < newlist.length; i++)
-            output['result'].push(newlist[i]);
-        return output;
     }
 
     sort_by = function(field: any, reverse: any, primer: any){
