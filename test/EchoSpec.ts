@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -984,7 +984,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it.only('query18', function() {
+    it('query18', function() {
         return insightFacade.performQuery(query18).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -995,7 +995,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it.only('query19', function() {
+    it('query19', function() {
         return insightFacade.performQuery(query19).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -1007,7 +1007,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only('query20', function() {
+    it('query20', function() {
         return insightFacade.performQuery(query20).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -1019,7 +1019,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only('query21', function() {
+    it('query21', function() {
         return insightFacade.performQuery(query21).then(function (value: any) {
             Log.test('Value ' + value);
             expect.fail();
@@ -1754,7 +1754,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
