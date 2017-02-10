@@ -13,7 +13,7 @@ class DoEveryThing {
     }
     whatKindofFilter(key: any, value: any, preList: any = [], not: boolean = true) {
         // this takes filter and its
-        var input = key;
+        let input = key;
         if(input == "OR" && not == false)
             input = "AND";
         if(input == "AND" && not == false)
@@ -31,8 +31,8 @@ class DoEveryThing {
             }
             return this.createANDList(value, preList, not);
         }
-        var subKey: any = Object.keys(value);
-        var subValue: any = value[subKey[0]];
+        let subKey: any = Object.keys(value);
+        let subValue: any = value[subKey[0]];
         if (input == 'GT') {    // MComparison
             return this.createGTList(subKey[0], subValue, preList, not);
         }
@@ -54,8 +54,8 @@ class DoEveryThing {
         }
     }
     createNOTList(value: any, dataList: any[], not:boolean): any[] {
-        var key = Object.keys(value)[0];
-        var keyValue = value[key];
+        let key = Object.keys(value)[0];
+        let keyValue = value[key];
         if(not) {
             var response = this.whatKindofFilter(key, keyValue, dataList, false);
         } else {
@@ -318,18 +318,16 @@ class DoEveryThing {
             }
             newlist.push(element);
         }
+
         if(optionsKey.length == 3) {
+
             let order = Object.keys(options)[1];
             let orderValue = options[order];
-            if(!columnsValue.includes(orderValue)){
+            if (!columnsValue.includes(orderValue)) {
                 this.fail = true;
-                return [];
             }
-            if(orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit"){
-                newlist.sort(this.sort_by(orderValue, false, parseFloat));
-            } else{
-                newlist.sort(this.sort_by(orderValue, false, function(a: any){return a.toUpperCase()}));
-            }
+
+            newlist.sort(this.sort_by(orderValue, false, parseFloat));
         }
         for(let i = 0; i < newlist.length; i++)
             output['result'].push(newlist[i]);

@@ -679,6 +679,26 @@ describe("EchoSpec", function () {
         }
     }
 
+    let query21: QueryRequest = {
+        "WHERE":{
+            "NOT" : {
+                "IS": {
+                    "courses_title": "*a*"
+                }
+            }
+        },
+        "OPTIONS":{
+            "COLUMNS":[
+                "courses_dept",
+                "courses_id",
+                "courses_avg" ,
+                "courses_instructor"
+            ],
+            "ORDER":"courses_fail",
+            "FORM":"TABLE"
+        }
+    }
+
 
     function sanityCheck(response: InsightResponse) {
         expect(response).to.have.property('code');
@@ -959,6 +979,42 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
+
+    it('query11', function() {
+        return insightFacade.performQuery(query11).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+    it('query13', function() {
+        return insightFacade.performQuery(query11).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
+    it('query14', function() {
+        return insightFacade.performQuery(query11).then (function (value: any) {
+            var response : InsightResponse = {
+                code: 200, body: {}
+            };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    });
+
     it('query16', function() {
         return insightFacade.performQuery(query16).then (function (value: any) {
             var response : InsightResponse = {
@@ -1003,6 +1059,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
+
     it('query20', function() {
         return insightFacade.performQuery(query20).then (function (value: any) {
             var response : InsightResponse = {
@@ -1014,38 +1071,14 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it('query11', function() {
-        return insightFacade.performQuery(query11).then (function (value: any) {
-            var response : InsightResponse = {
-                code: 200, body: {}
-            };
-            expect(value.code).to.equal(response.code);
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    });
-    it('query13', function() {
-        return insightFacade.performQuery(query11).then (function (value: any) {
-            var response : InsightResponse = {
-                code: 200, body: {}
-            };
-            expect(value.code).to.equal(response.code);
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    });
 
-    it('query14', function() {
-        return insightFacade.performQuery(query11).then (function (value: any) {
-            var response : InsightResponse = {
-                code: 200, body: {}
-            };
-            expect(value.code).to.equal(response.code);
+    it('query21', function() {
+        return insightFacade.performQuery(query21).then(function (value: any) {
+            Log.test('Value ' + value);
+            expect.fail();
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
-            expect.fail();
+            expect(err.code).to.equal(400);
         })
     });
 
