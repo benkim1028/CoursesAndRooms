@@ -193,10 +193,10 @@ class DoEveryThing {
     createISList(key: string, value: string, dataList: any[], not:boolean): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
-        if(typeof value !== 'string'){
-            this.fail= true;
-            return [];
-        }
+        // if(typeof value !== 'string'){
+        //     this.fail= true;
+        //     return [];
+        // }
 
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
@@ -429,7 +429,7 @@ export default class InsightFacade implements IInsightFacade {
     }
     removeDataset(id: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-        if (isNullOrUndefined(id)) {
+        if (!id && isNullOrUndefined(id)) {
             //console.log(!id);
             reject({code: 400, body: {"error": "this one"}});
         }
@@ -446,6 +446,7 @@ export default class InsightFacade implements IInsightFacade {
         })
         })
     }
+
 
 
 
