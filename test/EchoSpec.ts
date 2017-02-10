@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -1672,7 +1672,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("find all sections in a dept not taught by a specific person with *chan instructor.", function () {
+    it("find all sections in a dept not taught by a specific person with *chan instructor.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -1734,7 +1734,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("find all sections in a dept not taught by a specific person with *chan instructor and not LT.", function () {
+    it("find all sections in a dept not taught by a specific person with *chan instructor and not LT.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -1796,7 +1796,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+    it("find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -1858,59 +1858,59 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-        return insightFacade.performQuery(
-            {"WHERE":
-                {"AND": [
-                    {
-                        "NOT": {
-                            "IS": {
-                                "courses_dept": "inst adul educ"
-                            }
-                        }
-                    },
-                    {
-                        "IS":
-                            {
-                                "courses_instructor":"*ch*"
-                            }
-                    },
-                    {
-                        "NOT": {
-                            "IS": {
-                                "courses_dept": "adhe"
-                            }
-                        }
-                    },
-                    {
-                        "GT":
-                            {
-                                "courses_avg":95
-                            }
-                    }
+    // it("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
+    //     return insightFacade.performQuery(
+    //         {"WHERE":
+    //             {"AND": [
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "inst adul educ"
+    //                         }
+    //                     }
+    //                 },
+    //                 {
+    //                     "IS":
+    //                         {
+    //                             "courses_instructor":"*ch*"
+    //                         }
+    //                 },
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "adhe"
+    //                         }
+    //                     }
+    //                 },
+    //                 {
+    //                     "GT":
+    //                         {
+    //                             "courses_avg":95
+    //                         }
+    //                 }
+    //
+    //             ]
+    //             },
+    //             "OPTIONS":{
+    //                 "COLUMNS":[
+    //                     "courses_dept",
+    //                 ],
+    //                 "ORDER":"courses_dept",
+    //                 "FORM":"TABLE"
+    //             }
+    //         }).then(value => {
+    //         // expect.fail();
+    //         // Log.test('Value ' + value);
+    //         expect(value.code).to.equal(200);
+    //         // expect(value.body).to.equal({});
+    //     }).catch(function (err:any) {
+    //         Log.test('Error: ' + err);
+    //         expect.fail();
+    //         // expect(err.code).to.equal(400);
+    //     })
+    // }); //added
 
-                ]
-                },
-                "OPTIONS":{
-                    "COLUMNS":[
-                        "courses_dept",
-                    ],
-                    "ORDER":"courses_dept",
-                    "FORM":"TABLE"
-                }
-            }).then(value => {
-            // expect.fail();
-            // Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-            // expect(err.code).to.equal(400);
-        })
-    }); //added
-
-    it.only("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
+    it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"OR": [
@@ -2273,7 +2273,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);

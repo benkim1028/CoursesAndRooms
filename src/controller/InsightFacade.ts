@@ -317,7 +317,7 @@ class DoEveryThing {
         output['render'] = options[form];
         let columnsKey = Object.keys(options)[0];
         let columnsValue = options[columnsKey];
-        if (columnsValue.length <= 1) {
+        if (columnsValue.length < 1) {
             this.fail = true;
             return [];
         }
