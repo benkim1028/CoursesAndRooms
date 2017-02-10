@@ -321,10 +321,15 @@ class DoEveryThing {
         if(optionsKey.length == 3) {
             let order = Object.keys(options)[1];
             let orderValue = options[order];
-            if (this.findKey(orderValue) == "") {
+            if(!columnsValue.includes(orderValue)){
+                this.fail = true;
                 return [];
             }
-            newlist.sort(this.sort_by(orderValue, false, parseFloat));
+            if(orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit"){
+                newlist.sort(this.sort_by(orderValue, false, parseFloat));
+            } else{
+                newlist.sort(this.sort_by(orderValue, false, function(a: any){return a.toUpperCase()}));
+            }
         }
         for(let i = 0; i < newlist.length; i++)
             output['result'].push(newlist[i]);

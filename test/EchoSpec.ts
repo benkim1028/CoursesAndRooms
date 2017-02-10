@@ -196,11 +196,12 @@ describe("EchoSpec", function () {
         },
         "OPTIONS":{
             "COLUMNS":[
+                "courses_title",
                 "courses_dept",
                 "courses_id",
                 "courses_avg"
             ],
-            "ORDER":"courses_avg",
+            "ORDER":"courses_title",
             "FORM":"TABLE"
         }
     }
@@ -758,7 +759,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -846,7 +847,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it('successquery3', function() {
+    it.only('successquery3', function() {
         return insightFacade.performQuery(query3).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
