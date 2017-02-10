@@ -200,7 +200,14 @@ class DoEveryThing {
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'string') {
-                    if (firstcase.test(value)) {
+                    if (thirdcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        res = res.replace(testcase, "");//  *....*
+                        var newregex = new RegExp("^.*" + res + ".*$")
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
+                    else if (firstcase.test(value)) {
                         let res = value.replace(testcase, "");      //"*...."
                         var newregex = new RegExp("^.*" + res + "$");
                         if (newregex.test(dataList[i][realKey]))
@@ -212,15 +219,6 @@ class DoEveryThing {
                         if (newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
                     }
-
-                    else if (thirdcase.test(value)) {
-                        let res = value.replace(testcase, "");
-                        res = res.replace(testcase, "");//  *....*
-                        var newregex = new RegExp("^.*" + res + ".*$")
-                        if (newregex.test(dataList[i][realKey]))
-                            sortedList.push(dataList[i]);
-                    }
-
                     else if (dataList[i][realKey] == value) {
                         sortedList.push(dataList[i]);
                     }
@@ -230,7 +228,14 @@ class DoEveryThing {
         } else{
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'string') {
-                    if (firstcase.test(value)) {
+                    if (thirdcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^.*" + res + ".*$")
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
+                    }
+                    else if (firstcase.test(value)) {
                         let res = value.replace(testcase, "");// getting only strings from *....*
                         var newregex = new RegExp("^.*" + res + "$");
                         if (!newregex.test(dataList[i][realKey]))
@@ -239,14 +244,6 @@ class DoEveryThing {
                     else if (secondcase.test(value)) {
                         let res = value.replace(testcase, "");// getting only strings from *....*
                         var newregex = new RegExp("^" + res + ".*$");
-                        if (!newregex.test(dataList[i][realKey]))
-                            sortedList.push(dataList[i]);
-                    }
-
-                    else if (thirdcase.test(value)) {
-                        let res = value.replace(testcase, "");
-                        res = value.replace(testcase, "");// getting only strings from *....*
-                        var newregex = new RegExp("^.*" + res + ".*$")
                         if (!newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
                     }
@@ -471,7 +468,7 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error": "my text"}});
             }
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
