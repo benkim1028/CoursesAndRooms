@@ -1,6 +1,7 @@
 import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import Log from "../Util";
 import fs = require('fs');
+import {isNullOrUndefined} from "util";
 
 var JSZip = require('jszip');
 
@@ -422,23 +423,24 @@ export default class InsightFacade implements IInsightFacade {
         })
     }
     removeDataset(id: string): Promise<InsightResponse> {
-        var newPromise = new Promise(function (fulfill, reject){
-            var isFail: boolean = true;
-            try {
-                fs.unlinkSync(id + '.json');
-                delete DataList[id];
-                counter = true;
-            } catch (e) {
-                isFail = false;
+        return new Promise(function (fulfill, reject) {
+        if (!id || isNullOrUndefined(id)) {
+            reject({code: 400, body: {"error": "this one"}});
+        }
+        fs.exists('./' + id + '.json', function (value:boolean) {
+            if (!value) {
+                reject({code: 404, body: {"error": "path not exist"}});
             }
-            if(isFail) {
-                fulfill({code: 204, body: {}});
-            } else{
-                reject({code: 404, body: {}});
+            else {
+                fs.unlink('./' + id + '.json', function() {
+                    delete DataList[id];
+                    fulfill({code: 204, body: {}});
+                })
             }
         })
-        return newPromise;
+        })
     }
+
 
 
     performQuery(query: QueryRequest): Promise <InsightResponse> {
