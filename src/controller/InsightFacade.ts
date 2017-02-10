@@ -193,32 +193,36 @@ class DoEveryThing {
     createISList(key: string, value: string, dataList: any[], not:boolean): any[] {
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
-        // if(typeof value !== 'string'){
-        //     this.fail= true;
-        //     return [];
-        // }
+        // console.log(value);
+        if(typeof value !== 'string'){
+            this.fail= true;
+            return [];
+        }
 
-        if(not) {
+        else if(not) {
             for (let i = 0; i < dataList.length; i++) {
                 var eachValue = dataList[i][realKey];
                 var eachData = dataList[i];
                 if (typeof (dataList[i][realKey]) === 'string') {
                     if (value[0] == "*" && value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
+                        // console.log("1" +realValue);
                         if (eachValue.search(realValue)) {
                             sortedList.push(eachData);
                         }
                     }
                     else if (value[0] == "*") {
-                        var realValue = value.substring(1, value.length - 1);
+                        var realValue = value.substring(1, value.length);
+                        // console.log("2" +realValue);
                         if ((eachValue.substring(eachValue.length - value.length + 1, eachValue.length) == realValue)) {
                             sortedList.push(eachData);
                         }
                     }
 
                     else if (value[value.length - 1] == "*") {
-                        var realValue = value.substring(1, value.length - 1);
+                        var realValue = value.substring(0, value.length - 1);
                         if ((eachValue.substring(0, realValue.length) == realValue)) {
+                            // console.log("3" +realValue);
                             sortedList.push(eachData);
                         }
                     }
@@ -241,14 +245,15 @@ class DoEveryThing {
                         }
                     }
                     else if (value[0] == "*") {
-                        var realValue = value.substring(1, value.length - 1);
+                        var realValue = value.substring(1, value.length);
                         if (!(eachValue.substring(eachValue.length - value.length + 1, eachValue.length) == realValue)) {
                             sortedList.push(eachData);
                         }
                     }
 
                     else if (value[value.length - 1] == "*") {
-                        var realValue = value.substring(1, value.length - 1);
+                        var realValue = value.substring(0, value.length - 1);
+
                         if (!(eachValue.substring(0, realValue.length) == realValue)) {
                             sortedList.push(eachData);
                         }
@@ -486,7 +491,7 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error": "my text"}});
             }
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
