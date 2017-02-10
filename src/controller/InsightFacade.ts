@@ -197,33 +197,32 @@ class DoEveryThing {
             this.fail= true;
             return [];
         }
-        var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
-        var secondcase = new RegExp("^(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
-        var thirdcase = new RegExp("^^\\*(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
-        var testcase = new RegExp("\\*");
+
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
+                var eachData = dataList[i][realKey];
                 if (typeof (dataList[i][realKey]) === 'string') {
-                    if (thirdcase.test(value)) {
-                        let res = value.replace(testcase, "");
-                        res = res.replace(testcase, "");//  *....*
-                        var newregex = new RegExp("^.*" + res + ".*$")
-                        if (newregex.test(dataList[i][realKey]))
+                    if (value[0] == "*" && value[value.length - 1] == "*") {
+                        var realValue = value.substring(1, value.length - 1);
+                        if (!eachData.search(realValue)) {
                             sortedList.push(dataList[i]);
+                        }
                     }
-                    else if (firstcase.test(value)) {
-                        let res = value.replace(testcase, "");      //"*...."
-                        var newregex = new RegExp("^.*" + res + "$");
-                        if (newregex.test(dataList[i][realKey]))
+                    else if (value[0] == "*") {
+                        var realValue = value.substring(1, value.length - 1);
+                        if (!(eachData.substring(eachData.length - value.length + 1, eachData.length) == realValue)) {
                             sortedList.push(dataList[i]);
+                        }
                     }
-                    else if (secondcase.test(value)) {
-                        let res = value.replace(testcase, "");// ".....*"
-                        var newregex = new RegExp("^" + res + ".*$");
-                        if (newregex.test(dataList[i][realKey]))
+
+                    else if (value[value.length - 1] == "*") {
+                        var realValue = value.substring(1, value.length - 1);
+                        if (!(eachData.substring(0, realValue.length) == realValue)) {
                             sortedList.push(dataList[i]);
+                        }
                     }
-                    else if (dataList[i][realKey] == value) {
+
+                    else if (!(eachData == value)) {
                         sortedList.push(dataList[i]);
                     }
                 }
@@ -231,28 +230,29 @@ class DoEveryThing {
             return sortedList;
         } else{
             for (let i = 0; i < dataList.length; i++) {
+                var eachData = dataList[i][realKey];
                 if (typeof (dataList[i][realKey]) === 'string') {
-                    if (thirdcase.test(value)) {
-                        let res = value.replace(testcase, "");
-                        res = value.replace(testcase, "");// getting only strings from *....*
-                        var newregex = new RegExp("^.*" + res + ".*$")
-                        if (!newregex.test(dataList[i][realKey]))
+                    if (value[0] == "*" && value[value.length - 1] == "*") {
+                        var realValue = value.substring(1, value.length - 1);
+                        if (eachData.search(realValue)) {
                             sortedList.push(dataList[i]);
+                        }
                     }
-                    else if (firstcase.test(value)) {
-                        let res = value.replace(testcase, "");// getting only strings from *....*
-                        var newregex = new RegExp("^.*" + res + "$");
-                        if (!newregex.test(dataList[i][realKey]))
+                    else if (value[0] == "*") {
+                        var realValue = value.substring(1, value.length - 1);
+                        if ((eachData.substring(eachData.length - value.length + 1, eachData.length) == realValue)) {
                             sortedList.push(dataList[i]);
-                    }
-                    else if (secondcase.test(value)) {
-                        let res = value.replace(testcase, "");// getting only strings from *....*
-                        var newregex = new RegExp("^" + res + ".*$");
-                        if (!newregex.test(dataList[i][realKey]))
-                            sortedList.push(dataList[i]);
+                        }
                     }
 
-                    else if (dataList[i][realKey] != value) {
+                    else if (value[value.length - 1] == "*") {
+                        var realValue = value.substring(1, value.length - 1);
+                        if ((eachData.substring(0, realValue.length) == realValue)) {
+                            sortedList.push(dataList[i]);
+                        }
+                    }
+
+                    else if ((eachData == value)) {
                         sortedList.push(dataList[i]);
                     }
                 }
@@ -483,7 +483,7 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error": "my text"}});
             }
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }

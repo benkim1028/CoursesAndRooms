@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -984,7 +984,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it('query18', function() {
+    it.only('query18', function() {
         return insightFacade.performQuery(query18).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -995,7 +995,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it('query19', function() {
+    it.only('query19', function() {
         return insightFacade.performQuery(query19).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -1007,7 +1007,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it('query20', function() {
+    it.only('query20', function() {
         return insightFacade.performQuery(query20).then (function (value: any) {
             var response : InsightResponse = {
                 code: 200, body: {}
@@ -1019,7 +1019,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it('query21', function() {
+    it.only('query21', function() {
         return insightFacade.performQuery(query21).then(function (value: any) {
             Log.test('Value ' + value);
             expect.fail();
@@ -1403,6 +1403,39 @@ describe("EchoSpec", function () {
         })
     }); //added
 
+    it("Should be able to find all sections in a dept not taught by a specific person.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"NOT":
+                    {"IS":
+                        {
+                            "courses_instructor": "gossen, david"
+                        }
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            // Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
     it("IS error with simple query", function () {
         return insightFacade.performQuery(
             {"WHERE":
@@ -1721,7 +1754,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("removeDataset with existing file", function () {
+    it.only("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
