@@ -207,7 +207,7 @@ class DoEveryThing {
                     if (value[0] == "*" && value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
                         // console.log("1" +realValue);
-                        if (eachValue.search(realValue)) {
+                        if (eachValue.search(realValue) > -1) {
                             sortedList.push(eachData);
                         }
                     }
@@ -240,7 +240,9 @@ class DoEveryThing {
                 if (typeof (dataList[i][realKey]) === 'string') {
                     if (value[0] == "*" && value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if (!eachValue.search(realValue)) {
+                        if (!(eachValue.search(realValue) > -1)) {
+                            // console.log(realValue);
+                            // console.log(eachValue);
                             sortedList.push(eachData);
                         }
                     }
@@ -317,7 +319,7 @@ class DoEveryThing {
         output['render'] = options[form];
         let columnsKey = Object.keys(options)[0];
         let columnsValue = options[columnsKey];
-        if (columnsValue.length < 1) {
+        if (columnsValue.length == 0) {
             this.fail = true;
             return [];
         }

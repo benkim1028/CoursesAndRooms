@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -1858,7 +1858,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    // it("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
+    // it.only("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
     //     return insightFacade.performQuery(
     //         {"WHERE":
     //             {"AND": [
@@ -1869,31 +1869,93 @@ describe("EchoSpec", function () {
     //                         }
     //                     }
     //                 },
-    //                 {
-    //                     "IS":
-    //                         {
-    //                             "courses_instructor":"*ch*"
-    //                         }
-    //                 },
+    //
     //                 {
     //                     "NOT": {
     //                         "IS": {
-    //                             "courses_dept": "adhe"
+    //                             "courses_dept": "*a*"
     //                         }
     //                     }
     //                 },
+    //
     //                 {
-    //                     "GT":
-    //                         {
-    //                             "courses_avg":95
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*b*"
     //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*c*"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "d*"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*e"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*f"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*g"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*h"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*i"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_instructor": "gossen, david"
+    //                         }
+    //                     }
     //                 }
+    //
     //
     //             ]
     //             },
     //             "OPTIONS":{
     //                 "COLUMNS":[
-    //                     "courses_dept",
+    //                     "courses_dept"
     //                 ],
     //                 "ORDER":"courses_dept",
     //                 "FORM":"TABLE"
@@ -1909,6 +1971,99 @@ describe("EchoSpec", function () {
     //         // expect(err.code).to.equal(400);
     //     })
     // }); //added
+    //
+    // it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
+    //     return insightFacade.performQuery(
+    //         {"WHERE":
+    //             {"OR": [
+    //                 {
+    //                     "IS":
+    //                         {
+    //                             "courses_instructor":"chan, jennifer"
+    //                         }
+    //                 },
+    //
+    //                 {
+    //                     "IS":
+    //                         {
+    //                             "courses_instructor":"elfert, maren"
+    //                         }
+    //                 },
+    //
+    //                 {
+    //                     "IS":
+    //                         {
+    //                             "courses_instructor":"vanwynsberghe, robert"
+    //                         }
+    //                 }
+    //             ]
+    //             },
+    //             "OPTIONS":{
+    //                 "COLUMNS":[
+    //                     "courses_dept"
+    //                 ],
+    //                 "ORDER": "courses_dept",
+    //                 "FORM":"TABLE"
+    //             }
+    //         }).then(value => {
+    //         // expect.fail();
+    //         // Log.test('Value ' + value);
+    //         expect(value.code).to.equal(200);
+    //         // expect(value.body).to.equal({});
+    //     }).catch(function (err:any) {
+    //         Log.test('Error: ' + err);
+    //         expect.fail();
+    //         // expect(err.code).to.equal(400);
+    //     })
+    // }); //added
+
+    it.only("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"OR": [
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "inst adul educ"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*a*"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*b*"
+                            }
+                        }
+                                    }
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept"
+                    ],
+                    "ORDER":"courses_dept",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            // Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
 
     it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
         return insightFacade.performQuery(
@@ -2273,7 +2428,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("removeDataset with existing file", function () {
+    it.only("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
