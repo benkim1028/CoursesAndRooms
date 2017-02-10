@@ -200,60 +200,62 @@ class DoEveryThing {
 
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
-                var eachData = dataList[i][realKey];
+                var eachValue = dataList[i][realKey];
+                var eachData = dataList[i];
                 if (typeof (dataList[i][realKey]) === 'string') {
                     if (value[0] == "*" && value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if (!eachData.search(realValue)) {
-                            sortedList.push(dataList[i]);
+                        if (eachValue.search(realValue)) {
+                            sortedList.push(eachData);
                         }
                     }
                     else if (value[0] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if (!(eachData.substring(eachData.length - value.length + 1, eachData.length) == realValue)) {
-                            sortedList.push(dataList[i]);
+                        if ((eachValue.substring(eachValue.length - value.length + 1, eachValue.length) == realValue)) {
+                            sortedList.push(eachData);
                         }
                     }
 
                     else if (value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if (!(eachData.substring(0, realValue.length) == realValue)) {
-                            sortedList.push(dataList[i]);
+                        if ((eachValue.substring(0, realValue.length) == realValue)) {
+                            sortedList.push(eachData);
                         }
                     }
 
-                    else if (!(eachData == value)) {
-                        sortedList.push(dataList[i]);
+                    else if ((eachValue == value)) {
+                        sortedList.push(eachData);
                     }
                 }
             }
             return sortedList;
         } else{
             for (let i = 0; i < dataList.length; i++) {
-                var eachData = dataList[i][realKey];
+                var eachValue = dataList[i][realKey];
+                var eachData = dataList[i];
                 if (typeof (dataList[i][realKey]) === 'string') {
                     if (value[0] == "*" && value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if (eachData.search(realValue)) {
-                            sortedList.push(dataList[i]);
+                        if (!eachValue.search(realValue)) {
+                            sortedList.push(eachData);
                         }
                     }
                     else if (value[0] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if ((eachData.substring(eachData.length - value.length + 1, eachData.length) == realValue)) {
-                            sortedList.push(dataList[i]);
+                        if (!(eachValue.substring(eachValue.length - value.length + 1, eachValue.length) == realValue)) {
+                            sortedList.push(eachData);
                         }
                     }
 
                     else if (value[value.length - 1] == "*") {
                         var realValue = value.substring(1, value.length - 1);
-                        if ((eachData.substring(0, realValue.length) == realValue)) {
-                            sortedList.push(dataList[i]);
+                        if (!(eachValue.substring(0, realValue.length) == realValue)) {
+                            sortedList.push(eachData);
                         }
                     }
 
-                    else if ((eachData == value)) {
-                        sortedList.push(dataList[i]);
+                    else if (!(eachValue == value)) {
+                        sortedList.push(eachData);
                     }
                 }
             }
