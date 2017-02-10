@@ -424,12 +424,13 @@ export default class InsightFacade implements IInsightFacade {
     }
     removeDataset(id: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-        if (!id || isNullOrUndefined(id)) {
+        if (isNullOrUndefined(id)) {
+            //console.log(!id);
             reject({code: 400, body: {"error": "this one"}});
         }
         fs.exists('./' + id + '.json', function (value:boolean) {
             if (!value) {
-                reject({code: 404, body: {"error": "path not exist"}});
+                reject({code: 404, body: {"error": "file not exist"}});
             }
             else {
                 fs.unlink('./' + id + '.json', function() {
@@ -456,6 +457,7 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
             let body = query[names[0]];
+            console.log(body);
             let filterKey: any = Object.keys(body)[0];
             let filterValue = body[filterKey];
             let list: any = [];

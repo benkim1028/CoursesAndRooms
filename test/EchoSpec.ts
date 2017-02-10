@@ -779,7 +779,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -1111,7 +1111,7 @@ describe("EchoSpec", function () {
     });
 
 
-    it('removedatasetfail', function(){
+    it.only('removedatasetfail1', function(){
         return insightFacade.removeDataset('couresssssssssss').then (function (value: any) {
             expect.fail();
         }).catch(function (err:any) {
@@ -1122,8 +1122,31 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(response.code);
         })
     });
+    it.only('removedatasetfail2', function(){
+        return insightFacade.removeDataset(null).then (function (value: any) {
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            var response : InsightResponse = {
+                code: 400, body: {}
+            };
+            expect(err.code).to.equal(response.code);
+        })
+    });
 
-    it("For test purpose", function () {
+    it('removedatasetfail', function(){
+        return insightFacade.removeDataset('').then (function (value: any) {
+            expect.fail();
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            var response : InsightResponse = {
+                code: 404, body: {}
+            };
+            expect(err.code).to.equal(response.code);
+        })
+    });
+
+    it.only("For test purpose", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"GT":
@@ -1751,7 +1774,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("removeDataset with existing file", function () {
+    it.only("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
