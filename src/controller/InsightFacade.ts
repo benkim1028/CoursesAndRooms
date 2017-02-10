@@ -119,6 +119,9 @@ class DoEveryThing {
             this.fail= true;
             return [];
         }
+        if (dataList.length == 0) {
+
+        }
         if (not) {
             for (let i = 0; i < dataList.length; i++) {
 
@@ -153,7 +156,7 @@ class DoEveryThing {
                 }
             }
             return sortedList;
-        } else{
+        } else {
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] >= value) {
                     sortedList.push(dataList[i]);
@@ -457,7 +460,6 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
             let body = query[names[0]];
-            console.log(body);
             let filterKey: any = Object.keys(body)[0];
             let filterValue = body[filterKey];
             let list: any = [];
@@ -481,7 +483,7 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error": "my text"}});
             }
-            console.log(response);
+            // console.log(response);
             fulfill({code: 200, body: response});
         })
     }

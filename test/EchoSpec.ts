@@ -111,50 +111,7 @@ describe("EchoSpec", function () {
             "FORM":"TABLE"
         }
     };
-    let query1: QueryRequest = {
-        "WHERE":{
-            "AND":[
-                {
-                    "OR":[
-                        {
-                            "GT":{
-                                "courses_avg":95
-                            }
-                        },
-                        {
-                            "LT":{
-                                "courses_fail":2
-                            }
-                        }
-                    ]
-                },
-                {
-                    "OR":[
-                        {
-                            "EQ":{
-                                "courses_avg": 44
-                            }
-                        },
-                        {
-                            "GT": {
-                                "courses_pass": 200
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        "OPTIONS":{
-            "COLUMNS":[
-                "courses_dept",
-                "courses_id",
-                "courses_avg",
-                "courses_pass"
-            ],
-            "ORDER":"courses_avg",
-            "FORM":"TABLE"
-        }
-    }
+   
     let query2: QueryRequest =  {
         "WHERE": {
             "NOT": {
@@ -779,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -856,17 +813,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(response.code);
         })
     });
-    it('query1', function() {
-        return insightFacade.performQuery(query1).then (function (value: any) {
-            var response : InsightResponse = {
-                code: 200, body: {}
-            };
-            expect(value.code).to.equal(response.code);
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    });
+
     it('successquery3', function() {
         return insightFacade.performQuery(query3).then (function (value: any) {
             var response : InsightResponse = {
@@ -1111,7 +1058,7 @@ describe("EchoSpec", function () {
     });
 
 
-    it.only('removedatasetfail1', function(){
+    it('removedatasetfail1', function(){
         return insightFacade.removeDataset('couresssssssssss').then (function (value: any) {
             expect.fail();
         }).catch(function (err:any) {
@@ -1122,7 +1069,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(response.code);
         })
     });
-    it.only('removedatasetfail2', function(){
+    it('removedatasetfail2', function(){
         return insightFacade.removeDataset(null).then (function (value: any) {
             expect.fail();
         }).catch(function (err:any) {
@@ -1146,7 +1093,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only("For test purpose", function () {
+    it("For test purpose", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"GT":
@@ -1774,7 +1721,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
