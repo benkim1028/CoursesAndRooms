@@ -2017,53 +2017,53 @@ describe("EchoSpec", function () {
     //     })
     // }); //added
 
-    it.only("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-        return insightFacade.performQuery(
-            {"WHERE":
-                {"OR": [
-                    {
-                        "NOT": {
-                            "IS": {
-                                "courses_dept": "inst adul educ"
-                            }
-                        }
-                    },
-
-                    {
-                        "NOT": {
-                            "IS": {
-                                "courses_dept": "*a*"
-                            }
-                        }
-                    },
-
-                    {
-                        "NOT": {
-                            "IS": {
-                                "courses_dept": "*b*"
-                            }
-                        }
-                                    }
-                ]
-                },
-                "OPTIONS":{
-                    "COLUMNS":[
-                        "courses_dept"
-                    ],
-                    "ORDER":"courses_dept",
-                    "FORM":"TABLE"
-                }
-            }).then(value => {
-            // expect.fail();
-            // Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-            // expect(err.code).to.equal(400);
-        })
-    }); //added
+    // it.only("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
+    //     return insightFacade.performQuery(
+    //         {"WHERE":
+    //             {"OR": [
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "inst adul educ"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*a*"
+    //                         }
+    //                     }
+    //                 },
+    //
+    //                 {
+    //                     "NOT": {
+    //                         "IS": {
+    //                             "courses_dept": "*b*"
+    //                         }
+    //                     }
+    //                                 }
+    //             ]
+    //             },
+    //             "OPTIONS":{
+    //                 "COLUMNS":[
+    //                     "courses_dept"
+    //                 ],
+    //                 "ORDER":"courses_dept",
+    //                 "FORM":"TABLE"
+    //             }
+    //         }).then(value => {
+    //         // expect.fail();
+    //         // Log.test('Value ' + value);
+    //         expect(value.code).to.equal(200);
+    //         // expect(value.body).to.equal({});
+    //     }).catch(function (err:any) {
+    //         Log.test('Error: ' + err);
+    //         expect.fail();
+    //         // expect(err.code).to.equal(400);
+    //     })
+    // }); //added
 
     it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
         return insightFacade.performQuery(
