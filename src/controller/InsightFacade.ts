@@ -8,11 +8,14 @@ var JSZip = require('jszip');
 let DataList: any = {};
 class DoEveryThing {
     fail :boolean;
+    returnMessage : string;
     constructor() {
         Log.trace('Doeverything::init()');
         this.fail = false;
     }
     whatKindofFilter(key: any, value: any, preList: any = [], not: boolean = true) {
+        if (this.fail == true)
+            return this.returnMessage;
         // this takes filter and its
         let input = key;
         if(input == "OR" && not == false)
@@ -22,13 +25,15 @@ class DoEveryThing {
         if (input == "OR") {//logic comparison
             if (value.length == 0){
                 this.fail = true;
-                return [];
+                this.returnMessage = "OR has no data"
+                return this.returnMessage;
             }
             return this.createORList(value, preList, not);
         } else if (input == "AND") {
             if (value.length == 0){
                 this.fail = true;
-                return [];
+                this.returnMessage = "AND has no data"
+                return this.returnMessage;
             }
             return this.createANDList(value, preList, not);
         }
@@ -51,10 +56,13 @@ class DoEveryThing {
         }
         else {
             this.fail = true;
-            return [];
+            this.returnMessage = "invalid Filter"
+            return this.returnMessage;
         }
     }
-    createNOTList(value: any, dataList: any[], not:boolean): any[] {
+    createNOTList(value: any, dataList: any[], not:boolean) : any {
+        if (this.fail == true)
+            return this.returnMessage;
         let key = Object.keys(value)[0];
         let keyValue = value[key];
         if(not) {
@@ -64,7 +72,9 @@ class DoEveryThing {
         }
         return response;
     }
-    createORList(list: any[], preList: any[], not:boolean): any[]{
+    createORList(list: any[], preList: any[], not:boolean): any {
+        if (this.fail == true)
+            return this.returnMessage;
         var sortedList: any[] = [];
         for(let i = 0; i < list.length; i++){
             var keysOfObject = Object.keys(list[i]);
@@ -88,7 +98,9 @@ class DoEveryThing {
         return sortedList;
     }
 
-    createANDList(list: any[], preList: any[],not:boolean): any[]{
+    createANDList(list: any[], preList: any[],not:boolean): any{
+        if (this.fail == true)
+            return this.returnMessage;
         var Initialized = false;
         var resultlist: any[] = [];
         for(let i = 0; i < list.length; i++){
@@ -111,16 +123,16 @@ class DoEveryThing {
         }
         return resultlist;
     }
-    createGTList(key: string, value: number, dataList: any[],not:boolean): any[] {
+    createGTList(key: string, value: number, dataList: any[],not:boolean): any{
+        if (this.fail == true)
+            return this.returnMessage;
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
 
         if(typeof value !== 'number'){
             this.fail= true;
-            return [];
-        }
-        if (dataList.length == 0) {
-
+            this.returnMessage = "GT received non-nunmber"
+            return this.returnMessage;
         }
         if (not) {
             for (let i = 0; i < dataList.length; i++) {
@@ -142,12 +154,15 @@ class DoEveryThing {
         }
 
     }
-    createLTList(key: string, value: number, dataList: any[], not:boolean): any[] {
+    createLTList(key: string, value: number, dataList: any[], not:boolean): any {
+        if (this.fail == true)
+            return this.returnMessage;
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if(typeof value !== 'number'){
             this.fail= true;
-            return [];
+            this.returnMessage = "LT received non-number"
+            return this.returnMessage;
         }
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
@@ -156,7 +171,7 @@ class DoEveryThing {
                 }
             }
             return sortedList;
-        } else {
+        } else{
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] >= value) {
                     sortedList.push(dataList[i]);
@@ -166,12 +181,15 @@ class DoEveryThing {
         }
     }
 
-    createEQList(key: string, value: number, dataList: any[],not:boolean): any[] {
+    createEQList(key: string, value: number, dataList: any[],not:boolean): any {
+        if (this.fail == true)
+            return this.returnMessage;
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if(typeof value !== 'number'){
             this.fail= true;
-            return [];
+            this.returnMessage = "EQ received non-number"
+            return this.returnMessage;
         }
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
@@ -190,79 +208,73 @@ class DoEveryThing {
         }
     }
 
-    createISList(key: string, value: string, dataList: any[], not:boolean): any[] {
+    createISList(key: string, value: string, dataList: any[], not:boolean): any {
+        if (this.fail == true)
+            return this.returnMessage;
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
-        // console.log(value);
         if(typeof value !== 'string'){
             this.fail= true;
-            return [];
+            this.returnMessage = "IS received non-string"
+            return this.returnMessage;
         }
-
-        else if(not) {
+        var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
+        var secondcase = new RegExp("^(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
+        var thirdcase = new RegExp("^^\\*(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
+        var testcase = new RegExp("\\*");
+        if(not) {
             for (let i = 0; i < dataList.length; i++) {
-                var eachValue = dataList[i][realKey];
-                var eachData = dataList[i];
                 if (typeof (dataList[i][realKey]) === 'string') {
-                    if (value[0] == "*" && value[value.length - 1] == "*") {
-                        var realValue = value.substring(1, value.length - 1);
-                        // console.log("1" +realValue);
-                        if (eachValue.search(realValue) > -1) {
-                            sortedList.push(eachData);
-                        }
+                    if (thirdcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        res = res.replace(testcase, "");//  *....*
+                        var newregex = new RegExp("^.*" + res + ".*$")
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
                     }
-                    else if (value[0] == "*") {
-                        var realValue = value.substring(1, value.length);
-                        // console.log("2" +realValue);
-                        if ((eachValue.substring(eachValue.length - value.length + 1, eachValue.length) == realValue)) {
-                            sortedList.push(eachData);
-                        }
+                    else if (firstcase.test(value)) {
+                        let res = value.replace(testcase, "");      //"*...."
+                        var newregex = new RegExp("^.*" + res + "$");
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
                     }
-
-                    else if (value[value.length - 1] == "*") {
-                        var realValue = value.substring(0, value.length - 1);
-                        if ((eachValue.substring(0, realValue.length) == realValue)) {
-                            // console.log("3" +realValue);
-                            sortedList.push(eachData);
-                        }
+                    else if (secondcase.test(value)) {
+                        let res = value.replace(testcase, "");// ".....*"
+                        var newregex = new RegExp("^" + res + ".*$");
+                        if (newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
                     }
-
-                    else if ((eachValue == value)) {
-                        sortedList.push(eachData);
+                    else if (dataList[i][realKey] == value) {
+                        sortedList.push(dataList[i]);
                     }
                 }
             }
             return sortedList;
         } else{
             for (let i = 0; i < dataList.length; i++) {
-                var eachValue = dataList[i][realKey];
-                var eachData = dataList[i];
                 if (typeof (dataList[i][realKey]) === 'string') {
-                    if (value[0] == "*" && value[value.length - 1] == "*") {
-                        var realValue = value.substring(1, value.length - 1);
-                        if (!(eachValue.search(realValue) > -1)) {
-                            // console.log(realValue);
-                            // console.log(eachValue);
-                            sortedList.push(eachData);
-                        }
+                    if (thirdcase.test(value)) {
+                        let res = value.replace(testcase, "");
+                        res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^.*" + res + ".*$")
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
                     }
-                    else if (value[0] == "*") {
-                        var realValue = value.substring(1, value.length);
-                        if (!(eachValue.substring(eachValue.length - value.length + 1, eachValue.length) == realValue)) {
-                            sortedList.push(eachData);
-                        }
+                    else if (firstcase.test(value)) {
+                        let res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^.*" + res + "$");
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
                     }
-
-                    else if (value[value.length - 1] == "*") {
-                        var realValue = value.substring(0, value.length - 1);
-
-                        if (!(eachValue.substring(0, realValue.length) == realValue)) {
-                            sortedList.push(eachData);
-                        }
+                    else if (secondcase.test(value)) {
+                        let res = value.replace(testcase, "");// getting only strings from *....*
+                        var newregex = new RegExp("^" + res + ".*$");
+                        if (!newregex.test(dataList[i][realKey]))
+                            sortedList.push(dataList[i]);
                     }
 
-                    else if (!(eachValue == value)) {
-                        sortedList.push(eachData);
+                    else if (dataList[i][realKey] != value) {
+                        sortedList.push(dataList[i]);
                     }
                 }
             }
@@ -290,42 +302,66 @@ class DoEveryThing {
             return "Audit";
         if(key == "courses_uuid")
             return "id";
+        // if (key.search("_") != -1){
+        //     this.fail = true;
+        //     this.returnMessage = "provided key is not missing data";
+        //     return this.returnMessage;
+        // }
         else {
-            this.fail = true;
-            return "";
+            if (key.search("_") != -1) {
+                this.returnMessage = "provided key is missing data";
+            } else {
+                this.fail = true;
+                this.returnMessage = "provided key is not valid key";
+            }
+
+            return this.returnMessage;
         }
     }
 
     createModifiedList(list: any, options: any) {
+        if (this.fail == true)
+            return this.returnMessage;
         let output: any = {'render': '', 'result': []};
         let newlist: any[] = [];
         let optionsKey = Object.keys(options);
         if (optionsKey.length == 3) {
             if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "ORDER" || optionsKey[2] != "FORM") {
                 this.fail = true;
-                return [];
+                this.returnMessage = "Option is not valid option 3"
+                return this.returnMessage;
             }
         } else if (optionsKey.length == 2) {
             if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "FORM") {
                 this.fail = true;
-                return [];
+                this.returnMessage = "Option is not valid option 2"
+                return this.returnMessage;
             }
-        }
-        let form = Object.keys(options)[2];
-        if (options[form] != "TABLE") {
+        } else {
             this.fail = true;
-            return [];
+            this.returnMessage = "Option is not valid"
+            return this.returnMessage;
+        };
+        if (options["FORM"] != "TABLE") {
+            this.fail = true;
+            this.returnMessage = "FORM is not valid"
+            return this.returnMessage;
         }
-        output['render'] = options[form];
-        let columnsKey = Object.keys(options)[0];
-        let columnsValue = options[columnsKey];
+        output['render'] = options["FORM"];
+        let columnsValue = options["COLUMNS"];
         if (columnsValue.length == 0) {
             this.fail = true;
-            return [];
+            this.returnMessage = "Columns' length is 0"
+            return this.returnMessage;
         }
         for (let i = 0; i < list.length; i++) {
             let element: any = {};
             for (let j = 0; j < columnsValue.length; j++) {
+                if (isNullOrUndefined(columnsValue[j])){
+                    this.fail = true;
+                    this.returnMessage = "element in Columns is null or undefined"
+                    return this.returnMessage;
+                }
                 let key = this.findKey(columnsValue[j]);
                 element[columnsValue[j]] = list[i][key];
             }
@@ -338,7 +374,8 @@ class DoEveryThing {
             let orderValue = options[order];
             if (!columnsValue.includes(orderValue)) {
                 this.fail = true;
-                return [];
+                this.returnMessage = "Order is not in Columns"
+                return this.returnMessage;
             }
             if (orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit") {
                 newlist.sort(this.sort_by(orderValue, false, parseFloat));
@@ -347,10 +384,10 @@ class DoEveryThing {
                     return a.toUpperCase()
                 }));
             }
-            for (let i = 0; i < newlist.length; i++)
-                output['result'].push(newlist[i]);
-            return output;
         }
+        for (let i = 0; i < newlist.length; i++)
+            output['result'].push(newlist[i]);
+        return output;
     }
 
     sort_by = function(field: any, reverse: any, primer: any){
@@ -436,24 +473,22 @@ export default class InsightFacade implements IInsightFacade {
     }
     removeDataset(id: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
-        if (!id && isNullOrUndefined(id)) {
-            //console.log(!id);
-            reject({code: 400, body: {"error": "this one"}});
-        }
-        fs.exists('./' + id + '.json', function (value:boolean) {
-            if (!value) {
-                reject({code: 404, body: {"error": "file not exist"}});
+            if (!id || isNullOrUndefined(id)) {
+                reject({code: 404, body: {"error": "this one"}});
             }
-            else {
-                fs.unlink('./' + id + '.json', function() {
-                    delete DataList[id];
-                    fulfill({code: 204, body: {}});
-                })
-            }
-        })
+            fs.exists('./' + id + '.json', function (value:boolean) {
+                if (!value) {
+                    reject({code: 404, body: {"error": "path not exist"}});
+                }
+                else {
+                    fs.unlink('./' + id + '.json', function() {
+                        delete DataList[id];
+                        fulfill({code: 204, body: {}});
+                    })
+                }
+            })
         })
     }
-
 
 
 
@@ -479,20 +514,31 @@ export default class InsightFacade implements IInsightFacade {
                 try {
                     let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
                     list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
+
                 }catch(e){
                     reject({code: 424, body: {"missing":["courses"]}});
                 }
             }
             if (Doeverything.fail) {
                 Doeverything.fail = false;
-                reject({code: 400, body: {"error": "my text"}});
+                reject({code: 400, body: {"error" : Doeverything.returnMessage}});
+                console.log(Doeverything.returnMessage);
+                return;
             }
             let options = query[names[1]];
             let response = Doeverything.createModifiedList(list, options);
             if (Doeverything.fail) {
                 Doeverything.fail = false;
-                reject({code: 400, body: {"error": "my text"}});
+
+                reject({code: 400, body: {"error" : Doeverything.returnMessage}});
             }
+            else if (Doeverything.returnMessage == "provided key is missing data") {
+                Doeverything.returnMessage = null;
+                reject({code: 424, body: {"missing":["courses"]}});
+                console.log(Doeverything.returnMessage);
+                return;
+            }
+
             console.log(response);
             fulfill({code: 200, body: response});
         })
