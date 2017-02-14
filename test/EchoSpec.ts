@@ -111,7 +111,7 @@ describe("EchoSpec", function () {
             "FORM":"TABLE"
         }
     };
-   
+
     let query2: QueryRequest =  {
         "WHERE": {
             "NOT": {
@@ -119,14 +119,14 @@ describe("EchoSpec", function () {
                     {
                         "IS": {
                             "courses_dept": "adhe"
-                    }
-                },
+                        }
+                    },
                     {
                         "GT": {
                             "courses_avg": 20
                         }
                     }
-                    ]
+                ]
             }
 
         },
@@ -146,9 +146,9 @@ describe("EchoSpec", function () {
     let query3: QueryRequest ={
         "WHERE": {
 
-                "IS": {
-                    "courses_dept": "adhe"
-                }
+            "IS": {
+                "courses_dept": "adhe"
+            }
 
         },
         "OPTIONS":{
@@ -208,9 +208,9 @@ describe("EchoSpec", function () {
     }
     let query6: QueryRequest = {
         "WHERE":{
-                    "IS":{
-                        "courses_title" : "* anat"
-                    }
+            "IS":{
+                "courses_title" : "* anat"
+            }
         },
         "OPTIONS":{
             "COLUMNS":[
@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -1075,7 +1075,7 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             var response : InsightResponse = {
-                code: 400, body: {}
+                code: 404, body: {}
             };
             expect(err.code).to.equal(response.code);
         })
@@ -1208,7 +1208,7 @@ describe("EchoSpec", function () {
             expect.fail();
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
-            expect(err.code).to.equal(400);
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -1223,9 +1223,6 @@ describe("EchoSpec", function () {
                     "COLUMNS":[
                         "courses_dept",
                         "courses_avg"
-                        // "courses_uuid",
-                        // "courses_fail",
-                        // "courses_pass",
                     ],
                     "ORDER":"courses_avg",
                     "FORM":"TABLE"
@@ -1466,7 +1463,7 @@ describe("EchoSpec", function () {
                             }
                     }
 
-                    ]
+                ]
                 }
                 ,
                 "OPTIONS":{
@@ -1858,119 +1855,119 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    // it.only("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-    //     return insightFacade.performQuery(
-    //         {"WHERE":
-    //             {"AND": [
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "inst adul educ"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*a*"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*b*"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*c*"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "d*"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*e"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*f"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*g"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*h"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*i"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_instructor": "gossen, david"
-    //                         }
-    //                     }
-    //                 }
-    //
-    //
-    //             ]
-    //             },
-    //             "OPTIONS":{
-    //                 "COLUMNS":[
-    //                     "courses_dept"
-    //                 ],
-    //                 "ORDER":"courses_dept",
-    //                 "FORM":"TABLE"
-    //             }
-    //         }).then(value => {
-    //         // expect.fail();
-    //         // Log.test('Value ' + value);
-    //         expect(value.code).to.equal(200);
-    //         // expect(value.body).to.equal({});
-    //     }).catch(function (err:any) {
-    //         Log.test('Error: ' + err);
-    //         expect.fail();
-    //         // expect(err.code).to.equal(400);
-    //     })
-    // }); //added
+    it("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"AND": [
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "inst adul educ"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*a*"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*b*"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*c*"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "d*"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*e"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*f"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*g"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*h"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*i"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_instructor": "gossen, david"
+                            }
+                        }
+                    }
+
+
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept"
+                    ],
+                    "ORDER":"courses_dept",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            // Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
     //
     // it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
     //     return insightFacade.performQuery(
@@ -2017,53 +2014,53 @@ describe("EchoSpec", function () {
     //     })
     // }); //added
 
-    // it.only("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-    //     return insightFacade.performQuery(
-    //         {"WHERE":
-    //             {"OR": [
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "inst adul educ"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*a*"
-    //                         }
-    //                     }
-    //                 },
-    //
-    //                 {
-    //                     "NOT": {
-    //                         "IS": {
-    //                             "courses_dept": "*b*"
-    //                         }
-    //                     }
-    //                                 }
-    //             ]
-    //             },
-    //             "OPTIONS":{
-    //                 "COLUMNS":[
-    //                     "courses_dept"
-    //                 ],
-    //                 "ORDER":"courses_dept",
-    //                 "FORM":"TABLE"
-    //             }
-    //         }).then(value => {
-    //         // expect.fail();
-    //         // Log.test('Value ' + value);
-    //         expect(value.code).to.equal(200);
-    //         // expect(value.body).to.equal({});
-    //     }).catch(function (err:any) {
-    //         Log.test('Error: ' + err);
-    //         expect.fail();
-    //         // expect(err.code).to.equal(400);
-    //     })
-    // }); //added
+    it("Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"OR": [
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "inst adul educ"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*a*"
+                            }
+                        }
+                    },
+
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_dept": "*b*"
+                            }
+                        }
+                    }
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept"
+                    ],
+                    "ORDER":"courses_dept",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            // Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
 
     it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
         return insightFacade.performQuery(
@@ -2107,6 +2104,40 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
             // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+
+
+    it("Flamingo: Should be able to find all courses taught by a set of instructors.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":{
+                "NOT":
+                    {
+                        "LT":{
+                            "courses_avg":50
+                        }
+                    }
+
+            },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "stub_id",
+                        "daddy_avg"
+                    ],
+                    "ORDER":"courses_dept",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -2428,7 +2459,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
