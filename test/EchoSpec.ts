@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it.only("Create a new dataset with unique id ", function () {
+    it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -1793,7 +1793,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("1find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+    it("1find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -1855,7 +1855,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("2find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+    it("2find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -1917,7 +1917,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("3find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+    it("3find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -1980,7 +1980,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+    it("find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
@@ -2648,7 +2648,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
