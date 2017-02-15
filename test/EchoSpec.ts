@@ -736,7 +736,7 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Create a new dataset with unique id ", function () {
+    it.only("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -1793,21 +1793,21 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+    it.only("1find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
         return insightFacade.performQuery(
             {"WHERE":
                 {"AND": [
                     {
                         "NOT": {
                             "IS": {
-                                "courses_instructor": "gossen, david"
+                                "courses_4324": "gossen, david"
                             }
                         }
                     },
                     {
                         "IS":
                             {
-                                "courses_instructor":"*chan"
+                                "courses_234234":"*chan"
                             }
                     },
                     {
@@ -1820,7 +1820,7 @@ describe("EchoSpec", function () {
                     {
                         "IS":
                             {
-                                "courses_title":"*educ*"
+                                "csfdafa":"*educ*"
                             }
                     },
                     {
@@ -1844,14 +1844,203 @@ describe("EchoSpec", function () {
                     "FORM":"TABLE"
                 }
             }).then(value => {
-            // expect.fail();
+            expect.fail();
             // Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
+            // expect(value.code).to.equal(200);
             // expect(value.body).to.equal({});
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it.only("2find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"AND": [
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_4324": "gossen, david"
+                            }
+                        }
+                    },
+                    {
+                        "IS":
+                            {
+                                "courses_234234":"*chan"
+                            }
+                    },
+                    {
+                        "NOT": {
+                            "EQ": {
+                                "courses_avg":90
+                            }
+                        }
+                    },
+                    {
+                        "IS":
+                            {
+                                "csfdafa_dsfsdf":"*educ*"
+                            }
+                    },
+                    {
+                        "GT":
+                            {
+                                "sdjldsjf_dsjf":95
+                            }
+                    }
+
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
             expect.fail();
-            // expect(err.code).to.equal(400);
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(424);
+        })
+    }); //added
+
+    it.only("3find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"AND": [
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_instructor": "gossen, david"
+                            }
+                        }
+                    },
+                    {
+                        "IS":
+                            {
+                                "courses_dept":"*chan"
+                            }
+                    },
+                    {
+                        "NOT": {
+                            "EQ": {
+                                "courses_avg":90
+                            }
+                        }
+                    },
+                    {
+                        "IS":
+                            {
+                                "courses_dept":"*educ*"
+                            }
+                    },
+                    {
+                        "GT":
+                            {
+                                "courses_avg":95
+                            }
+                    }
+
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "djfslf_sdfsdf",
+                        "courses_avg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_pass"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(424);
+        })
+    }); //added
+
+    it.only("find all sections in a dept not taught by a specific person with *chan instructor and not EQ.", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"AND": [
+                    {
+                        "NOT": {
+                            "IS": {
+                                "courses_instructor": "gossen, david"
+                            }
+                        }
+                    },
+                    {
+                        "IS":
+                            {
+                                "courses_dept":"*chan"
+                            }
+                    },
+                    {
+                        "NOT": {
+                            "EQ": {
+                                "courses_avg":90
+                            }
+                        }
+                    },
+                    {
+                        "IS":
+                            {
+                                "courses_dept":"*educ*"
+                            }
+                    },
+                    {
+                        "GT":
+                            {
+                                "courses_avg":95
+                            }
+                    }
+
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept",
+                        "djfslf_sdfsdf",
+                        "csdfsdfavg",
+                        "courses_uuid",
+                        "courses_fail",
+                        "courses_avg",
+                        "courses_pass"
+                    ],
+                    "ORDER":"courses_avg",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -2459,7 +2648,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("removeDataset with existing file", function () {
+    it.only("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);

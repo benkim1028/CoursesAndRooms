@@ -9,6 +9,7 @@ let DataList: any = {};
 class DoEveryThing {
     fail :boolean;
     returnMessage : string;
+    // returnMessage1 : string;
     constructor() {
         Log.trace('Doeverything::init()');
         this.fail = false;
@@ -354,6 +355,12 @@ class DoEveryThing {
             this.returnMessage = "Columns' length is 0"
             return this.returnMessage;
         }
+        for (let j = 0; j < columnsValue.length; j++) {
+            if (columnsValue[j].search("_") != -1) {
+                this.returnMessage = "provided key is missing data";
+            }
+        }
+
         for (let i = 0; i < list.length; i++) {
             let element: any = {};
             for (let j = 0; j < columnsValue.length; j++) {
@@ -522,6 +529,7 @@ export default class InsightFacade implements IInsightFacade {
             if (Doeverything.fail) {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error" : Doeverything.returnMessage}});
+                Doeverything.returnMessage = null;
                 console.log(Doeverything.returnMessage);
                 return;
             }
