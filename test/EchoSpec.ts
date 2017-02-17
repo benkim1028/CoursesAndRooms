@@ -10,7 +10,6 @@ import {expect} from 'chai';
 import Log from "../src/Util";
 import InsightFacade from "../src/controller/InsightFacade";
 import {InsightResponse, QueryRequest} from "../src/controller/IInsightFacade";
-import Doeverything from "../src/controller/InsightFacade";
 import fs = require('fs');
 
 describe("EchoSpec", function () {
@@ -664,7 +663,7 @@ describe("EchoSpec", function () {
         expect(response.code).to.be.a('number');
     }
     var insightFacade:InsightFacade = null; //added
-    var doeverything:Doeverything = null;
+
 
 
     before(function () {
@@ -675,7 +674,7 @@ describe("EchoSpec", function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insightFacade = new InsightFacade(); //added
         zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
-        doeverything = new Doeverything();
+
         // emptyfolder = Buffer.from(fs.readFileSync("course2.zip")).toString('base64');
         // invalidfiletxt = Buffer.from(fs.readFileSync("course3.zip")).toString('base64');
         // invalidzip = Buffer.from(fs.readFileSync("courses.txt")).toString('base64');

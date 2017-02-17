@@ -8,11 +8,16 @@ var JSZip = require('jszip');
 let DataList: any = {};
 class DoEveryThing {
     fail :boolean;
+    fail_for_424 : boolean;
+    fail_for_missingKey : boolean;
     returnMessage : string;
-    // returnMessage1 : string;
+    missingIds : string[];
     constructor() {
         Log.trace('Doeverything::init()');
         this.fail = false;
+        this.fail_for_424 = false;
+        this.fail_for_missingKey = false;
+        this.missingIds = [];
     }
     whatKindofFilter(key: any, value: any, preList: any = [], not: boolean = true) {
         if (this.fail == true)
@@ -128,13 +133,14 @@ class DoEveryThing {
         if (this.fail == true)
             return this.returnMessage;
         var sortedList: any[] = [];
-        var realKey = this.findKey(key);
 
-        if(typeof value !== 'number'){
+        if(typeof value !== 'number' || key == "courses_dept" || key == "courses_id"  || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid"){
             this.fail= true;
             this.returnMessage = "GT received non-nunmber"
             return this.returnMessage;
         }
+
+        var realKey = this.findKey(key);
         if (not) {
             for (let i = 0; i < dataList.length; i++) {
 
@@ -158,13 +164,14 @@ class DoEveryThing {
     createLTList(key: string, value: number, dataList: any[], not:boolean): any {
         if (this.fail == true)
             return this.returnMessage;
-        var sortedList: any[] = [];
-        var realKey = this.findKey(key);
-        if(typeof value !== 'number'){
+
+        if(typeof value !== 'number' || key == "courses_dept" || key == "courses_id"  || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid"){
             this.fail= true;
             this.returnMessage = "LT received non-number"
             return this.returnMessage;
         }
+        var sortedList: any[] = [];
+        var realKey = this.findKey(key);
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] < value) {
@@ -185,13 +192,14 @@ class DoEveryThing {
     createEQList(key: string, value: number, dataList: any[],not:boolean): any {
         if (this.fail == true)
             return this.returnMessage;
-        var sortedList: any[] = [];
-        var realKey = this.findKey(key);
-        if(typeof value !== 'number'){
+
+        if(typeof value !== 'number' || key == "courses_dept" || key == "courses_id"  || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid"){
             this.fail= true;
             this.returnMessage = "EQ received non-number"
             return this.returnMessage;
         }
+        var sortedList: any[] = [];
+        var realKey = this.findKey(key);
         if(not) {
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'number' && dataList[i][realKey] == value) {
@@ -212,13 +220,14 @@ class DoEveryThing {
     createISList(key: string, value: string, dataList: any[], not:boolean): any {
         if (this.fail == true)
             return this.returnMessage;
-        var sortedList: any[] = [];
-        var realKey = this.findKey(key);
-        if(typeof value !== 'string'){
+
+        if(typeof value !== 'string' || key == "courses_avg" || key == "courses_pass" || key == "courses_fail" || key == "courses_audit"){
             this.fail= true;
             this.returnMessage = "IS received non-string"
             return this.returnMessage;
         }
+        var sortedList: any[] = [];
+        var realKey = this.findKey(key);
         var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
         var secondcase = new RegExp("^(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
         var thirdcase = new RegExp("^^\\*(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
@@ -303,20 +312,29 @@ class DoEveryThing {
             return "Audit";
         if(key == "courses_uuid")
             return "id";
-        // if (key.search("_") != -1){
-        //     this.fail = true;
-        //     this.returnMessage = "provided key is not missing data";
-        //     return this.returnMessage;
-        // }
         else {
             if (key.search("_") != -1) {
-                this.returnMessage = "provided key is missing data";
+                let indexOF_= key.indexOf("_");
+                let missingId = key.substring(0, indexOF_);
+
+                if (missingId != "courses"){
+                    this.fail_for_424 = true;
+                    this.missingIds.push(missingId);
+                    this.returnMessage = "provided key is missing id";
+                    return this.returnMessage;
+                }
+                else {
+                    this.fail_for_missingKey = true;
+                    this.returnMessage = "provided key is missing key";
+                    return this.returnMessage;
+                }
             } else {
                 this.fail = true;
                 this.returnMessage = "provided key is not valid key";
+                return this.returnMessage;
             }
 
-            return this.returnMessage;
+
         }
     }
 
@@ -355,12 +373,6 @@ class DoEveryThing {
             this.returnMessage = "Columns' length is 0"
             return this.returnMessage;
         }
-        for (let j = 0; j < columnsValue.length; j++) {
-            if (columnsValue[j].search("_") != -1) {
-                this.returnMessage = "provided key is missing data";
-            }
-        }
-
         for (let i = 0; i < list.length; i++) {
             let element: any = {};
             for (let j = 0; j < columnsValue.length; j++) {
@@ -373,6 +385,11 @@ class DoEveryThing {
                 element[columnsValue[j]] = list[i][key];
             }
             newlist.push(element);
+        }
+        if (list.length == 0) {
+            for (let j = 0; j < columnsValue.length; j++) {
+                let key =  this.findKey(columnsValue[j]);
+            }
         }
 
         if (optionsKey.length == 3) {
@@ -521,7 +538,6 @@ export default class InsightFacade implements IInsightFacade {
                 try {
                     let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
                     list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
-
                 }catch(e){
                     reject({code: 424, body: {"missing":["courses"]}});
                 }
@@ -529,25 +545,34 @@ export default class InsightFacade implements IInsightFacade {
             if (Doeverything.fail) {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error" : Doeverything.returnMessage}});
-                Doeverything.returnMessage = null;
-                console.log(Doeverything.returnMessage);
+                Doeverything.missingIds = [];
                 return;
             }
             let options = query[names[1]];
             let response = Doeverything.createModifiedList(list, options);
             if (Doeverything.fail) {
                 Doeverything.fail = false;
-
-                reject({code: 400, body: {"error" : Doeverything.returnMessage}});
+                if (Doeverything.missingIds.length > 0) {
+                    reject({code: 424, body: {"error": Doeverything.returnMessage}});
+                    Doeverything.missingIds = [];
+                    Doeverything.fail_for_424 = false;
+                }
+                else{
+                    reject({code: 400, body: {"error": Doeverything.returnMessage}});
+                }
             }
-            else if (Doeverything.returnMessage == "provided key is missing data") {
-                Doeverything.returnMessage = null;
-                reject({code: 424, body: {"missing":["courses"]}});
-                console.log(Doeverything.returnMessage);
-                return;
+            else if (Doeverything.fail_for_424) {
+                reject({code: 424, body: {"error": Doeverything.missingIds}});
+                Doeverything.missingIds = [];
             }
-
-            console.log(response);
+            else if (Doeverything.fail_for_missingKey) {
+                reject({code: 400, body: {"error": Doeverything.missingIds}});
+                Doeverything.missingIds = [];
+            }
+            Doeverything.fail_for_missingKey = false;
+            Doeverything.fail_for_424 = false;
+            Doeverything.fail = false;
+            // console.log(response);
             fulfill({code: 200, body: response});
         })
     }
