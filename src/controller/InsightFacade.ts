@@ -217,10 +217,85 @@ class DoEveryThing {
         }
     }
 
+    // createISList(key: string, value: string, dataList: any[], not:boolean): any {
+    //     if (this.fail == true)
+    //         return this.returnMessage;
+    //
+    //     if(typeof value !== 'string' || key == "courses_avg" || key == "courses_pass" || key == "courses_fail" || key == "courses_audit"){
+    //         this.fail= true;
+    //         this.returnMessage = "IS received non-string"
+    //         return this.returnMessage;
+    //     }
+    //     var sortedList: any[] = [];
+    //     var realKey = this.findKey(key);
+    //     var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
+    //     var secondcase = new RegExp("^(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
+    //     var thirdcase = new RegExp("^^\\*(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
+    //     var testcase = new RegExp("\\*");
+    //     if(not) {
+    //         for (let i = 0; i < dataList.length; i++) {
+    //             if (typeof (dataList[i][realKey]) === 'string') {
+    //                 if (thirdcase.test(value)) {
+    //                     let res = value.replace(testcase, "");
+    //                     res = res.replace(testcase, "");//  *....*
+    //                     var newregex = new RegExp("^.*" + res + ".*$")
+    //                     if (newregex.test(dataList[i][realKey]))
+    //                         sortedList.push(dataList[i]);
+    //                 }
+    //                 else if (firstcase.test(value)) {
+    //                     let res = value.replace(testcase, "");      //"*...."
+    //                     var newregex = new RegExp("^.*" + res + "$");
+    //                     if (newregex.test(dataList[i][realKey]))
+    //                         sortedList.push(dataList[i]);
+    //                 }
+    //                 else if (secondcase.test(value)) {
+    //                     let res = value.replace(testcase, "");// ".....*"
+    //                     var newregex = new RegExp("^" + res + ".*$");
+    //                     if (newregex.test(dataList[i][realKey]))
+    //                         sortedList.push(dataList[i]);
+    //                 }
+    //                 else if (dataList[i][realKey] == value) {
+    //                     sortedList.push(dataList[i]);
+    //                 }
+    //             }
+    //         }
+    //         return sortedList;
+    //     } else{
+    //         for (let i = 0; i < dataList.length; i++) {
+    //             if (typeof (dataList[i][realKey]) === 'string') {
+    //                 if (thirdcase.test(value)) {
+    //                     let res = value.replace(testcase, "");
+    //                     res = value.replace(testcase, "");// getting only strings from *....*
+    //                     var newregex = new RegExp("^.*" + res + ".*$")
+    //                     if (!newregex.test(dataList[i][realKey]))
+    //                         sortedList.push(dataList[i]);
+    //                 }
+    //                 else if (firstcase.test(value)) {
+    //                     let res = value.replace(testcase, "");// getting only strings from *....*
+    //                     var newregex = new RegExp("^.*" + res + "$");
+    //                     if (!newregex.test(dataList[i][realKey]))
+    //                         sortedList.push(dataList[i]);
+    //                 }
+    //                 else if (secondcase.test(value)) {
+    //                     let res = value.replace(testcase, "");// getting only strings from *....*
+    //                     var newregex = new RegExp("^" + res + ".*$");
+    //                     if (!newregex.test(dataList[i][realKey]))
+    //                         sortedList.push(dataList[i]);
+    //                 }
+    //
+    //                 else if (dataList[i][realKey] != value) {
+    //                     sortedList.push(dataList[i]);
+    //                 }
+    //             }
+    //         }
+    //         return sortedList;
+    //     }
+    //
+    // }
+
     createISList(key: string, value: string, dataList: any[], not:boolean): any {
         if (this.fail == true)
             return this.returnMessage;
-
         if(typeof value !== 'string' || key == "courses_avg" || key == "courses_pass" || key == "courses_fail" || key == "courses_audit"){
             this.fail= true;
             this.returnMessage = "IS received non-string"
@@ -236,8 +311,7 @@ class DoEveryThing {
             for (let i = 0; i < dataList.length; i++) {
                 if (typeof (dataList[i][realKey]) === 'string') {
                     if (thirdcase.test(value)) {
-                        let res = value.replace(testcase, "");
-                        res = res.replace(testcase, "");//  *....*
+                        let res = value.substring(1, value.length - 1);//  *....*
                         var newregex = new RegExp("^.*" + res + ".*$")
                         if (newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
@@ -262,10 +336,9 @@ class DoEveryThing {
             return sortedList;
         } else{
             for (let i = 0; i < dataList.length; i++) {
-                if (typeof (dataList[i][realKey]) === 'string') {
+                if (typeof (dataList[i][realKey]) === 'string'  ) {
                     if (thirdcase.test(value)) {
-                        let res = value.replace(testcase, "");
-                        res = value.replace(testcase, "");// getting only strings from *....*
+                        let res = value.substring(1, value.length - 1);// getting only strings from *....*
                         var newregex = new RegExp("^.*" + res + ".*$")
                         if (!newregex.test(dataList[i][realKey]))
                             sortedList.push(dataList[i]);
@@ -386,9 +459,11 @@ class DoEveryThing {
             }
             newlist.push(element);
         }
+
         if (list.length == 0) {
             for (let j = 0; j < columnsValue.length; j++) {
                 let key =  this.findKey(columnsValue[j]);
+
             }
         }
 
@@ -409,6 +484,7 @@ class DoEveryThing {
                 }));
             }
         }
+
         for (let i = 0; i < newlist.length; i++)
             output['result'].push(newlist[i]);
         return output;
@@ -546,6 +622,8 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.fail = false;
                 reject({code: 400, body: {"error" : Doeverything.returnMessage}});
                 Doeverything.missingIds = [];
+                console.log("1");
+                console.log(Doeverything.returnMessage);
                 return;
             }
             let options = query[names[1]];
@@ -556,19 +634,28 @@ export default class InsightFacade implements IInsightFacade {
                     reject({code: 424, body: {"error": Doeverything.returnMessage}});
                     Doeverything.missingIds = [];
                     Doeverything.fail_for_424 = false;
+                    console.log("2");
+                    console.log(Doeverything.returnMessage);
                 }
                 else{
                     reject({code: 400, body: {"error": Doeverything.returnMessage}});
+                    console.log("3");
+                    console.log(Doeverything.returnMessage);
                 }
             }
             else if (Doeverything.fail_for_424) {
                 reject({code: 424, body: {"error": Doeverything.missingIds}});
                 Doeverything.missingIds = [];
+                console.log("4");
+                console.log(Doeverything.returnMessage);
             }
             else if (Doeverything.fail_for_missingKey) {
                 reject({code: 400, body: {"error": Doeverything.missingIds}});
                 Doeverything.missingIds = [];
+                console.log("5");
+                console.log(Doeverything.returnMessage);
             }
+
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
