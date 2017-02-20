@@ -14,7 +14,8 @@ import fs = require('fs');
 
 describe("EchoSpec", function () {
 
-    var zipContent: any = null;
+    var zipContentForCourses: any = null;
+    var zipContentForRooms: any = null;
 
     let query: QueryRequest = {
         "WHERE":{
@@ -673,8 +674,8 @@ describe("EchoSpec", function () {
     beforeEach(function () {
         Log.test('BeforeTest: ' + (<any>this).currentTest.title);
         insightFacade = new InsightFacade(); //added
-        zipContent = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
-
+        zipContentForCourses = Buffer.from(fs.readFileSync("courses.zip")).toString('base64');
+        zipContentForRooms   = Buffer.from(fs.readFileSync("rooms.zip")).toString('base64');
         // emptyfolder = Buffer.from(fs.readFileSync("course2.zip")).toString('base64');
         // invalidfiletxt = Buffer.from(fs.readFileSync("course3.zip")).toString('base64');
         // invalidzip = Buffer.from(fs.readFileSync("courses.txt")).toString('base64');
@@ -739,7 +740,7 @@ describe("EchoSpec", function () {
     });
 
     it("Create a new dataset with unique id ", function () {
-        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+        return insightFacade.addDataset("courses", zipContentForCourses).then(function (value:any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
                 code: 204,
@@ -749,8 +750,8 @@ describe("EchoSpec", function () {
         })
     });
 
-    it("Create a new dataset with non-unique id", function () {
-        return insightFacade.addDataset("courses", zipContent).then(function (value:any) {
+    it.only("Create a new dataset with non-unique id", function () {
+        return insightFacade.addDataset("courses", zipContentForCourses).then(function (value:any) {
             Log.test('Value ' + value);
             var response : InsightResponse = { code: 201, body: {} };
             expect(value.code).to.equal(response.code);
@@ -3057,6 +3058,17 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(response.code);
             expect(err.body).to.eql(response.body);
+        })
+    });
+
+    it.only("Create a new room dataset with non-unique id", function () {
+        return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value:any) {
+            Log.test('Value ' + value);
+            var response : InsightResponse = { code: 201, body: {} };
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
         })
     });
 
