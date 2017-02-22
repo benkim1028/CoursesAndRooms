@@ -5,6 +5,8 @@ import {isNullOrUndefined} from "util";
 
 var JSZip = require('jszip');
 const parse5 = require('parse5');
+var request = require('request');
+
 
 
 let DataList: any = {};
@@ -604,6 +606,20 @@ class DoEveryThing {
 
 }
 
+function getLatandLon(url: any){
+    return new Promise(function(fulfill, reject){
+
+            request.get(url, function (error: any, response: any, body: any) {
+                if (!error && response.statusCode == 200) {
+                    fulfill(body);
+                }
+                else
+                    reject(error);
+            });
+        })
+
+}
+
 
 
 
@@ -679,7 +695,10 @@ export default class InsightFacade implements IInsightFacade {
             else if (id == 'rooms') {
                 zip.loadAsync(content,{base64: true})
                     .then(function (contents:any) {
+                        var validlats: number[] = [];
+                        var validlons: number[] = [];
                         let validCodes:string[] = [];
+                        let encoded_uri_list:string[] = [];
                         // let filepaths = Object.keys(contents.files);
                         // if (filepaths.length  == 5) {
                         //     reject({code: 400, body: {"error": "my text"}});
@@ -742,6 +761,19 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                     }
                                                                                                                                     else if (attr['value'] == 'views-field views-field-field-building-address') {
                                                                                                                                         // console.log(item11.childNodes[0]['value'].trim());
+                                                                                                                                        encoded_uri_list.push(encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + item11.childNodes[0]['value'].trim()));
+
+                                                                                                                                        let encoded_uri = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + item11.childNodes[0]['value'].trim());
+                                                                                                                                        getLatandLon(encoded_uri).then(function(latlon: any){
+                                                                                                                                            // console.log(latlon);
+                                                                                                                                            let response = JSON.parse(latlon);
+                                                                                                                                            // console.log(response);
+                                                                                                                                            validlats.push(response["lat"]);
+                                                                                                                                            console.log(response["lat"]);
+                                                                                                                                            validlons.push(response["lon"]);
+                                                                                                                                        }).catch(function(){
+                                                                                                                                            reject({code: 400, body: {"error": "this three"}});
+                                                                                                                                        });
                                                                                                                                     }
                                                                                                                                     else if (attr['value'] == 'views-field views-field-title') {
                                                                                                                                         for (let item12 of item11.childNodes) {
@@ -785,18 +817,17 @@ export default class InsightFacade implements IInsightFacade {
                                         }
                                     }
                                 }
+                                // for (let encoded_uri of encoded_uri_list) {
+
+                                // }
                                 Promise.all(promiseList).then(data => {
                                     let i:number = 0;
                                     let j:number = 0;
                                     let k:number = 0;
-                                    let emptyObject:any = {};
-
-
-
 
                                     // console.log(document1);
                                     // console.log(promiseList.length);
-                                    console.log(data.length);
+                                    // console.log(data.length);
                                     for (let each of data) {
                                         let rooms_fullname:string ='';
                                         let rooms_shortname:string ='';
@@ -856,6 +887,11 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                         rooms_fullname = item12.childNodes[0]['value'];
                                                                                                                                         // console.log("rooms_shortname : " + validCodes[j]);
                                                                                                                                         rooms_shortname = validCodes[j];
+                                                                                                                                        rooms_lat = validlats[j];
+                                                                                                                                        // console.log(j);
+                                                                                                                                        // console.log(validlats[j]);
+                                                                                                                                        rooms_lon = validlons[j];
+                                                                                                                                        // console.log(validlats[j]);
                                                                                                                                     }
                                                                                                                                 }
                                                                                                                                 else if (item11.tagName == 'div') {
@@ -865,7 +901,6 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                 if (isNullOrUndefined(item13.attrs)){
                                                                                                                                                     if (item13['value'].search('Building Hour') == -1 && item13['value'].search('Building is') == -1 && item13['value'].search('Opening hours') == -1 ) {
                                                                                                                                                         // console.log("rooms_address : " + item13['value']); //building address
-                                                                                                                                                        emptyList.push(("{" + "rooms_address : " + item13['value'] + "}"));
                                                                                                                                                         rooms_address = item13['value'];
                                                                                                                                                     }
                                                                                                                                                 }
@@ -940,7 +975,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                                                                                                                                         if (!isNullOrUndefined(item14.attrs) && item14.attrs.length == 1) {
                                                                                                                                                             // console.log("room_href : " + item14.attrs[0]['value']); // room_href
-                                                                                                                                                            rooms_href = item14.attrs[0]['value']
+                                                                                                                                                            rooms_href = item14.attrs[0]['value'];
 
 
                                                                                                                                                             if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
@@ -955,17 +990,18 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                 //     + "rooms_type : " + rooms_type + ", "
                                                                                                                                                                 //     + "rooms_furniture : " + rooms_furniture + ", "
                                                                                                                                                                 //     + "rooms_href : " + rooms_href + "}");
-                                                                                                                                                                validData.push("{" + "rooms_fullname : " + rooms_fullname + ", "
-                                                                                                                                                                    + "rooms_shortname : " + rooms_shortname + ", "
-                                                                                                                                                                    + "rooms_number : " + rooms_number + ", "
-                                                                                                                                                                    + "rooms_name : " + rooms_shortname + "_" + rooms_number + ", "
-                                                                                                                                                                    + "rooms_address : " + rooms_address + ", "
-                                                                                                                                                                    // + "rooms_lat : " + rooms_lat + ", "
-                                                                                                                                                                    // + "rooms_lon : " + rooms_lon + ", "
-                                                                                                                                                                    + "rooms_seats : " + rooms_seats + ", "
-                                                                                                                                                                    + "rooms_type : " + rooms_type + ", "
-                                                                                                                                                                    + "rooms_furniture : " + rooms_furniture + ", "
-                                                                                                                                                                    + "rooms_href : " + rooms_href + "}");
+
+                                                                                                                                                                validData.push({ "rooms_fullname" :  rooms_fullname,
+                                                                                                                                                                    "rooms_shortname" :  rooms_shortname,
+                                                                                                                                                                    "rooms_number" : rooms_number,
+                                                                                                                                                                    "rooms_name" : rooms_shortname + "_" + rooms_number,
+                                                                                                                                                                    "rooms_address" : rooms_address,
+                                                                                                                                                                    "rooms_lat" : rooms_lat,
+                                                                                                                                                                    "rooms_lon" : rooms_lon,
+                                                                                                                                                                    "rooms_seats" : rooms_seats,
+                                                                                                                                                                    "rooms_type" : rooms_type,
+                                                                                                                                                                    "rooms_furniture" : rooms_furniture,
+                                                                                                                                                                    "rooms_href" : rooms_href });
                                                                                                                                                         }
 
 
@@ -1020,30 +1056,22 @@ export default class InsightFacade implements IInsightFacade {
                                         }
                                     j++; // for room shortname
                                         if (rooms_number == '' && rooms_seats == 0) {
-                                            // console.log("{" + "rooms_fullname : " + rooms_fullname + ", "
-                                            //     + "rooms_shortname : " + rooms_shortname + ", "
-                                            //     // + "rooms_number : " + rooms_number + ", "
-                                            //     // + "rooms_name : " + rooms_shortname + "_" + rooms_number + ", "
-                                            //     + "rooms_address : " + rooms_address
-                                            //     // + "rooms_lat : " + rooms_lat + ", "
-                                            //     // + "rooms_lon : " + rooms_lon + ", "
-                                            //     // + "rooms_seats : " + rooms_seats + ", "
-                                            //     // + "rooms_type : " + rooms_type + ", "
-                                            //     // + "rooms_furniture : " + rooms_furniture + ", "
-                                            //     // + "rooms_href : " + rooms_href
-                                            //     + "}");
-                                            validData.push("{" + "rooms_fullname : " + rooms_fullname + ", "
-                                                + "rooms_shortname : " + rooms_shortname + ", "
-                                                + "rooms_address : " + rooms_address
-                                                // + "rooms_lat : " + rooms_lat + ", "
-                                                // + "rooms_lon : " + rooms_lon
 
-                                                + "}")
+                                            validData.push({ "rooms_fullname" :  rooms_fullname,
+                                                "rooms_shortname" :  rooms_shortname,
+                                                "rooms_address" : rooms_number,
+                                                "rooms_lat" : rooms_lat,
+                                                "rooms_lon" : rooms_lon
+                                                })
                                         }
                                         // console.log(k);
-                                    }
-                                    console.log(validData);
 
+                                    }
+                                    // console.log(validData[1]["rooms_fullname"]);
+
+
+
+                                    fs.writeFile(id + '.json', JSON.stringify(validData));
                                     fulfill({code: code, body: {}});
                                 })
                                     .catch((err: any) => {
