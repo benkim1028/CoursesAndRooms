@@ -604,129 +604,6 @@ class DoEveryThing {
 
 }
 
-function helper(content:string) {
-    // return new Promise(function (fulfill, reject) {
-    //     {
-            var new_zip = new JSZip();
-            var validFilePaths: string[] = [];
-            new_zip.loadAsync(content, {base64: true})
-                .then(function (contents: any) {
-                    new_zip.file("index.htm").async('string')
-                        .then((data: any) => {
-                            let document = parse5.parse(data);
-                            // console.log(document);
-                            for (let item of document.childNodes) {
-                                if (item.tagName == 'html') {
-                                    // console.log(item);
-                                    for (let item1 of item.childNodes) {
-                                        if (item1.tagName == 'body') {
-                                            // console.log(item1);
-                                            for (let item2 of item1.childNodes) {
-                                                if (item2.tagName == 'div') {
-                                                    // console.log(item2.childNodes);
-                                                    for (let item3 of item2.childNodes) {
-                                                        if (!isNullOrUndefined(item3.attrs) && item3.attrs[0]['value'] == 'main') {
-                                                            // console.log(item3.childNodes);
-                                                            for (let item4 of item3.childNodes) {
-                                                                // console.log(item4.attrs);
-                                                                if (!isNullOrUndefined(item4.attrs) && item4.attrs[0]['value'] == 'content') {
-                                                                    for (let item5 of item4.childNodes) {
-                                                                        if (item5.tagName == 'section') {
-                                                                            // console.log(item5);
-                                                                            for (let item6 of item5.childNodes) {
-                                                                                if (item6.tagName == 'div') {
-                                                                                    for (let item7 of item6.childNodes) {
-                                                                                        if (!isNullOrUndefined(item7.attrs) && item7.attrs[0]['value'] == 'view-content') {
-                                                                                            // console.log(item7);
-                                                                                            for (let item8 of item7.childNodes) {
-                                                                                                // console.log(item8.childNodes);
-                                                                                                if (!isNullOrUndefined(item8.childNodes)) {
-                                                                                                    for (let item9 of item8.childNodes) {
-                                                                                                        if (item9.tagName == 'tbody') {
-                                                                                                            // console.log(item9);
-                                                                                                            for (let item10 of item9.childNodes) {
-                                                                                                                if (!isNullOrUndefined(item10) && item10.tagName == 'tr') {
-                                                                                                                    // console.log(item10.childNodes);
-                                                                                                                    for (let item11 of item10.childNodes) {
-                                                                                                                        if (item11.tagName == 'td') {
-                                                                                                                            // console.log(item11);
-                                                                                                                            for (let attr of item11.attrs) {
-                                                                                                                                // console.log(item11);
-                                                                                                                                if (attr['value'] == 'vie   ws-field views-field-field-building-code') {
-                                                                                                                                    // console.log(item11.childNodes[0]['value'].trim());
-                                                                                                                                }
-                                                                                                                                else if (attr['value'] == 'views-field views-field-field-building-address') {
-                                                                                                                                    // console.log(item11.childNodes[0]['value'].trim());
-                                                                                                                                }
-                                                                                                                                else if (attr['value'] == 'views-field views-field-title') {
-                                                                                                                                    for (let item12 of item11.childNodes) {
-                                                                                                                                        if (item12.tagName == 'a') {
-                                                                                                                                            // console.log(item12.attrs[0]['value'].toString());
-                                                                                                                                            // console.log(item12.childNodes[0]['value']);
-                                                                                                                                            // console.log(item12.attrs[0]['value'].toString().substring(2));
-                                                                                                                                            validFilePaths.push(item12.attrs[0]['value'].toString().substring(2));
-                                                                                                                                            // console.log(validFilePaths);
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-
-                                                                                        }
-
-
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            console.log(validFilePaths);
-
-                            // fulfill(validFilePaths);
-
-
-
-                            // fulfill({code: code, body: {}});
-                            // console.log(data);
-                        })
-                    // .catch((err: any) => {
-                    //     console.log(err);
-                    //     // reject({code: 400, body: {"error": "this three"}});
-                    // });
-
-
-                    //     console.log("hi");
-                    //     console.log(validFilePaths);
-                    // return validFilePaths;
-                    return validFilePaths; })
-            // .catch((err: any)  => {
-            //     console.log(err);
-            //     // reject({code: 400, body: {"error": "this three"}});
-            // });
-        // }
-    // })
-}
-
-
-
 
 
 
@@ -745,8 +622,7 @@ export default class InsightFacade implements IInsightFacade {
     addDataset(id: string, content: string) : Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             let promiseList: Promise<any>[] = [];
-            let promiseList2: Promise<any>[] = [];
-            let validFilePaths: string[] = [];
+            let validData: any[] = [];
             let code: number = 0;
             let zip = new JSZip();
             if (id == 'courses') {
@@ -803,21 +679,21 @@ export default class InsightFacade implements IInsightFacade {
             else if (id == 'rooms') {
                 zip.loadAsync(content,{base64: true})
                     .then(function (contents:any) {
-                        /*let filepaths = Object.keys(contents.files);
-                        promiseList.push(zip.files['index.htm'].async('string'));
-                        if (filepaths.length  == 5) {
-                            reject({code: 400, body: {"error": "my text"}});
-                        }
-                        else {
-                            for (let filepath of filepaths) {
-                                if (filepath.search("campus/discover/buildings-and-classrooms/") != -1) {
-                                    if (filepath.substring(41).length == 3 || filepath.substring(41).length == 4 ) {
-                                        console.log(filepath);
-                                        promiseList.push(zip.files[filepath].async('string'));
-                                    }
-                                }
-                            }
-                        }*/
+                        let validCodes:string[] = [];
+                        // let filepaths = Object.keys(contents.files);
+                        // if (filepaths.length  == 5) {
+                        //     reject({code: 400, body: {"error": "my text"}});
+                        // }
+                        // else {
+                        //     for (let filepath of filepaths) {
+                        //         if (filepath.search("campus/discover/buildings-and-classrooms/") != -1) {
+                        //             if (filepath.substring(41).length == 3 || filepath.substring(41).length == 4 ) {
+                        //                 console.log(filepath);
+                        //                 promiseList.push(zip.files[filepath].async('string'));
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         zip.file("index.htm").async('string')
                             .then((data: any) => {
                                 let document = parse5.parse(data);
@@ -859,8 +735,10 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                 // console.log(item11);
                                                                                                                                 for (let attr of item11.attrs) {
                                                                                                                                     // console.log(item11);
-                                                                                                                                    if (attr['value'] == 'vie   ws-field views-field-field-building-code') {
+                                                                                                                                    if (attr['value'] == 'views-field views-field-field-building-code') {
                                                                                                                                         // console.log(item11.childNodes[0]['value'].trim());
+                                                                                                                                        validCodes.push(item11.childNodes[0]['value'].trim());
+
                                                                                                                                     }
                                                                                                                                     else if (attr['value'] == 'views-field views-field-field-building-address') {
                                                                                                                                         // console.log(item11.childNodes[0]['value'].trim());
@@ -868,6 +746,7 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                     else if (attr['value'] == 'views-field views-field-title') {
                                                                                                                                         for (let item12 of item11.childNodes) {
                                                                                                                                             if (item12.tagName == 'a') {
+                                                                                                                                                // console.log(item12);
                                                                                                                                                 // console.log(item12.attrs[0]['value'].toString());
                                                                                                                                                 // console.log(item12.childNodes[0]['value']);
                                                                                                                                                 // console.log(item12.attrs[0]['value'].toString().substring(2));
@@ -907,16 +786,33 @@ export default class InsightFacade implements IInsightFacade {
                                     }
                                 }
                                 Promise.all(promiseList).then(data => {
-                                    var list: any [] = [];
+                                    let i:number = 0;
+                                    let j:number = 0;
+                                    let k:number = 0;
+                                    let emptyObject:any = {};
+
+
+
 
                                     // console.log(document1);
                                     // console.log(promiseList.length);
                                     console.log(data.length);
                                     for (let each of data) {
+                                        let rooms_fullname:string ='';
+                                        let rooms_shortname:string ='';
+                                        let rooms_number:string = '';
+                                        // let rooms_name:string = rooms_shortname + "_" + rooms_number;
+                                        let rooms_address:string ='';
+                                        let rooms_lat:number = 0;
+                                        let rooms_lon:number = 0;
+                                        let rooms_seats:number = 0;
+                                        let rooms_type:string ='';
+                                        let rooms_furniture:string ='';
+                                        let rooms_href:string ='';
                                         let document1 = parse5.parse(each);
 
-
                                     for (let item of document1.childNodes) {
+                                        let emptyList:any[]  = [];
                                         if (item.tagName == 'html') {
                                             for (let item1 of item.childNodes) {
                                                 // console.log(item1);
@@ -956,7 +852,10 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                             for(let item11 of item10.childNodes) {
                                                                                                                                 if (item11.tagName == 'h2') {
                                                                                                                                     for (let item12 of item11.childNodes) {
-                                                                                                                                        // console.log(item12.childNodes[0]['value']); //building full name
+                                                                                                                                        // console.log("rooms_fullname : " + item12.childNodes[0]['value']); //building full name
+                                                                                                                                        rooms_fullname = item12.childNodes[0]['value'];
+                                                                                                                                        // console.log("rooms_shortname : " + validCodes[j]);
+                                                                                                                                        rooms_shortname = validCodes[j];
                                                                                                                                     }
                                                                                                                                 }
                                                                                                                                 else if (item11.tagName == 'div') {
@@ -965,14 +864,13 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                             for (let item13 of item12.childNodes) {
                                                                                                                                                 if (isNullOrUndefined(item13.attrs)){
                                                                                                                                                     if (item13['value'].search('Building Hour') == -1 && item13['value'].search('Building is') == -1 && item13['value'].search('Opening hours') == -1 ) {
-                                                                                                                                                        console.log(item13['value']);
+                                                                                                                                                        // console.log("rooms_address : " + item13['value']); //building address
+                                                                                                                                                        emptyList.push(("{" + "rooms_address : " + item13['value'] + "}"));
+                                                                                                                                                        rooms_address = item13['value'];
                                                                                                                                                     }
                                                                                                                                                 }
-
                                                                                                                                             }
-                                                                                                                                            // console.log(item12.childNodes);
                                                                                                                                         }
-
                                                                                                                                     }
                                                                                                                                 }
                                                                                                                             }
@@ -995,9 +893,100 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                     for (let item10 of item9.childNodes) {
                                                                                                                         if (!isNullOrUndefined(item10.attrs)) {
                                                                                                                             // console.log(item10.attrs);
-                                                                                                                            // for (let item11 of item10.chidlNodes) {
-                                                                                                                            //
-                                                                                                                            // }
+                                                                                                                            for (let item11 of item10.childNodes) {
+                                                                                                                                // console.log(item11);
+                                                                                                                                if(item11.tagName == 'tbody') {
+                                                                                                                                    // console.log(item11);
+                                                                                                                                    for (let item12 of item11.childNodes) {
+                                                                                                                                        // console.log(item12);
+                                                                                                                                        if (item12.tagName == 'tr') {
+                                                                                                                                            // console.log(item12);
+                                                                                                                                            for (let item13 of item12.childNodes) {
+                                                                                                                                                if (item13.tagName == 'td') {
+                                                                                                                                                    // console.log(item13.childNodes);
+                                                                                                                                                    for (let item14 of item13.childNodes) {
+                                                                                                                                                        let room_info_list:any = {};
+                                                                                                                                                        // console.log(item14.childNodes);
+                                                                                                                                                        // console.log(item14.attrs);
+                                                                                                                                                        if (item14['nodeName'] != '#text') {
+                                                                                                                                                            for (let item15  of item14.childNodes) {
+                                                                                                                                                                if (item15['value'] != 'More info') {
+                                                                                                                                                                    // console.log("rooms_number : " + item15['value']); //room number
+                                                                                                                                                                    // room_info_list.push(("{" + "rooms_number : " + item15['value'] + "}"));
+                                                                                                                                                                    rooms_number = item15['value'];
+                                                                                                                                                                }
+                                                                                                                                                            }
+                                                                                                                                                        }
+                                                                                                                                                        else {
+                                                                                                                                                            if (item14['value'].trim().length > 1) {
+                                                                                                                                                                if (i % 3 == 0) {
+                                                                                                                                                                    // console.log("rooms_seats : " + item14['value'].trim()); // capacity furniture room_type
+
+                                                                                                                                                                    rooms_type = item14['value'].trim();
+                                                                                                                                                                    // room_info_list.push(("{" + "rooms_seats : " + item14['value'].trim() + "}"));
+                                                                                                                                                                }
+                                                                                                                                                                else if (i % 3 == 1) {
+                                                                                                                                                                    // console.log("rooms_type : " + item14['value'].trim()); // capacity furniture room_type
+                                                                                                                                                                    rooms_seats = item14['value'].trim();
+                                                                                                                                                                }
+                                                                                                                                                                else if (i % 3 == 2) {
+                                                                                                                                                                    // console.log("rooms_furniture : " +item14['value'].trim()); // capacity furniture room_type
+
+                                                                                                                                                                    rooms_furniture = item14['value'].trim();
+                                                                                                                                                                }
+                                                                                                                                                                i++;
+                                                                                                                                                            }
+                                                                                                                                                        }
+
+                                                                                                                                                        if (!isNullOrUndefined(item14.attrs) && item14.attrs.length == 1) {
+                                                                                                                                                            // console.log("room_href : " + item14.attrs[0]['value']); // room_href
+                                                                                                                                                            rooms_href = item14.attrs[0]['value']
+
+
+                                                                                                                                                            if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
+                                                                                                                                                                // console.log("{" + "rooms_fullname : " + rooms_fullname + ", "
+                                                                                                                                                                //     + "rooms_shortname : " + rooms_shortname + ", "
+                                                                                                                                                                //     + "rooms_number : " + rooms_number + ", "
+                                                                                                                                                                //     + "rooms_name : " + rooms_shortname + "_" + rooms_number + ", "
+                                                                                                                                                                //     + "rooms_address : " + rooms_address + ", "
+                                                                                                                                                                //     // + "rooms_lat : " + rooms_lat + ", "
+                                                                                                                                                                //     // + "rooms_lon : " + rooms_lon + ", "
+                                                                                                                                                                //     + "rooms_seats : " + rooms_seats + ", "
+                                                                                                                                                                //     + "rooms_type : " + rooms_type + ", "
+                                                                                                                                                                //     + "rooms_furniture : " + rooms_furniture + ", "
+                                                                                                                                                                //     + "rooms_href : " + rooms_href + "}");
+                                                                                                                                                                validData.push("{" + "rooms_fullname : " + rooms_fullname + ", "
+                                                                                                                                                                    + "rooms_shortname : " + rooms_shortname + ", "
+                                                                                                                                                                    + "rooms_number : " + rooms_number + ", "
+                                                                                                                                                                    + "rooms_name : " + rooms_shortname + "_" + rooms_number + ", "
+                                                                                                                                                                    + "rooms_address : " + rooms_address + ", "
+                                                                                                                                                                    // + "rooms_lat : " + rooms_lat + ", "
+                                                                                                                                                                    // + "rooms_lon : " + rooms_lon + ", "
+                                                                                                                                                                    + "rooms_seats : " + rooms_seats + ", "
+                                                                                                                                                                    + "rooms_type : " + rooms_type + ", "
+                                                                                                                                                                    + "rooms_furniture : " + rooms_furniture + ", "
+                                                                                                                                                                    + "rooms_href : " + rooms_href + "}");
+                                                                                                                                                        }
+
+
+
+
+                                                                                                                                                    }
+
+
+                                                                                                                                                    }
+
+
+
+                                                                                                                                                }
+
+
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                }
+
+                                                                                                                            }
                                                                                                                         }
                                                                                                                     }
                                                                                                                 }
@@ -1022,28 +1011,39 @@ export default class InsightFacade implements IInsightFacade {
                                                     }
 
                                                 }
-                                                else if (item1.tagName == 'head') {
-                                                    if (!isNullOrUndefined(item1.childNodes)) {
-                                                        for (let item2 of item1.childNodes) {
-                                                            if (!isNullOrUndefined(item2.childNodes)) {
-                                                                // console.log(item2.attrs);
-                                                                for (let item3 of item2.childNodes) {
-                                                                    // console.log(item3);
-                                                                    if (!isNullOrUndefined(item3.attrs)) {
-
-                                                                    }
-
-                                                                }
-                                                            }
-                                                        }
-
-                                                    }
-                                                }
-
                                             }
                                         }
+                                        if (emptyList.length > 0) {
+                                            // console.log(emptyList)
+                                        };
+                                            k++;
+                                        }
+                                    j++; // for room shortname
+                                        if (rooms_number == '' && rooms_seats == 0) {
+                                            // console.log("{" + "rooms_fullname : " + rooms_fullname + ", "
+                                            //     + "rooms_shortname : " + rooms_shortname + ", "
+                                            //     // + "rooms_number : " + rooms_number + ", "
+                                            //     // + "rooms_name : " + rooms_shortname + "_" + rooms_number + ", "
+                                            //     + "rooms_address : " + rooms_address
+                                            //     // + "rooms_lat : " + rooms_lat + ", "
+                                            //     // + "rooms_lon : " + rooms_lon + ", "
+                                            //     // + "rooms_seats : " + rooms_seats + ", "
+                                            //     // + "rooms_type : " + rooms_type + ", "
+                                            //     // + "rooms_furniture : " + rooms_furniture + ", "
+                                            //     // + "rooms_href : " + rooms_href
+                                            //     + "}");
+                                            validData.push("{" + "rooms_fullname : " + rooms_fullname + ", "
+                                                + "rooms_shortname : " + rooms_shortname + ", "
+                                                + "rooms_address : " + rooms_address
+                                                // + "rooms_lat : " + rooms_lat + ", "
+                                                // + "rooms_lon : " + rooms_lon
+
+                                                + "}")
+                                        }
+                                        // console.log(k);
                                     }
-                                    }
+                                    console.log(validData);
+
                                     fulfill({code: code, body: {}});
                                 })
                                     .catch((err: any) => {
