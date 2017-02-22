@@ -454,29 +454,12 @@ class DoEveryThing {
                 }
             }
             else if (id == "rooms") {
-                if (key == "rooms_fullname")
-                    return "building-info, field-content";//**
-                if (key == "rooms_shortname")
-                    return "views-field views-field-field-building-code";
-                if (key == "rooms_number")
-                    return "views-field views-field-field-room-number";
-                if (key == "rooms_name")
-                    return "views-field views-field-field-building-code" + "_" + "views-field views-field-field-room-number";
-                if (key == "rooms_address")
-                    return "";
-                if (key == "rooms_lat")
-                    return "";
-                if (key == "rooms_lon")
-                    return "";
-                if (key == "rooms_seats")
-                    return "views-field views-field-field-room-capacity";
-                if (key == "rooms_type")
-                    return "views-field views-field-field-room-type";
-                if (key == "rooms_furniture")
-                    return "views-field views-field-field-room-furniture";
-                if (key == "rooms_href")
-                    return "views-field views-field-nothing";
-
+                return key;
+            }
+            else {
+                this.fail_for_missingKey = true;
+                this.returnMessage = "provided key is missing key";
+                return this.returnMessage;
             }
         }
 
@@ -608,16 +591,14 @@ class DoEveryThing {
 
 function getLatandLon(url: any){
     return new Promise(function(fulfill, reject){
-
-            request.get(url, function (error: any, response: any, body: any) {
-                if (!error && response.statusCode == 200) {
-                    fulfill(body);
-                }
-                else
-                    reject(error);
-            });
-        })
-
+        request.get(url, function (error: any, response: any, body: any) {
+            if (!error && response.statusCode == 200) {
+                fulfill(body);
+            }
+            else
+                reject(error);
+        });
+    })
 }
 
 
@@ -699,6 +680,7 @@ export default class InsightFacade implements IInsightFacade {
                         var validlons: number[] = [];
                         let validCodes:string[] = [];
                         let encoded_uri_list:string[] = [];
+                        let processList: any[] = [];
                         // let filepaths = Object.keys(contents.files);
                         // if (filepaths.length  == 5) {
                         //     reject({code: 400, body: {"error": "my text"}});
@@ -757,23 +739,6 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                     if (attr['value'] == 'views-field views-field-field-building-code') {
                                                                                                                                         // console.log(item11.childNodes[0]['value'].trim());
                                                                                                                                         validCodes.push(item11.childNodes[0]['value'].trim());
-
-                                                                                                                                    }
-                                                                                                                                    else if (attr['value'] == 'views-field views-field-field-building-address') {
-                                                                                                                                        // console.log(item11.childNodes[0]['value'].trim());
-                                                                                                                                        encoded_uri_list.push(encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + item11.childNodes[0]['value'].trim()));
-
-                                                                                                                                        let encoded_uri = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + item11.childNodes[0]['value'].trim());
-                                                                                                                                        getLatandLon(encoded_uri).then(function(latlon: any){
-                                                                                                                                            // console.log(latlon);
-                                                                                                                                            let response = JSON.parse(latlon);
-                                                                                                                                            // console.log(response);
-                                                                                                                                            validlats.push(response["lat"]);
-                                                                                                                                            console.log(response["lat"]);
-                                                                                                                                            validlons.push(response["lon"]);
-                                                                                                                                        }).catch(function(){
-                                                                                                                                            reject({code: 400, body: {"error": "this three"}});
-                                                                                                                                        });
                                                                                                                                     }
                                                                                                                                     else if (attr['value'] == 'views-field views-field-title') {
                                                                                                                                         for (let item12 of item11.childNodes) {
@@ -821,7 +786,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                 // }
                                 Promise.all(promiseList).then(data => {
-                                    let i:number = 0;
+                                    // let i:number = 0;
                                     let j:number = 0;
                                     let k:number = 0;
 
@@ -841,198 +806,192 @@ export default class InsightFacade implements IInsightFacade {
                                         let rooms_furniture:string ='';
                                         let rooms_href:string ='';
                                         let document1 = parse5.parse(each);
-
-                                    for (let item of document1.childNodes) {
-                                        let emptyList:any[]  = [];
-                                        if (item.tagName == 'html') {
-                                            for (let item1 of item.childNodes) {
-                                                // console.log(item1);
-                                                if (item1.tagName == 'body') {
-                                                    // console.log(item1.childNodes);
-                                                    for (let item2 of item1.childNodes) {
-                                                        if (!isNullOrUndefined(item2.attrs) && item2.attrs.length == 1 && item2.attrs[0]["value"] == "full-width-container") {  //&& item2.attrs[0]["value"] == "full-width-container"
-                                                            // console.log(item2.attrs);
-                                                            for (let item3 of item2.childNodes) {
-                                                                if (!isNullOrUndefined(item3.attrs) && item3.attrs[0]['value'] == 'main') { // && item3.attrs.length == 1 && item3.attrs[0]["value"] == "expand row-fluid  contentwrapper-node-"
-                                                                    // console.log(item3.attrs);
-                                                                    for (let item4 of item3.childNodes) {
-                                                                        if (!isNullOrUndefined(item4.attrs) && item4.attrs[0]['value'] == 'content') {
-                                                                            // console.log(item4.attrs);
-                                                                            for (let item5 of item4.childNodes) {
-                                                                                if (item5.tagName == 'section') {
-                                                                                    // console.log(item5.childNodes);
-                                                                                    for (let item6 of item5.childNodes) {
-                                                                                        if (item6.tagName == 'div') {
-                                                                                            // console.log(item6.childNodes);
-                                                                                            for (let item7 of item6.childNodes) {
-                                                                                                if (!isNullOrUndefined(item7.attrs) && item7.attrs[0]['value'] == 'view-content') {
-                                                                                                    // console.log(item7.attrs);
-                                                                                                    for (let item8 of item7.childNodes) {
-                                                                                                        if (!isNullOrUndefined(item8.attrs)) {
-                                                                                                            for (let item9 of item8.childNodes) {
-                                                                                                                // console.log(item9.attrs);
-                                                                                                                if (!isNullOrUndefined(item9.attrs) && item9.attrs.length == 1 && item9.attrs[0]['value'] == 'buildings-wrapper') { //
+                                        let i:number = 0 ;
+                                        for (let item of document1.childNodes) {
+                                            let emptyList:any[]  = [];
+                                            if (item.tagName == 'html') {
+                                                for (let item1 of item.childNodes) {
+                                                    // console.log(item1);
+                                                    if (item1.tagName == 'body') {
+                                                        // console.log(item1.childNodes);
+                                                        for (let item2 of item1.childNodes) {
+                                                            if (!isNullOrUndefined(item2.attrs) && item2.attrs.length == 1 && item2.attrs[0]["value"] == "full-width-container") {  //&& item2.attrs[0]["value"] == "full-width-container"
+                                                                // console.log(item2.attrs);
+                                                                for (let item3 of item2.childNodes) {
+                                                                    if (!isNullOrUndefined(item3.attrs) && item3.attrs[0]['value'] == 'main') { // && item3.attrs.length == 1 && item3.attrs[0]["value"] == "expand row-fluid  contentwrapper-node-"
+                                                                        // console.log(item3.attrs);
+                                                                        for (let item4 of item3.childNodes) {
+                                                                            if (!isNullOrUndefined(item4.attrs) && item4.attrs[0]['value'] == 'content') {
+                                                                                // console.log(item4.attrs);
+                                                                                for (let item5 of item4.childNodes) {
+                                                                                    if (item5.tagName == 'section') {
+                                                                                        // console.log(item5.childNodes);
+                                                                                        for (let item6 of item5.childNodes) {
+                                                                                            if (item6.tagName == 'div') {
+                                                                                                // console.log(item6.childNodes);
+                                                                                                for (let item7 of item6.childNodes) {
+                                                                                                    if (!isNullOrUndefined(item7.attrs) && item7.attrs[0]['value'] == 'view-content') {
+                                                                                                        // console.log(item7.attrs);
+                                                                                                        for (let item8 of item7.childNodes) {
+                                                                                                            if (!isNullOrUndefined(item8.attrs)) {
+                                                                                                                for (let item9 of item8.childNodes) {
+                                                                                                                    // console.log(item9.attrs);
+                                                                                                                    if (!isNullOrUndefined(item9.attrs) && item9.attrs.length == 1 && item9.attrs[0]['value'] == 'buildings-wrapper') { //
 
                                                                                                                         // console.log(item9);
 
 
-                                                                                                                    for (let item10 of item9.childNodes) {
-                                                                                                                        // console.log(item10.attrs);
-                                                                                                                        if (!isNullOrUndefined(item10.attrs) && item10.attrs.length == 1 && item10.attrs[0]['value'] == 'building-info') {
-                                                                                                                            // console.log(item10);
-                                                                                                                            for(let item11 of item10.childNodes) {
-                                                                                                                                if (item11.tagName == 'h2') {
-                                                                                                                                    for (let item12 of item11.childNodes) {
-                                                                                                                                        // console.log("rooms_fullname : " + item12.childNodes[0]['value']); //building full name
-                                                                                                                                        rooms_fullname = item12.childNodes[0]['value'];
-                                                                                                                                        // console.log("rooms_shortname : " + validCodes[j]);
-                                                                                                                                        rooms_shortname = validCodes[j];
-                                                                                                                                        rooms_lat = validlats[j];
-                                                                                                                                        // console.log(j);
-                                                                                                                                        // console.log(validlats[j]);
-                                                                                                                                        rooms_lon = validlons[j];
-                                                                                                                                        // console.log(validlats[j]);
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                                else if (item11.tagName == 'div') {
-                                                                                                                                    for (let item12 of item11.childNodes) {
-                                                                                                                                        if (!isNullOrUndefined(item12.childNodes)) {
-                                                                                                                                            for (let item13 of item12.childNodes) {
-                                                                                                                                                if (isNullOrUndefined(item13.attrs)){
-                                                                                                                                                    if (item13['value'].search('Building Hour') == -1 && item13['value'].search('Building is') == -1 && item13['value'].search('Opening hours') == -1 ) {
-                                                                                                                                                        // console.log("rooms_address : " + item13['value']); //building address
-                                                                                                                                                        rooms_address = item13['value'];
-                                                                                                                                                    }
-                                                                                                                                                }
-                                                                                                                                            }
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            }
-
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                                else if (!isNullOrUndefined(item7.attrs) && item7.attrs[0]['value'] == 'view-footer') {
-                                                                                                    for (let item8 of item7.childNodes) {
-                                                                                                        if (!isNullOrUndefined(item8.attrs)) {
-                                                                                                            // console.log(item8.tagName);
-                                                                                                            for (let item9 of item8.childNodes) {
-                                                                                                                // console.log(item9);
-                                                                                                                if (!isNullOrUndefined(item9.attrs) && item9.attrs[0]['value'] == 'view-content') {
-                                                                                                                    // console.log(item9.tagName);
-                                                                                                                    for (let item10 of item9.childNodes) {
-                                                                                                                        if (!isNullOrUndefined(item10.attrs)) {
+                                                                                                                        for (let item10 of item9.childNodes) {
                                                                                                                             // console.log(item10.attrs);
-                                                                                                                            for (let item11 of item10.childNodes) {
-                                                                                                                                // console.log(item11);
-                                                                                                                                if(item11.tagName == 'tbody') {
-                                                                                                                                    // console.log(item11);
-                                                                                                                                    for (let item12 of item11.childNodes) {
-                                                                                                                                        // console.log(item12);
-                                                                                                                                        if (item12.tagName == 'tr') {
-                                                                                                                                            // console.log(item12);
-                                                                                                                                            for (let item13 of item12.childNodes) {
-                                                                                                                                                if (item13.tagName == 'td') {
-                                                                                                                                                    // console.log(item13.childNodes);
-                                                                                                                                                    for (let item14 of item13.childNodes) {
-                                                                                                                                                        let room_info_list:any = {};
-                                                                                                                                                        // console.log(item14.childNodes);
-                                                                                                                                                        // console.log(item14.attrs);
-                                                                                                                                                        if (item14['nodeName'] != '#text') {
-                                                                                                                                                            for (let item15  of item14.childNodes) {
-                                                                                                                                                                if (item15['value'] != 'More info') {
-                                                                                                                                                                    // console.log("rooms_number : " + item15['value']); //room number
-                                                                                                                                                                    // room_info_list.push(("{" + "rooms_number : " + item15['value'] + "}"));
-                                                                                                                                                                    rooms_number = item15['value'];
-                                                                                                                                                                }
-                                                                                                                                                            }
+                                                                                                                            if (!isNullOrUndefined(item10.attrs) && item10.attrs.length == 1 && item10.attrs[0]['value'] == 'building-info') {
+                                                                                                                                // console.log(item10);
+                                                                                                                                for(let item11 of item10.childNodes) {
+                                                                                                                                    if (item11.tagName == 'h2') {
+                                                                                                                                        for (let item12 of item11.childNodes) {
+                                                                                                                                            // console.log("rooms_fullname : " + item12.childNodes[0]['value']); //building full name
+                                                                                                                                            rooms_fullname = item12.childNodes[0]['value'];
+                                                                                                                                            // console.log("rooms_shortname : " + validCodes[j]);
+                                                                                                                                            rooms_shortname = validCodes[j];
+                                                                                                                                            rooms_lat = validlats[j];
+                                                                                                                                            // console.log(j);
+                                                                                                                                            // console.log(validlats[j]);
+                                                                                                                                            rooms_lon = validlons[j];
+                                                                                                                                            // console.log(validlats[j]);
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                    else if (item11.tagName == 'div') {
+                                                                                                                                        for (let item12 of item11.childNodes) {
+                                                                                                                                            if (!isNullOrUndefined(item12.childNodes)) {
+                                                                                                                                                for (let item13 of item12.childNodes) {
+                                                                                                                                                    if (isNullOrUndefined(item13.attrs)){
+                                                                                                                                                        if (item13['value'].search('Building Hour') == -1 && item13['value'].search('Building is') == -1 && item13['value'].search('Opening hours') == -1 ) {
+                                                                                                                                                            // console.log("rooms_address : " + item13['value']); //building address
+                                                                                                                                                            rooms_address = item13['value'];
+                                                                                                                                                            // console.log(rooms_address);
                                                                                                                                                         }
-                                                                                                                                                        else {
-                                                                                                                                                            if (item14['value'].trim().length > 1) {
-                                                                                                                                                                if (i % 3 == 0) {
-                                                                                                                                                                    // console.log("rooms_seats : " + item14['value'].trim()); // capacity furniture room_type
-
-                                                                                                                                                                    rooms_type = item14['value'].trim();
-                                                                                                                                                                    // room_info_list.push(("{" + "rooms_seats : " + item14['value'].trim() + "}"));
-                                                                                                                                                                }
-                                                                                                                                                                else if (i % 3 == 1) {
-                                                                                                                                                                    // console.log("rooms_type : " + item14['value'].trim()); // capacity furniture room_type
-                                                                                                                                                                    rooms_seats = item14['value'].trim();
-                                                                                                                                                                }
-                                                                                                                                                                else if (i % 3 == 2) {
-                                                                                                                                                                    // console.log("rooms_furniture : " +item14['value'].trim()); // capacity furniture room_type
-
-                                                                                                                                                                    rooms_furniture = item14['value'].trim();
-                                                                                                                                                                }
-                                                                                                                                                                i++;
-                                                                                                                                                            }
-                                                                                                                                                        }
-
-                                                                                                                                                        if (!isNullOrUndefined(item14.attrs) && item14.attrs.length == 1) {
-                                                                                                                                                            // console.log("room_href : " + item14.attrs[0]['value']); // room_href
-                                                                                                                                                            rooms_href = item14.attrs[0]['value'];
-
-
-                                                                                                                                                            if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
-                                                                                                                                                                // console.log("{" + "rooms_fullname : " + rooms_fullname + ", "
-                                                                                                                                                                //     + "rooms_shortname : " + rooms_shortname + ", "
-                                                                                                                                                                //     + "rooms_number : " + rooms_number + ", "
-                                                                                                                                                                //     + "rooms_name : " + rooms_shortname + "_" + rooms_number + ", "
-                                                                                                                                                                //     + "rooms_address : " + rooms_address + ", "
-                                                                                                                                                                //     // + "rooms_lat : " + rooms_lat + ", "
-                                                                                                                                                                //     // + "rooms_lon : " + rooms_lon + ", "
-                                                                                                                                                                //     + "rooms_seats : " + rooms_seats + ", "
-                                                                                                                                                                //     + "rooms_type : " + rooms_type + ", "
-                                                                                                                                                                //     + "rooms_furniture : " + rooms_furniture + ", "
-                                                                                                                                                                //     + "rooms_href : " + rooms_href + "}");
-
-                                                                                                                                                                validData.push({ "rooms_fullname" :  rooms_fullname,
-                                                                                                                                                                    "rooms_shortname" :  rooms_shortname,
-                                                                                                                                                                    "rooms_number" : rooms_number,
-                                                                                                                                                                    "rooms_name" : rooms_shortname + "_" + rooms_number,
-                                                                                                                                                                    "rooms_address" : rooms_address,
-                                                                                                                                                                    "rooms_lat" : rooms_lat,
-                                                                                                                                                                    "rooms_lon" : rooms_lon,
-                                                                                                                                                                    "rooms_seats" : rooms_seats,
-                                                                                                                                                                    "rooms_type" : rooms_type,
-                                                                                                                                                                    "rooms_furniture" : rooms_furniture,
-                                                                                                                                                                    "rooms_href" : rooms_href });
-                                                                                                                                                        }
-
-
-
-
                                                                                                                                                     }
-
-
-                                                                                                                                                    }
-
-
-
                                                                                                                                                 }
-
-
                                                                                                                                             }
                                                                                                                                         }
                                                                                                                                     }
                                                                                                                                 }
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                }
 
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                    else if (!isNullOrUndefined(item7.attrs) && item7.attrs[0]['value'] == 'view-footer') {
+
+                                                                                                        for (let item8 of item7.childNodes) {
+                                                                                                            if (!isNullOrUndefined(item8.attrs)) {
+                                                                                                                // console.log(item8.tagName);
+                                                                                                                for (let item9 of item8.childNodes) {
+                                                                                                                    // console.log(item9);
+                                                                                                                    if (!isNullOrUndefined(item9.attrs) && item9.attrs[0]['value'] == 'view-content') {
+                                                                                                                        // console.log(item9.tagName);
+                                                                                                                        for (let item10 of item9.childNodes) {
+                                                                                                                            if (!isNullOrUndefined(item10.attrs)) {
+                                                                                                                                // console.log(item10.attrs);
+                                                                                                                                for (let item11 of item10.childNodes) {
+                                                                                                                                    // console.log(item11);
+                                                                                                                                    if(item11.tagName == 'tbody') {
+                                                                                                                                        // console.log(item11);
+                                                                                                                                        for (let item12 of item11.childNodes) {
+                                                                                                                                            // console.log(item12);
+                                                                                                                                            if (item12.tagName == 'tr') {
+                                                                                                                                                // console.log(item12);
+                                                                                                                                                for (let item13 of item12.childNodes) {
+                                                                                                                                                    if (item13.tagName == 'td') {
+                                                                                                                                                        // console.log(item13.childNodes);
+                                                                                                                                                        for (let item14 of item13.childNodes) {
+
+                                                                                                                                                            let room_info_list:any = {};
+                                                                                                                                                            // console.log(item14.childNodes);
+                                                                                                                                                            // console.log(item14.attrs);
+                                                                                                                                                            if (item14['nodeName'] != '#text') {
+                                                                                                                                                                for (let item15  of item14.childNodes) {
+                                                                                                                                                                    if (item15['value'] != 'More info') {
+                                                                                                                                                                        // console.log("rooms_number : " + item15['value']); //room number
+                                                                                                                                                                        // room_info_list.push(("{" + "rooms_number : " + item15['value'] + "}"));
+                                                                                                                                                                        rooms_number = item15['value'];
+                                                                                                                                                                    }
+                                                                                                                                                                }
+                                                                                                                                                            }
+                                                                                                                                                            else {
+                                                                                                                                                                // let i:number = 0 ;
+
+                                                                                                                                                                if (item14['value'].trim().length >= 1) {
+                                                                                                                                                                    if (item14['value'].trim().length < 4 && item14['value'].trim().search('TBD') == -1) {
+                                                                                                                                                                        // console.log("rooms_seats : " + item14['value'].trim()); // capacity furniture room_type
+                                                                                                                                                                        rooms_seats = item14['value'].trim();
+                                                                                                                                                                        // console.log(rooms_seats);
+                                                                                                                                                                    }
+                                                                                                                                                                    else  if (item14['value'].trim().length <= 18 || item14['value'].trim().search('Purpose') != -1 || item14['value'].trim().search('Group') != -1) {
+                                                                                                                                                                        // console.log(item14['value'].trim());
+                                                                                                                                                                        rooms_type = item14['value'].trim();
+                                                                                                                                                                    }
+                                                                                                                                                                    else {
+                                                                                                                                                                        rooms_furniture = item14['value'].trim();
+                                                                                                                                                                        // console.log(rooms_furniture);
+                                                                                                                                                                    }
+                                                                                                                                                                }
+                                                                                                                                                            }
+
+                                                                                                                                                            if (!isNullOrUndefined(item14.attrs) && item14.attrs.length == 1) {
+                                                                                                                                                                rooms_href = item14.attrs[0]['value'];
+                                                                                                                                                                let url = "http://skaha.cs.ubc.ca:11316/api/v1/team35/" + rooms_address;
+                                                                                                                                                                processList.push(getLatandLon(url).then(function (geoResponse: any){
+                                                                                                                                                                    var responselat: any = null;
+                                                                                                                                                                    var responselon: any = null;
+                                                                                                                                                                    let response = JSON.parse(geoResponse);
+                                                                                                                                                                    responselat = Number(response.lat);
+                                                                                                                                                                    responselon = Number(response.lon);
+                                                                                                                                                                    if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
+                                                                                                                                                                        var newdata: any = {};
+                                                                                                                                                                        newdata["rooms_fullname"] =  rooms_fullname;
+                                                                                                                                                                        newdata["rooms_shortname"] =  rooms_shortname;
+                                                                                                                                                                        newdata["rooms_number"] = rooms_number;
+                                                                                                                                                                        newdata["rooms_name"] = rooms_shortname + "_" + rooms_number;
+                                                                                                                                                                        newdata["rooms_address"] = rooms_address;
+                                                                                                                                                                        newdata["rooms_lat"] = responselat;
+                                                                                                                                                                        newdata["rooms_lon"] = responselon;
+                                                                                                                                                                        newdata["rooms_seats"] = rooms_seats;
+                                                                                                                                                                        newdata["rooms_type"] = rooms_type;
+                                                                                                                                                                        newdata["rooms_furniture"] = rooms_furniture;
+                                                                                                                                                                        newdata["rooms_href"] = rooms_href;
+                                                                                                                                                                    }
+                                                                                                                                                                    validData.push(newdata);
+                                                                                                                                                                }).catch(function(){
+                                                                                                                                                                    reject({code: 400, body: {"error": "this three"}});
+                                                                                                                                                                }))
+                                                                                                                                                            }
+                                                                                                                                                        }
+
+
+
+                                                                                                                                                    }
+
+
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    }
+
+                                                                                                                                }
                                                                                                                             }
                                                                                                                         }
                                                                                                                     }
                                                                                                                 }
                                                                                                             }
                                                                                                         }
+
                                                                                                     }
-
                                                                                                 }
-                                                                                            }
 
+                                                                                            }
                                                                                         }
                                                                                     }
                                                                                 }
@@ -1041,49 +1000,54 @@ export default class InsightFacade implements IInsightFacade {
                                                                     }
                                                                 }
                                                             }
+
+
                                                         }
 
-
                                                     }
-
                                                 }
                                             }
-                                        }
-                                        if (emptyList.length > 0) {
-                                            // console.log(emptyList)
-                                        };
+                                            if (emptyList.length > 0) {
+                                                // console.log(emptyList)
+                                            };
                                             k++;
                                         }
-                                    j++; // for room shortname
+                                        j++; // for room shortname
                                         if (rooms_number == '' && rooms_seats == 0) {
-
+                                            // console.log(rooms_address);
                                             validData.push({ "rooms_fullname" :  rooms_fullname,
                                                 "rooms_shortname" :  rooms_shortname,
-                                                "rooms_address" : rooms_number,
+                                                "rooms_address" : rooms_address,
                                                 "rooms_lat" : rooms_lat,
                                                 "rooms_lon" : rooms_lon
-                                                })
+                                            })
                                         }
                                         // console.log(k);
 
                                     }
                                     // console.log(validData[1]["rooms_fullname"]);
 
-
-
-                                    fs.writeFile(id + '.json', JSON.stringify(validData));
-                                    fulfill({code: code, body: {}});
-                                })
-                                    .catch((err: any) => {
+                                    Promise.all(processList).then(function (){
+                                        DataList[id] = validData;
+                                        fs.writeFile(id + '.json', JSON.stringify(validData));
+                                        fulfill({code: code, body: {}});
+                                    }).catch((err: any) => {
                                         console.log(err);
                                         reject({
                                             code: 400,
                                             body: {"error": "this three"}
                                         });
                                     });
-                        })
+                                }).catch((err: any) => {
+                                    console.log(err);
+                                    reject({
+                                        code: 400,
+                                        body: {"error": "this three"}
+                                    });
+                                });
+                            })
                             .catch(function(){
-                            reject({code: 400, body: {"error": "this three"}});
+                                reject({code: 400, body: {"error": "this three"}});
                             });
                     })
                     .catch(function() {
@@ -1134,11 +1098,12 @@ export default class InsightFacade implements IInsightFacade {
             let filterKey: any = Object.keys(body)[0];
             let filterValue = body[filterKey];
             let list: any = [];
-            if('courses' in DataList){
-                list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList['courses']);
+            let options = query[names[1]];
+            if('rooms' in DataList){
+                list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList['rooms']);
             } else {
                 try {
-                    let datalist = JSON.parse(fs.readFileSync('courses.json', 'utf8'));
+                    let datalist = JSON.parse(fs.readFileSync('rooms.json', 'utf8'));
                     list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
                 }catch(e){
                     reject({code: 424, body: {"missing":["courses"]}});
@@ -1152,7 +1117,7 @@ export default class InsightFacade implements IInsightFacade {
                 console.log(Doeverything.returnMessage);
                 return;
             }
-            let options = query[names[1]];
+
             let response = Doeverything.createModifiedList(list, options);
             if (Doeverything.fail) {
                 Doeverything.fail = false;
@@ -1185,7 +1150,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
