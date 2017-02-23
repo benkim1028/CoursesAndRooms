@@ -750,7 +750,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only("Create a new dataset with non-unique id", function () {
+    it("Create a new dataset with non-unique id", function () {
         return insightFacade.addDataset("courses", zipContentForCourses).then(function (value:any) {
             Log.test('Value ' + value);
             var response : InsightResponse = { code: 201, body: {} };
@@ -3038,6 +3038,35 @@ describe("EchoSpec", function () {
         })
     }); //added
 
+    it("course_year query", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"GT":
+                    {"courses_year": 2000
+                    }
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_year",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER":"courses_year",
+                    "FORM":"TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
     it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
@@ -3061,7 +3090,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only("Create a new room dataset with non-unique id", function () {
+    it("Create a new room dataset with non-unique id", function () {
         return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value:any) {
             Log.test('Value ' + value);
             var response : InsightResponse = { code: 201, body: {} };
@@ -3072,7 +3101,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only("rooms test1", function () {
+    it("rooms test1", function () {
         return insightFacade.performQuery(
             {
                 "WHERE":{
@@ -3120,43 +3149,8 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("rooms test2", function () {
+    it("rooms test2", function () {
         return insightFacade.performQuery(
-            // {
-            //     "WHERE":{
-            //         "OR":[
-            //             {
-            //                 "AND":[
-            //                     {
-            //                         "EQ":{
-            //                             "rooms_lat": "49.26486"
-            //                         }
-            //                     },
-            //                     {
-            //                         "IS":{
-            //                             "rooms_address":"*a*"
-            //                         }
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 "IS":{
-            //                     "rooms_shortname": 'ANGU'
-            //                 }
-            //             }
-            //         ]
-            //     },
-            //     "OPTIONS":{
-            //         "COLUMNS":[
-            //             "rooms_type",
-            //             "rooms_href",
-            //             "rooms_lat",
-            //             "rooms_fullname"
-            //         ],
-            //         "ORDER":"rooms_fullname",
-            //         "FORM":"TABLE"
-            //     }
-            // }
             {
                 "WHERE": {
                     "IS": {
@@ -3183,7 +3177,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("rooms test3", function () {
+    it("rooms test3", function () {
         return insightFacade.performQuery(
             {
                 "WHERE":{
@@ -3231,7 +3225,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("rooms test4", function () {
+    it("rooms test4", function () {
         return insightFacade.performQuery(
             {
                 "WHERE":{
@@ -3279,7 +3273,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("rooms test5", function () {
+    it("rooms test5", function () {
         return insightFacade.performQuery(
             {
                 "WHERE":{
@@ -3324,6 +3318,64 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             // expect.fail();
             expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("removeDataset with existing file", function () {
+        return insightFacade.removeDataset('rooms').then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(204);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
+
+    it("rooms test6(Cinnamon)", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE":{
+                    "OR":[
+                        {
+                            "AND":[
+                                {
+                                    "EQ":{
+                                        "courses_": 49.26486
+                                    }
+                                },
+                                {
+                                    "IS":{
+                                        "rooms_address":"*2053*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS":{
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(424);
         })
     }); //added
 
