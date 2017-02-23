@@ -689,6 +689,17 @@ export default class InsightFacade implements IInsightFacade {
                     });
             }
             else if (id == 'rooms') {
+                fs.access(id + '.json', (err) => {
+                    if (!err) {
+                        fs.unlink(id + '.json', (err) => {
+                            //if (err) throw err;
+                            code = 201; // id already existed
+                        })
+                    }
+                    else {
+                        code = 204; // id is new
+                    }
+                });
                 zip.loadAsync(content,{base64: true})
                     .then(function (contents:any) {
                         var validlats: number[] = [];
