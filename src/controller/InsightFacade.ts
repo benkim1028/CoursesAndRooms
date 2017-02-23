@@ -2,15 +2,17 @@ import {IInsightFacade, InsightResponse, QueryRequest} from "./IInsightFacade";
 import Log from "../Util";
 import fs = require('fs');
 import {isNullOrUndefined} from "util";
+import {error} from "util";
 
 var JSZip = require('jszip');
-var parse5 = require('parse5');
+const parse5 = require('parse5');
 var request = require('request');
 
 
 
 let DataList: any = {};
 class DoEveryThing {
+    id: string;
     fail: boolean;
     fail_for_424: boolean;
     fail_for_missingKey: boolean;
@@ -24,6 +26,13 @@ class DoEveryThing {
         this.fail_for_missingKey = false;
         this.missingIds = [];
 
+    }
+    identifyID(){
+        if (this.id == "courses"){
+            return "id";
+        } else if (this.id == "rooms"){
+            return "rooms_name";
+        }
     }
 
     whatKindofFilter(key: any, value: any, preList: any = [], not: boolean = true) {
@@ -90,6 +99,7 @@ class DoEveryThing {
     createORList(list: any[], preList: any[], not: boolean): any {
         if (this.fail == true)
             return this.returnMessage;
+        var identifier = this.identifyID();
         var sortedList: any[] = [];
         for (let i = 0; i < list.length; i++) {
             var keysOfObject = Object.keys(list[i]);
@@ -100,18 +110,10 @@ class DoEveryThing {
                 for (var j = 0; j < response.length; j++) {
                     var counter = 0;
                     for (var k = 0; k < sortedList.length; k++) {
-                        if (!isNullOrUndefined(sortedList[k]["id"])) {
-                            if (sortedList[k]["id"] == response[j]["id"]) {
-                                sortedList.push(response[j]);
-                            }
+                        if (sortedList[k][identifier] == response[j][identifier]) {
+                            counter = 1;
+                            break;
                         }
-                        else {
-                            if (sortedList[k]["rooms_name"] == response[j]["rooms_name"] ) {
-                                counter = 1;
-                                break;
-                            }
-                        }
-                        // else if () || sortedList[k]["rooms_name"] == response[j]["rooms_name"]
                     }
                     if (counter == 0)
                         sortedList.push(response[j])
@@ -124,6 +126,7 @@ class DoEveryThing {
     createANDList(list: any[], preList: any[], not: boolean): any {
         if (this.fail == true)
             return this.returnMessage;
+        var identifier = this.identifyID();
         var Initialized = false;
         var resultlist: any[] = [];
         for (let i = 0; i < list.length; i++) {
@@ -136,15 +139,8 @@ class DoEveryThing {
             } else {
                 for (var j = 0; j < response.length; j++) {
                     for (var k = 0; k < resultlist.length; k++) {
-                        if (!isNullOrUndefined(resultlist[k]["id"])) {
-                            if (resultlist[k]["id"] == response[j]["id"]) {
-                                sortedList.push(response[j]);
-                            }
-                        }
-                        else {
-                            if (resultlist[k]["rooms_name"] == response[j]["rooms_name"]) {
-                                sortedList.push(response[j]);
-                        }
+                        if (resultlist[k][identifier] == response[j][identifier]) {
+                            sortedList.push(response[j]);
                         }
                     }
                 }
@@ -153,17 +149,41 @@ class DoEveryThing {
         }
         return resultlist;
     }
+    Typechecker(filterkey: any,shouldbe: string, value: any, key: string){
+        if(this.id == "courses"){
+            if (shouldbe == "number") {
+                if (typeof value !== shouldbe || key == "courses_dept" || key == "courses_id" || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid") {
+                    this.fail = true;
+                    this.returnMessage =  filterkey + " received non-nunmber"
+                }
+            } else if (shouldbe == "string"){
+                if (typeof value !== shouldbe || key == "courses_avg" || key == "courses_pass" || key == "courses_fail" || key == "courses_audit" || key == "courses_year"){
+                    this.fail = true;
+                    this.returnMessage = filterkey + " received non-string"
+                }
+            }
+        }
+        else if (this.id == "rooms"){
+            if (shouldbe == "number") {
+                if (typeof value !== shouldbe || key == "rooms_fullname" || key == "rooms_shortname" || key == "rooms_number" || key == "rooms_name" || key == "rooms_address" ||
+                    key == "rooms_type" || key == "rooms_furniture" || key == "rooms_href") {
+                    this.fail = true;
+                    this.returnMessage =  filterkey + " received non-nunmber"
+                }
+            } else if (shouldbe == "string"){
+                if (typeof value !== shouldbe|| key == "rooms_lat" || key == "rooms_lon" || key == "rooms_seat"){
+                    this.fail = true;
+                    this.returnMessage = filterkey + " received non-string"
+                }
+            }
+        }
+    }
 
     createGTList(key: string, value: number, dataList: any[], not: boolean): any {
+        this.Typechecker("GT",'number', value, key);
         if (this.fail == true)
             return this.returnMessage;
         var sortedList: any[] = [];
-
-        if (typeof value !== 'number' || key == "courses_dept" || key == "courses_id" || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid") {
-            this.fail = true;
-            this.returnMessage = "GT received non-nunmber"
-            return this.returnMessage;
-        }
 
         var realKey = this.findKey(key);
         if (not) {
@@ -188,14 +208,9 @@ class DoEveryThing {
     }
 
     createLTList(key: string, value: number, dataList: any[], not: boolean): any {
+        this.Typechecker("LT",'number', value, key);
         if (this.fail == true)
             return this.returnMessage;
-
-        if (typeof value !== 'number' || key == "courses_dept" || key == "courses_id" || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid") {
-            this.fail = true;
-            this.returnMessage = "LT received non-number"
-            return this.returnMessage;
-        }
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if (not) {
@@ -216,14 +231,10 @@ class DoEveryThing {
     }
 
     createEQList(key: string, value: number, dataList: any[], not: boolean): any {
+        this.Typechecker("EQ",'number', value, key);
         if (this.fail == true)
             return this.returnMessage;
 
-        if (typeof value !== 'number' || key == "courses_dept" || key == "courses_id" || key == "courses_instructor" || key == "courses_title" || key == "courses_uuid") {
-            this.fail = true;
-            this.returnMessage = "EQ received non-number"
-            return this.returnMessage;
-        }
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         if (not) {
@@ -244,14 +255,9 @@ class DoEveryThing {
     }
 
     createISList(key: string, value: string, dataList: any[], not: boolean): any {
+        this.Typechecker("IS",'string', value, key);
         if (this.fail == true)
             return this.returnMessage;
-
-        if (typeof value !== 'string' || key == "courses_avg" || key == "courses_pass" || key == "courses_fail" || key == "courses_audit") {
-            this.fail = true;
-            this.returnMessage = "IS received non-string"
-            return this.returnMessage;
-        }
         var sortedList: any[] = [];
         var realKey = this.findKey(key);
         var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
@@ -318,124 +324,6 @@ class DoEveryThing {
         }
 
     }
-
-    // createISList(key: string, value: string, dataList: any[], not:boolean): any {
-    //     if (this.fail == true)
-    //         return this.returnMessage;
-    //     if(typeof value !== 'string' || key == "courses_avg" || key == "courses_pass" || key == "courses_fail" || key == "courses_audit"){
-    //         this.fail= true;
-    //         this.returnMessage = "IS received non-string"
-    //         return this.returnMessage;
-    //     }
-    //     var sortedList: any[] = [];
-    //     var realKey = this.findKey(key);
-    //     var firstcase = new RegExp("^\\*(\\s|\\S)*\\S+(\\s|\\S)*$");
-    //     var secondcase = new RegExp("^(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
-    //     var thirdcase = new RegExp("^^\\*(\\s|\\S)*\\S+(\\s|\\S)*\\*$");
-    //     var testcase = new RegExp("\\*");
-    //     if(not) {
-    //         for (let i = 0; i < dataList.length; i++) {
-    //             if (typeof (dataList[i][realKey]) === 'string') {
-    //                 if (thirdcase.test(value)) {
-    //                     let res = value.substring(1, value.length - 1);//  *....*
-    //                     var newregex = new RegExp("^.*" + res + ".*$")
-    //                     if (newregex.test(dataList[i][realKey]))
-    //                         sortedList.push(dataList[i]);
-    //                 }
-    //                 else if (firstcase.test(value)) {
-    //                     let res = value.replace(testcase, "");      //"*...."
-    //                     var newregex = new RegExp("^.*" + res + "$");
-    //                     if (newregex.test(dataList[i][realKey]))
-    //                         sortedList.push(dataList[i]);
-    //                 }
-    //                 else if (secondcase.test(value)) {
-    //                     let res = value.replace(testcase, "");// ".....*"
-    //                     var newregex = new RegExp("^" + res + ".*$");
-    //                     if (newregex.test(dataList[i][realKey]))
-    //                         sortedList.push(dataList[i]);
-    //                 }
-    //                 else if (dataList[i][realKey] == value) {
-    //                     sortedList.push(dataList[i]);
-    //                 }
-    //             }
-    //         }
-    //         return sortedList;
-    //     } else{
-    //         for (let i = 0; i < dataList.length; i++) {
-    //             if (typeof (dataList[i][realKey]) === 'string'  ) {
-    //                 if (thirdcase.test(value)) {
-    //                     let res = value.substring(1, value.length - 1);// getting only strings from *....*
-    //                     var newregex = new RegExp("^.*" + res + ".*$")
-    //                     if (!newregex.test(dataList[i][realKey]))
-    //                         sortedList.push(dataList[i]);
-    //                 }
-    //                 else if (firstcase.test(value)) {
-    //                     let res = value.replace(testcase, "");// getting only strings from *....*
-    //                     var newregex = new RegExp("^.*" + res + "$");
-    //                     if (!newregex.test(dataList[i][realKey]))
-    //                         sortedList.push(dataList[i]);
-    //                 }
-    //                 else if (secondcase.test(value)) {
-    //                     let res = value.replace(testcase, "");// getting only strings from *....*
-    //                     var newregex = new RegExp("^" + res + ".*$");
-    //                     if (!newregex.test(dataList[i][realKey]))
-    //                         sortedList.push(dataList[i]);
-    //                 }
-    //
-    //                 else if (dataList[i][realKey] != value) {
-    //                     sortedList.push(dataList[i]);
-    //                 }
-    //             }
-    //         }
-    //         return sortedList;
-    //     }
-    //
-    // }
-
-    // findKey(key: string){
-    //     if(key == "courses_dept")
-    //         return "Subject";
-    //     if(key == "courses_id")
-    //         return "Course";
-    //     if(key == "courses_avg")
-    //         return "Avg";
-    //     if(key == "courses_instructor")
-    //         return "Professor";
-    //     if(key == "courses_title")
-    //         return "Title";
-    //     if(key == "courses_pass")
-    //         return "Pass";
-    //     if(key == "courses_fail")
-    //         return "Fail";
-    //     if(key == "courses_audit")
-    //         return "Audit";
-    //     if(key == "courses_uuid")
-    //         return "id";
-    //     else {
-    //         if (key.search("_") != -1) {
-    //             let indexOF_= key.indexOf("_");
-    //             let missingId = key.substring(0, indexOF_);
-    //
-    //             if (missingId != "courses"){
-    //                 this.fail_for_424 = true;
-    //                 this.missingIds.push(missingId);
-    //                 this.returnMessage = "provided key is missing id";
-    //                 return this.returnMessage;
-    //             }
-    //             else {
-    //                 this.fail_for_missingKey = true;
-    //                 this.returnMessage = "provided key is missing key";
-    //                 return this.returnMessage;
-    //             }
-    //         } else {
-    //             this.fail = true;
-    //             this.returnMessage = "provided key is not valid key";
-    //             return this.returnMessage;
-    //         }
-    //
-    //
-    //     }
-    // }
 
     findKey(key: string) {
         if (key.search("_") != -1) {
@@ -504,7 +392,6 @@ class DoEveryThing {
 
         }
     }
-
     createModifiedList(list: any, options: any) {
         if (this.fail == true)
             return this.returnMessage;
@@ -637,20 +524,21 @@ export default class InsightFacade implements IInsightFacade {
             let validData: any[] = [];
             let code: number = 0;
             let zip = new JSZip();
-            if (id == 'courses') {
-                fs.access(id + '.json', (err) => {
-                    if (!err) {
-                        fs.unlink(id + '.json', (err) => {
-                            //if (err) throw err;
-                            code = 201; // id already existed
-                        })
-                    }
-                    else {
-                        code = 204; // id is new
-                    }
-                });
-                zip.loadAsync(content, {base64: true})
-                    .then(function (contents: any) {
+            fs.access(id + '.json', (err) => {
+                if (!err) {
+                    fs.unlink(id + '.json', (err) => {
+                        //if (err) throw err;
+                        code = 201; // id already existed
+                    })
+                }
+                else {
+                    code = 204; // id is new
+                }
+            });
+
+            zip.loadAsync(content, {base64: true})
+                .then(function (contents: any) {
+                    if (id == 'courses') {
                         let filepaths = Object.keys(contents.files);
                         if (filepaths.length == 1) {
                             reject({code: 400, body: {"error": "my text"}});
@@ -683,25 +571,10 @@ export default class InsightFacade implements IInsightFacade {
                         }).catch(function () {
                             reject({code: 400, body: {"error": "this three"}});
                         });
-                    })
-                    .catch(function () {
-                        reject({code: 400, body: {"error": "this one"}});
-                    });
-            }
-            else if (id == 'rooms') {
-                fs.access(id + '.json', (err) => {
-                    if (!err) {
-                        fs.unlink(id + '.json', (err) => {
-                            //if (err) throw err;
-                            code = 201; // id already existed
-                        })
                     }
-                    else {
-                        code = 204; // id is new
-                    }
-                });
-                zip.loadAsync(content,{base64: true})
-                    .then(function (contents:any) {
+
+                    else if (id == 'rooms') {
+
                         var validlats: number[] = [];
                         var validlons: number[] = [];
                         let validCodes:string[] = [];
@@ -984,7 +857,7 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                 rooms_href = item14.attrs[0]['value'];
                                                                                                                                                                 rooms_href_list.push(rooms_href);
                                                                                                                                                                 // console.log(rooms_number);
-                                                                                                                                                                let url = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + rooms_address);
+                                                                                                                                                                let url = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team10/" + rooms_address);
 
 
                                                                                                                                                                 processList.push(getLatandLon(url).then(function (geoResponse: any){
@@ -1113,15 +986,20 @@ export default class InsightFacade implements IInsightFacade {
                                     });
                                 });
                             })
-                            .catch(function(){
-                                reject({code: 400, body: {"error": "this three"}});
+                            .catch(function() {
+                                reject({code: 400, body: {"error": "this one"}});
                             });
-                    })
-                    .catch(function() {
-                        reject({code: 400, body: {"error": "this one"}});
-                    });
+                    }
+                })
+                .catch(function () {
+                    reject({code: 400, body: {"error": "my text"}});
+                });
 
-            }
+
+
+
+
+
 
 
         })
@@ -1148,7 +1026,6 @@ export default class InsightFacade implements IInsightFacade {
     }
 
 
-
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
             if (counter) {
@@ -1166,14 +1043,22 @@ export default class InsightFacade implements IInsightFacade {
             let filterValue = body[filterKey];
             let list: any = [];
             let options = query[names[1]];
-            if('rooms' in DataList){
-                list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList['rooms']);
+            ///////
+            try {
+                var id = identifyID(options);
+                Doeverything.id = id;
+            } catch(e){
+                reject({code: 400, body: {"error" : "this is not valid ID"}});
+            }
+            /////////
+            if(id in DataList){
+                list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList[id]);
             } else {
                 try {
-                    let datalist = JSON.parse(fs.readFileSync('rooms.json', 'utf8'));
+                    let datalist = JSON.parse(fs.readFileSync(id+".json", 'utf8'));
                     list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
                 }catch(e){
-                    reject({code: 424, body: {"missing":["courses"]}});
+                    reject({code: 424, body: {"missing":[id]}});
                 }
             }
             if (Doeverything.fail) {
@@ -1221,4 +1106,14 @@ export default class InsightFacade implements IInsightFacade {
             fulfill({code: 200, body: response});
         })
     }
+}
+
+function identifyID(options: any): string{
+    let columnsValue = options["COLUMNS"];
+    if(columnsValue == 0){
+        throw error;
+    }
+    let indexOF_ = columnsValue[0].indexOf("_");
+    let id = columnsValue[0].substring(0, indexOF_);
+    return id;
 }
