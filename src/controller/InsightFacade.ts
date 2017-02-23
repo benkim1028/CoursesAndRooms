@@ -789,6 +789,7 @@ export default class InsightFacade implements IInsightFacade {
                                     // let i:number = 0;
                                     let j:number = 0;
                                     let k:number = 0;
+                                    let qq:number = 0;
 
                                     // console.log(document1);
                                     // console.log(promiseList.length);
@@ -796,18 +797,25 @@ export default class InsightFacade implements IInsightFacade {
                                     for (let each of data) {
                                         let rooms_fullname:string ='';
                                         let rooms_shortname:string ='';
+                                        // let rooms_number:string = '';
                                         let rooms_number:string = '';
-                                        // let rooms_name:string = rooms_shortname + "_" + rooms_number;
+                                        let rooms_number_list:string[] = [];
+                                        let rooms_name:string = rooms_shortname + "_" + rooms_number;
                                         let rooms_address:string ='';
                                         let rooms_lat:number = 0;
                                         let rooms_lon:number = 0;
                                         let rooms_seats:number = 0;
+                                        let rooms_seats_list:number[] = [];
                                         let rooms_type:string ='';
+                                        let rooms_type_list:string[] = [];
                                         let rooms_furniture:string ='';
+                                        let rooms_furniture_list:string[] = [];
                                         let rooms_href:string ='';
+                                        let rooms_href_list:string[] = [];
                                         let document1 = parse5.parse(each);
-                                        let i:number = 0 ;
+                                        let a:number = 0;
                                         for (let item of document1.childNodes) {
+
                                             let emptyList:any[]  = [];
                                             if (item.tagName == 'html') {
                                                 for (let item1 of item.childNodes) {
@@ -907,16 +915,17 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                     if (item13.tagName == 'td') {
                                                                                                                                                         // console.log(item13.childNodes);
                                                                                                                                                         for (let item14 of item13.childNodes) {
-
+                                                                                                                                                            // let rooms_number:string = '';
                                                                                                                                                             let room_info_list:any = {};
                                                                                                                                                             // console.log(item14.childNodes);
                                                                                                                                                             // console.log(item14.attrs);
                                                                                                                                                             if (item14['nodeName'] != '#text') {
                                                                                                                                                                 for (let item15  of item14.childNodes) {
                                                                                                                                                                     if (item15['value'] != 'More info') {
-                                                                                                                                                                        // console.log("rooms_number : " + item15['value']); //room number
+                                                                                                                                                                        console.log("rooms_number : " + item15['value']); //room number
                                                                                                                                                                         // room_info_list.push(("{" + "rooms_number : " + item15['value'] + "}"));
                                                                                                                                                                         rooms_number = item15['value'];
+                                                                                                                                                                        rooms_number_list.push(item15['value']);
                                                                                                                                                                     }
                                                                                                                                                                 }
                                                                                                                                                             }
@@ -924,17 +933,22 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                 // let i:number = 0 ;
 
                                                                                                                                                                 if (item14['value'].trim().length >= 1) {
+                                                                                                                                                                    // console.log(item14['value'].trim()); // capacity furniture room_type
                                                                                                                                                                     if (item14['value'].trim().length < 4 && item14['value'].trim().search('TBD') == -1) {
-                                                                                                                                                                        // console.log("rooms_seats : " + item14['value'].trim()); // capacity furniture room_type
+
                                                                                                                                                                         rooms_seats = item14['value'].trim();
+                                                                                                                                                                        rooms_seats_list.push(rooms_seats);
                                                                                                                                                                         // console.log(rooms_seats);
                                                                                                                                                                     }
                                                                                                                                                                     else  if (item14['value'].trim().length <= 18 || item14['value'].trim().search('Purpose') != -1 || item14['value'].trim().search('Group') != -1) {
                                                                                                                                                                         // console.log(item14['value'].trim());
                                                                                                                                                                         rooms_type = item14['value'].trim();
+                                                                                                                                                                        rooms_type_list.push(rooms_type);
                                                                                                                                                                     }
                                                                                                                                                                     else {
+
                                                                                                                                                                         rooms_furniture = item14['value'].trim();
+                                                                                                                                                                        rooms_furniture_list.push(rooms_furniture);
                                                                                                                                                                         // console.log(rooms_furniture);
                                                                                                                                                                     }
                                                                                                                                                                 }
@@ -942,27 +956,48 @@ export default class InsightFacade implements IInsightFacade {
 
                                                                                                                                                             if (!isNullOrUndefined(item14.attrs) && item14.attrs.length == 1) {
                                                                                                                                                                 rooms_href = item14.attrs[0]['value'];
-                                                                                                                                                                let url = "http://skaha.cs.ubc.ca:11316/api/v1/team35/" + rooms_address;
+                                                                                                                                                                rooms_href_list.push(rooms_href);
+                                                                                                                                                                // console.log(rooms_number);
+                                                                                                                                                                let url = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + rooms_address);
+
+
                                                                                                                                                                 processList.push(getLatandLon(url).then(function (geoResponse: any){
                                                                                                                                                                     var responselat: any = null;
                                                                                                                                                                     var responselon: any = null;
                                                                                                                                                                     let response = JSON.parse(geoResponse);
                                                                                                                                                                     responselat = Number(response.lat);
                                                                                                                                                                     responselon = Number(response.lon);
+                                                                                                                                                                    rooms_lat = responselat;
+                                                                                                                                                                    rooms_lon = responselon;
+                                                                                                                                                                    // console.log(rooms_number_list);
+                                                                                                                                                                    let rooms_number_index:number = rooms_number_list.length;
+
+                                                                                                                                                                    let each_rooms_number:string = rooms_number_list[a];
+                                                                                                                                                                    let each_rooms_seats:number = rooms_seats_list[a];
+                                                                                                                                                                    let each_rooms_type:string = rooms_type_list[a];
+                                                                                                                                                                    let each_rooms_furniture:string = rooms_furniture_list[a];
+                                                                                                                                                                    let each_rooms_href:string = rooms_href_list[a];
+
                                                                                                                                                                     if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
                                                                                                                                                                         var newdata: any = {};
                                                                                                                                                                         newdata["rooms_fullname"] =  rooms_fullname;
                                                                                                                                                                         newdata["rooms_shortname"] =  rooms_shortname;
-                                                                                                                                                                        newdata["rooms_number"] = rooms_number;
-                                                                                                                                                                        newdata["rooms_name"] = rooms_shortname + "_" + rooms_number;
+                                                                                                                                                                        newdata["rooms_number"] = each_rooms_number;
+                                                                                                                                                                        newdata["rooms_name"] = rooms_shortname + "_" + each_rooms_number;
                                                                                                                                                                         newdata["rooms_address"] = rooms_address;
                                                                                                                                                                         newdata["rooms_lat"] = responselat;
                                                                                                                                                                         newdata["rooms_lon"] = responselon;
-                                                                                                                                                                        newdata["rooms_seats"] = rooms_seats;
-                                                                                                                                                                        newdata["rooms_type"] = rooms_type;
-                                                                                                                                                                        newdata["rooms_furniture"] = rooms_furniture;
-                                                                                                                                                                        newdata["rooms_href"] = rooms_href;
+                                                                                                                                                                        newdata["rooms_seats"] = each_rooms_seats;
+                                                                                                                                                                        newdata["rooms_type"] = each_rooms_type;
+                                                                                                                                                                        newdata["rooms_furniture"] = each_rooms_furniture;
+                                                                                                                                                                        newdata["rooms_href"] = each_rooms_href;
+                                                                                                                                                                        if (a < rooms_number_index) {
+                                                                                                                                                                            a++;
+                                                                                                                                                                        }
+
                                                                                                                                                                     }
+
+                                                                                                                                                                    console.log(newdata);
                                                                                                                                                                     validData.push(newdata);
                                                                                                                                                                 }).catch(function(){
                                                                                                                                                                     reject({code: 400, body: {"error": "this three"}});
@@ -1013,15 +1048,21 @@ export default class InsightFacade implements IInsightFacade {
                                             k++;
                                         }
                                         j++; // for room shortname
-                                        if (rooms_number == '' && rooms_seats == 0) {
-                                            // console.log(rooms_address);
-                                            validData.push({ "rooms_fullname" :  rooms_fullname,
-                                                "rooms_shortname" :  rooms_shortname,
-                                                "rooms_address" : rooms_address,
-                                                "rooms_lat" : rooms_lat,
-                                                "rooms_lon" : rooms_lon
-                                            })
-                                        }
+                                        // if (rooms_seats == 0) {
+                                        //     // console.log(rooms_address);
+                                        //     validData.push({ "rooms_fullname" :  rooms_fullname,
+                                        //         "rooms_shortname" :  rooms_shortname,
+                                        //         "rooms_number" : '',
+                                        //         "rooms_name" : '',
+                                        //         "rooms_address" : rooms_address,
+                                        //         "rooms_lat" : rooms_lat,
+                                        //         "rooms_lon" : rooms_lon,
+                                        //         "rooms_seats" : rooms_seats,
+                                        //         "rooms_type" : rooms_type,
+                                        //         "rooms_furniture" : rooms_furniture,
+                                        //         "rooms_href" : rooms_href
+                                        //     })
+                                        // }
                                         // console.log(k);
 
                                     }
