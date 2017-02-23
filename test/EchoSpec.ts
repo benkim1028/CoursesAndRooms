@@ -1,10 +1,3 @@
-/**
- * Created by ENVY on 2017-02-06.
- */
-/**
- * Created by rtholmes on 2016-10-31.
- */
-
 import Server from "../src/rest/Server";
 import {expect} from 'chai';
 import Log from "../src/Util";
@@ -1916,7 +1909,7 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(424);
+            expect(err.code).to.equal(400);
         })
     }); //added
 
@@ -2021,7 +2014,7 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(424);
+            expect(err.code).to.equal(400);
         })
     }); //added
 
@@ -2085,7 +2078,7 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(424);
+            expect(err.code).to.equal(400);
         })
     }); //added
 
@@ -2522,7 +2515,7 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(424);
+            expect(err.code).to.equal(400);
         })
     }); //added
 
@@ -2791,7 +2784,7 @@ describe("EchoSpec", function () {
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(424);
+            expect(err.code).to.equal(400);
         })
     }); //added
 
@@ -3038,35 +3031,6 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("course_year query", function () {
-        return insightFacade.performQuery(
-            {"WHERE":
-                {"GT":
-                    {"courses_year": 2000
-                    }
-                },
-                "OPTIONS":{
-                    "COLUMNS":[
-                        "courses_year",
-                        "courses_id",
-                        "courses_avg",
-                        "courses_instructor"
-                    ],
-                    "ORDER":"courses_year",
-                    "FORM":"TABLE"
-                }
-            }).then(value => {
-            // expect.fail();
-            Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-            // expect(err.code).to.equal(400);
-        })
-    }); //added
-
     it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
@@ -3090,7 +3054,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it("Create a new room dataset with non-unique id", function () {
+    it("Create a new rooms dataset with non-unique id", function () {
         return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value:any) {
             Log.test('Value ' + value);
             var response : InsightResponse = { code: 201, body: {} };
@@ -3100,6 +3064,8 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
+
+
 
     it("rooms test1", function () {
         return insightFacade.performQuery(
@@ -3319,19 +3285,9 @@ describe("EchoSpec", function () {
             // expect.fail();
             expect(err.code).to.equal(400);
         })
-    }); //added
+    }); //add
 
-    it("removeDataset with existing file", function () {
-        return insightFacade.removeDataset('rooms').then(value => {
-            Log.test('Value ' + value);
-            expect(value.code).to.equal(204);
-        }).catch(function (err:any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    }); //added
-
-    it("rooms test6(Cinnamon)", function () {
+    it("rooms test55", function () {
         return insightFacade.performQuery(
             {
                 "WHERE":{
@@ -3340,12 +3296,12 @@ describe("EchoSpec", function () {
                             "AND":[
                                 {
                                     "EQ":{
-                                        "courses_": 49.26486
+                                        "rooms_lat": 49.26826
                                     }
                                 },
                                 {
                                     "IS":{
-                                        "rooms_address":"*2053*"
+                                        "rooms_href":"*BUCH-D322*"
                                     }
                                 }
                             ]
@@ -3368,17 +3324,187 @@ describe("EchoSpec", function () {
                 }
             }
         ).then(value => {
-            expect.fail();
+            // expect.fail();
             Log.test('Value ' + value);
-            // expect(value.code).to.equal(200);
+            expect(value.code).to.equal(200);
             // expect(value.body).to.equal({});
         }).catch(function (err:any) {
             Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //add
+
+    it("rooms test6", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"OR": [
+                    {
+                        "IS":
+                            {
+                                "courses_instructor":"chan, jennifer"
+                            }
+                    },
+
+                    {
+                        "IS":
+                            {
+                                "courses_instructor":"elfert, maren"
+                            }
+                    },
+
+                    {
+                        "IS":
+                            {
+                                "courses_instructor":"vanwynsberghe, robert"
+                            }
+                    }
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept"
+                    ],
+                    "ORDER": "courses_dept",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        })
+    }); //add
+    it("rooms test7", function () {
+        return insightFacade.performQuery(
+            {"WHERE":
+                {"OR": [
+                    {
+                        "IS":
+                            {
+                                "courses_instructor":"chan, jennifer"
+                            }
+                    },
+
+                    {
+                        "IS":
+                            {
+                                "courses_instructor":"elfert, maren"
+                            }
+                    },
+
+                    {
+                        "IS":
+                            {
+                                "courses_instructor":"vanwynsberghe, robert"
+                            }
+                    }
+                ]
+                },
+                "OPTIONS":{
+                    "COLUMNS":[
+                        "courses_dept"
+                    ],
+                    "ORDER": "courses_dept",
+                    "FORM":"TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        })
+    }); //add
+    it("courses yeartest", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "GT": {
+                        "courses_year": 1900
+                    }
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_year"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        })
+    }); //add
+    it("rooms test8", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND":[
+                        {
+                            "GT":{
+                                "rooms_seats": 100
+                            }
+                        },
+                        {
+                            "IS":{
+                                "rooms_furniture":"*oo*"
+                            }
+                        }
+                    ]
+
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_address", "rooms_name","rooms_seats"
+                    ],
+                    "ORDER" : "rooms_address",
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
             // expect.fail();
-            expect(err.code).to.equal(424);
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //add
+
+    it("removeDataset with existing courses file", function () {
+        return insightFacade.removeDataset('courses').then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(204);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
         })
     }); //added
 
+    it("removeDataset with existing rooms file", function () {
+        return insightFacade.removeDataset('rooms').then(value => {
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(204);
+        }).catch(function (err:any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+        })
+    }); //added
 
+    it('test perfrom query after data is removed', function() {
+        return insightFacade.performQuery(query).then (function (value: any) {
+            expect.fail();
+        }).catch(function (err:any) {
+            var response : InsightResponse = {
+                code: 424, body: {"missing": ["courses"]}
+            };
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(response.code);
+            expect(err.body).to.eql(response.body);
+        })
+    });
 
 });
