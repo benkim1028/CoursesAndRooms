@@ -4,7 +4,7 @@ import fs = require('fs');
 import {isNullOrUndefined} from "util";
 
 var JSZip = require('jszip');
-const parse5 = require('parse5');
+var parse5 = require('parse5');
 var request = require('request');
 
 
@@ -100,10 +100,18 @@ class DoEveryThing {
                 for (var j = 0; j < response.length; j++) {
                     var counter = 0;
                     for (var k = 0; k < sortedList.length; k++) {
-                        if (sortedList[k]["id"] == response[j]["id"]) {
-                            counter = 1;
-                            break;
+                        if (!isNullOrUndefined(sortedList[k]["id"])) {
+                            if (sortedList[k]["id"] == response[j]["id"]) {
+                                sortedList.push(response[j]);
+                            }
                         }
+                        else {
+                            if (sortedList[k]["rooms_name"] == response[j]["rooms_name"] ) {
+                                counter = 1;
+                                break;
+                            }
+                        }
+                        // else if () || sortedList[k]["rooms_name"] == response[j]["rooms_name"]
                     }
                     if (counter == 0)
                         sortedList.push(response[j])
@@ -128,8 +136,15 @@ class DoEveryThing {
             } else {
                 for (var j = 0; j < response.length; j++) {
                     for (var k = 0; k < resultlist.length; k++) {
-                        if (resultlist[k]["id"] == response[j]["id"]) {
-                            sortedList.push(response[j]);
+                        if (!isNullOrUndefined(resultlist[k]["id"])) {
+                            if (resultlist[k]["id"] == response[j]["id"]) {
+                                sortedList.push(response[j]);
+                            }
+                        }
+                        else {
+                            if (resultlist[k]["rooms_name"] == response[j]["rooms_name"]) {
+                                sortedList.push(response[j]);
+                        }
                         }
                     }
                 }
@@ -922,7 +937,7 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                             if (item14['nodeName'] != '#text') {
                                                                                                                                                                 for (let item15  of item14.childNodes) {
                                                                                                                                                                     if (item15['value'] != 'More info') {
-                                                                                                                                                                        console.log("rooms_number : " + item15['value']); //room number
+                                                                                                                                                                        // console.log("rooms_number : " + item15['value']); //room number
                                                                                                                                                                         // room_info_list.push(("{" + "rooms_number : " + item15['value'] + "}"));
                                                                                                                                                                         rooms_number = item15['value'];
                                                                                                                                                                         rooms_number_list.push(item15['value']);
@@ -997,7 +1012,7 @@ export default class InsightFacade implements IInsightFacade {
 
                                                                                                                                                                     }
 
-                                                                                                                                                                    console.log(newdata);
+                                                                                                                                                                    // console.log(newdata);
                                                                                                                                                                     validData.push(newdata);
                                                                                                                                                                 }).catch(function(){
                                                                                                                                                                     reject({code: 400, body: {"error": "this three"}});
