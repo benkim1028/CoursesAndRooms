@@ -149,6 +149,13 @@ class DoEveryThing {
         }
         return resultlist;
     }
+    OrderValueChecker(orderValue: any){
+        if(this.id == "courses"){
+            return orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit" || orderValue == "courses_year";
+        } if (this.id == "rooms"){
+            return orderValue == "rooms_lat" || orderValue =="rooms_lon" || orderValue == "rooms_seats";
+        }
+    }
     Typechecker(filterkey: any,shouldbe: string, value: any, key: string){
         if(this.id == "courses"){
             if (shouldbe == "number") {
@@ -458,7 +465,7 @@ class DoEveryThing {
                 this.returnMessage = "Order is not in Columns"
                 return this.returnMessage;
             }
-            if (orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit") {
+            if (this.OrderValueChecker(orderValue)) {
                 newlist.sort(this.sort_by(orderValue, false, parseFloat));
             } else {
                 newlist.sort(this.sort_by(orderValue, false, function (a: any) {
@@ -558,6 +565,11 @@ export default class InsightFacade implements IInsightFacade {
                                     var course_info = element["result"];  // course_info = value of result = [{....}]
                                     for (let each1 of course_info) {// each = each object in result
                                         if (each1 != [])
+                                            if(each1["Section"] == "overall"){
+                                                each1["Year"] = 1900;
+                                            } else {
+                                                each1["Year"] = Number(each1["Year"]);
+                                            }
                                             list.push(each1);
                                     }
                                 }
@@ -857,7 +869,7 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                 rooms_href = item14.attrs[0]['value'];
                                                                                                                                                                 rooms_href_list.push(rooms_href);
                                                                                                                                                                 // console.log(rooms_number);
-                                                                                                                                                                let url = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team10/" + rooms_address);
+                                                                                                                                                                let url = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + rooms_address);
 
 
                                                                                                                                                                 processList.push(getLatandLon(url).then(function (geoResponse: any){
@@ -872,7 +884,7 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                     let rooms_number_index:number = rooms_number_list.length;
 
                                                                                                                                                                     let each_rooms_number:string = rooms_number_list[a];
-                                                                                                                                                                    let each_rooms_seats:number = rooms_seats_list[a];
+                                                                                                                                                                    let each_rooms_seats:number = Number(rooms_seats_list[a]);
                                                                                                                                                                     let each_rooms_type:string = rooms_type_list[a];
                                                                                                                                                                     let each_rooms_furniture:string = rooms_furniture_list[a];
                                                                                                                                                                     let each_rooms_href:string = rooms_href_list[a];
@@ -1102,7 +1114,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
