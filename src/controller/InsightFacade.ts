@@ -178,7 +178,7 @@ class DoEveryThing {
                     this.returnMessage =  filterkey + " received non-nunmber"
                 }
             } else if (shouldbe == "string"){
-                if (typeof value !== shouldbe|| key == "rooms_lat" || key == "rooms_lon" || key == "rooms_seat"){
+                if (typeof value !== shouldbe || key == "rooms_lat" || key == "rooms_lon" || key == "rooms_seat"){
                     this.fail = true;
                     this.returnMessage = filterkey + " received non-string"
                 }
@@ -364,40 +364,52 @@ class DoEveryThing {
                 }
             }
             else if (id == "rooms") {
-                return key;
-            }
-            else {
-                this.fail_for_missingKey = true;
-                this.returnMessage = "provided key is missing key";
-                return this.returnMessage;
-            }
-        }
-
-
-        else {
-            if (key.search("_") != -1) {
-                let indexOF_ = key.indexOf("_");
-                let id = key.substring(0, indexOF_);
-
-                if (id != "courses") {
-                    this.fail_for_424 = true;
-                    this.missingIds.push(id);
-                    this.returnMessage = "provided key is missing id";
-                    return this.returnMessage;
+                if (key == "rooms_fullname" || key == "rooms_shortname" || key == "rooms_number" || key == "rooms_name" || key == "rooms_address" ||
+                    key == "rooms_type" || key == "rooms_furniture" || key == "rooms_href" || key == "rooms_lat" || key == "rooms_lon" || key == "rooms_seats") {
+                    return key;
                 }
+
                 else {
                     this.fail_for_missingKey = true;
                     this.returnMessage = "provided key is missing key";
                     return this.returnMessage;
                 }
-            } else {
-                this.fail = true;
-                this.returnMessage = "provided key is not valid key";
+            }
+
+            else {
+                this.fail_for_424 = true;
+                this.missingIds.push(id);
+                this.returnMessage = "provided key is missing id";
                 return this.returnMessage;
             }
 
-
         }
+
+
+        // else {
+        //     if (key.search("_") != -1) {
+        //         let indexOF_ = key.indexOf("_");
+        //         let id = key.substring(0, indexOF_);
+        //
+        //         if (id != "courses") {
+        //             this.fail_for_424 = true;
+        //             this.missingIds.push(id);
+        //             this.returnMessage = "provided key is missing id";
+        //             return this.returnMessage;
+        //         }
+        //         else {
+        //             this.fail_for_missingKey = true;
+        //             this.returnMessage = "provided key is missing key";
+        //             return this.returnMessage;
+        //         }
+        //     } else {
+        //         this.fail = true;
+        //         this.returnMessage = "provided key is not valid key";
+        //         return this.returnMessage;
+        //     }
+        //
+        //
+        // }
     }
     createModifiedList(list: any, options: any) {
         if (this.fail == true)
@@ -1079,6 +1091,9 @@ export default class InsightFacade implements IInsightFacade {
                 Doeverything.missingIds = [];
                 console.log("1");
                 console.log(Doeverything.returnMessage);
+                Doeverything.fail_for_missingKey = false;
+                Doeverything.fail_for_424 = false;
+                Doeverything.fail = false;
                 return;
             }
 

@@ -1902,7 +1902,7 @@ describe("EchoSpec", function () {
         }).catch(function (err: any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(400);
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -2005,7 +2005,7 @@ describe("EchoSpec", function () {
         }).catch(function (err: any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(400);
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -2067,7 +2067,7 @@ describe("EchoSpec", function () {
         }).catch(function (err: any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(400);
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -2505,7 +2505,7 @@ describe("EchoSpec", function () {
         }).catch(function (err: any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(400);
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -2775,7 +2775,7 @@ describe("EchoSpec", function () {
         }).catch(function (err: any) {
             Log.test('Error: ' + err);
             // expect.fail();
-            expect(err.code).to.equal(400);
+            expect(err.code).to.equal(424);
         })
     }); //added
 
@@ -3022,7 +3022,7 @@ describe("EchoSpec", function () {
     }); //added
 
 
-    it("Create a new rooms dataset with unique id", function () {
+    it.only("Create a new rooms dataset with unique id", function () {
         return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value: any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {code: 204, body: {}};
@@ -3065,7 +3065,7 @@ describe("EchoSpec", function () {
                         },
                         {
                             "IS": {
-                                "rooms_shortname": 'ANGU'
+                                "rooms_shortname": "ANGU"
                             }
                         }
                     ]
@@ -3165,6 +3165,54 @@ describe("EchoSpec", function () {
             Log.test('Error: ' + err);
             expect.fail();
             // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("rooms test11", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "EQ": {
+                                        "rooms_address": "adhe"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_address": "*a*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": "ANGU"
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_type",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "ORDER": "rooms_fullname",
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            Log.test('Value ' + value);
+            expect.fail();
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect(err.code).to.equal(400);
         })
     }); //added
 
@@ -3410,7 +3458,7 @@ describe("EchoSpec", function () {
             // expect(value.body).to.equal({});
         })
     }); //add
-    it("rooms test8", function () {
+    it.only("rooms test8", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -3547,6 +3595,422 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     }); //added
+
+    it("rooms test11 invalid IS1", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "EQ": {
+                                        "rooms_lat": 49.26486
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": 12345
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid IS2", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "EQ": {
+                                        "rooms_lat": 49.26486
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_lat": "2053 Main Mall"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid LT1", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "LT": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid LT2", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "LT": {
+                                        "rooms_seats": "lol"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid GT1", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid GT2", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "rooms_seats": "lol"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid EQ1", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "EQ": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+    it("rooms test11 invalid EQ2", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "EQ": {
+                                        "rooms_seats": "lol"
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "rooms_name": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
+
+    it("rooms test11 invalid EQ2", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "IS": {
+                        "rooms_area": "Classroom-Movable Tablets"
+                    }
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_fullname",
+                        "rooms_name",
+                        "rooms_furniture"
+                    ],
+                    "ORDER": "rooms_name",
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+
     it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
@@ -3569,7 +4033,7 @@ describe("EchoSpec", function () {
             expect(err.body).to.eql(response.body);
         })
     });
-    it("removeDataset with existing file", function () {
+    it.only("removeDataset with existing file", function () {
         return insightFacade.removeDataset('rooms').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
