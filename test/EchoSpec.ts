@@ -3022,7 +3022,7 @@ describe("EchoSpec", function () {
     }); //added
 
 
-    it.only("Create a new rooms dataset with unique id", function () {
+    it("Create a new rooms dataset with unique id", function () {
         return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value: any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {code: 204, body: {}};
@@ -3458,7 +3458,7 @@ describe("EchoSpec", function () {
             // expect(value.body).to.equal({});
         })
     }); //add
-    it.only("rooms test8", function () {
+    it("rooms test8", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -3979,6 +3979,95 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
+    it("tungsten", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "EQ": {
+                                        "rooms_seats": 100
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "courses_title": "BUCH_D304"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "IS": {
+                                "rooms_shortname": 'ANGU'
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "rooms_href",
+                        "rooms_lat",
+                        "rooms_fullname"
+                    ],
+                    "FORM": "TABLE"
+                }
+            }
+        ).then(value => {
+            expect.fail();
+            Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+    it("Kleene: Find all group type rooms without some furniture.", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {
+                            "NOT": {
+                                "IS": {
+                                    "rooms_furniture": "Classroom-Movable Tablets"
+                                }
+                            }
+                        },
+
+                        {
+                            "NOT": {
+                                "IS": {
+                                    "rooms_furniture": "Classroom-Movable Tables & Chairs"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_type",
+                        "rooms_seats"
+                    ],
+                    "ORDER": "rooms_seats",
+                    "FORM": "TABLE"
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
 
 
     it("rooms test11 invalid EQ2", function () {
@@ -4033,7 +4122,7 @@ describe("EchoSpec", function () {
             expect(err.body).to.eql(response.body);
         })
     });
-    it.only("removeDataset with existing file", function () {
+    it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('rooms').then(value => {
             Log.test('Value ' + value);
             expect(value.code).to.equal(204);
