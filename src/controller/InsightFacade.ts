@@ -3,9 +3,11 @@ import Log from "../Util";
 import fs = require('fs');
 import {isNullOrUndefined} from "util";
 import {error} from "util";
-var http = require("http");
+
 var JSZip = require('jszip');
-const parse5 = require('parse5');
+var parse5 = require('parse5');
+var request = require('request');
+
 
 
 let DataList: any = {};
@@ -334,55 +336,42 @@ class DoEveryThing {
         if (key.search("_") != -1) {
             let indexOF_ = key.indexOf("_");
             let id = key.substring(0, indexOF_);
-            if  (id == "courses"){
-                if (this.id == "courses") {
-                    if (key == "courses_dept")
-                        return "Subject";
-                    if (key == "courses_id")
-                        return "Course";
-                    if (key == "courses_avg")
-                        return "Avg";
-                    if (key == "courses_instructor")
-                        return "Professor";
-                    if (key == "courses_title")
-                        return "Title";
-                    if (key == "courses_pass")
-                        return "Pass";
-                    if (key == "courses_fail")
-                        return "Fail";
-                    if (key == "courses_audit")
-                        return "Audit";
-                    if (key == "courses_uuid")
-                        return "id";
-                    if (key == "courses_year")
-                        return "Year";
-                    else {
-                        this.fail_for_missingKey = true;
-                        this.returnMessage = "provided key is missing key";
-                        return this.returnMessage;
-                    }
-                } else {
-                    this.fail = true;
-                    this.returnMessage = "Rooms and Courses can't exist together";
+            if (id == "courses") {
+                if (key == "courses_dept")
+                    return "Subject";
+                if (key == "courses_id")
+                    return "Course";
+                if (key == "courses_avg")
+                    return "Avg";
+                if (key == "courses_instructor")
+                    return "Professor";
+                if (key == "courses_title")
+                    return "Title";
+                if (key == "courses_pass")
+                    return "Pass";
+                if (key == "courses_fail")
+                    return "Fail";
+                if (key == "courses_audit")
+                    return "Audit";
+                if (key == "courses_uuid")
+                    return "id";
+                if (key == "courses_year")
+                    return "Year";
+                else {
+                    this.fail_for_missingKey = true;
+                    this.returnMessage = "provided key is missing key";
                     return this.returnMessage;
                 }
             }
-            if  (id == "rooms"){
-                if (this.id == "rooms") {
-                    if (key == "rooms_fullname" || key == "rooms_shortname" || key == "rooms_number" || key == "rooms_name" || key == "rooms_address" ||
-                        key == "rooms_type" || key == "rooms_furniture" || key == "rooms_href" || key == "rooms_lat" || key == "rooms_lon" || key == "rooms_seats") {
-                        return key;
-                    }
-
-                    else {
-                        this.fail_for_missingKey = true;
-                        this.returnMessage = "provided key is missing key";
-                        return this.returnMessage;
-                    }
+            else if (id == "rooms") {
+                if (key == "rooms_fullname" || key == "rooms_shortname" || key == "rooms_number" || key == "rooms_name" || key == "rooms_address" ||
+                    key == "rooms_type" || key == "rooms_furniture" || key == "rooms_href" || key == "rooms_lat" || key == "rooms_lon" || key == "rooms_seats") {
+                    return key;
                 }
+
                 else {
-                    this.fail = true;
-                    this.returnMessage = "Rooms and Courses can't exist together";
+                    this.fail_for_missingKey = true;
+                    this.returnMessage = "provided key is missing key";
                     return this.returnMessage;
                 }
             }
@@ -521,32 +510,17 @@ class DoEveryThing {
 
 }
 
-function getLatandLon(address: any){
-    let res = encodeURI(address);
-    let path = "/api/v1/team35/"+res;
-
-    let options = {
-        host: "skaha.cs.ubc.ca",
-        port: 11316,
-        path: path
-    };
-
-    return new Promise(function (fulfill, reject) {
-        http.get(options, function (res:any) {
-            let str:string = "";
-            res.on("data", function (data:any) {
-                str+=data;
-            });
-
-            res.on("end", function () {
-                fulfill(str);
-            });
-        }).on("error", function(error:any) {
-            reject(error);
+function getLatandLon(url: any){
+    return new Promise(function(fulfill, reject){
+        request.get(url, function (error: any, response: any, body: any) {
+            if (!error && response.statusCode == 200) {
+                fulfill(body);
+            }
+            else
+                reject(error);
         });
-    });
+    })
 }
-
 
 
 
@@ -907,10 +881,10 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                 rooms_href = item14.attrs[0]['value'];
                                                                                                                                                                 rooms_href_list.push(rooms_href);
                                                                                                                                                                 // console.log(rooms_number);
-                                                                                                                                                                let address = rooms_address;
+                                                                                                                                                                let url = encodeURI("http://skaha.cs.ubc.ca:11316/api/v1/team35/" + rooms_address);
 
 
-                                                                                                                                                                processList.push(getLatandLon(address).then(function (geoResponse: any){
+                                                                                                                                                                processList.push(getLatandLon(url).then(function (geoResponse: any){
                                                                                                                                                                     var responselat: any = null;
                                                                                                                                                                     var responselon: any = null;
                                                                                                                                                                     let response = JSON.parse(geoResponse);
@@ -918,7 +892,7 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                                     responselon = Number(response.lon);
                                                                                                                                                                     rooms_lat = responselat;
                                                                                                                                                                     rooms_lon = responselon;
-                                                                                                                                                                    console.log(rooms_number_list);
+                                                                                                                                                                    // console.log(rooms_number_list);
                                                                                                                                                                     let rooms_number_index:number = rooms_number_list.length;
 
                                                                                                                                                                     let each_rooms_number:string = rooms_number_list[a];
@@ -996,9 +970,26 @@ export default class InsightFacade implements IInsightFacade {
                                             };
                                             k++;
                                         }
-                                        j++;
+                                        j++; // for room shortname
+                                        // if (rooms_seats == 0) {
+                                        //     // console.log(rooms_address);
+                                        //     validData.push({ "rooms_fullname" :  rooms_fullname,
+                                        //         "rooms_shortname" :  rooms_shortname,
+                                        //         "rooms_number" : '',
+                                        //         "rooms_name" : '',
+                                        //         "rooms_address" : rooms_address,
+                                        //         "rooms_lat" : rooms_lat,
+                                        //         "rooms_lon" : rooms_lon,
+                                        //         "rooms_seats" : rooms_seats,
+                                        //         "rooms_type" : rooms_type,
+                                        //         "rooms_furniture" : rooms_furniture,
+                                        //         "rooms_href" : rooms_href
+                                        //     })
+                                        // }
+                                        // console.log(k);
 
                                     }
+                                    // console.log(validData[1]["rooms_fullname"]);
 
                                     Promise.all(processList).then(function (){
                                         DataList[id] = validData;
