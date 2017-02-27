@@ -3022,7 +3022,7 @@ describe("EchoSpec", function () {
     }); //added
 
 
-    it("Create a new rooms dataset with unique id", function () {
+    it.only("Create a new rooms dataset with unique id", function () {
         return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value: any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {code: 204, body: {}};

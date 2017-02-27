@@ -1155,7 +1155,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            console.log(response);
+            // console.log(response);
             fulfill({code: 200, body: response});
         })
     }
