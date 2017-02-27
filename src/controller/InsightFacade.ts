@@ -997,26 +997,8 @@ export default class InsightFacade implements IInsightFacade {
                                             k++;
                                         }
                                         j++; // for room shortname
-                                        // if (rooms_seats == 0) {
-                                        //     // console.log(rooms_address);
-                                        //     validData.push({ "rooms_fullname" :  rooms_fullname,
-                                        //         "rooms_shortname" :  rooms_shortname,
-                                        //         "rooms_number" : '',
-                                        //         "rooms_name" : '',
-                                        //         "rooms_address" : rooms_address,
-                                        //         "rooms_lat" : rooms_lat,
-                                        //         "rooms_lon" : rooms_lon,
-                                        //         "rooms_seats" : rooms_seats,
-                                        //         "rooms_type" : rooms_type,
-                                        //         "rooms_furniture" : rooms_furniture,
-                                        //         "rooms_href" : rooms_href
-                                        //     })
-                                        // }
-                                        // console.log(k);
 
                                     }
-                                    // console.log(validData[1]["rooms_fullname"]);
-
                                     Promise.all(processList).then(function (){
                                         DataList[id] = validData;
                                         fs.writeFile(id + '.json', JSON.stringify(validData));

@@ -3022,7 +3022,7 @@ describe("EchoSpec", function () {
     }); //added
 
 
-    it.only("Create a new rooms dataset with unique id", function () {
+    it("Create a new rooms dataset with unique id", function () {
         return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value: any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {code: 204, body: {}};
@@ -3032,16 +3032,7 @@ describe("EchoSpec", function () {
             expect.fail();
         })
     });
-    it("Create a new rooms dataset with non-unique id", function () {
-        return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value: any) {
-            Log.test('Value ' + value);
-            var response: InsightResponse = {code: 201, body: {}};
-            expect(value.code).to.equal(response.code);
-        }).catch(function (err: any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    });
+
 
 
     it("rooms test1", function () {
@@ -3089,6 +3080,17 @@ describe("EchoSpec", function () {
         }).catch(function (err: any) {
             Log.test('Error: ' + err);
             expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("Create a new rooms dataset with non-unique id", function () {
+        return insightFacade.addDataset("rooms", zipContentForRooms).then(function (value: any) {
+            Log.test('Value ' + value);
+            var response: InsightResponse = {code: 201, body: {}};
+            expect(value.code).to.equal(response.code);
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
         })
     }); //added
 
