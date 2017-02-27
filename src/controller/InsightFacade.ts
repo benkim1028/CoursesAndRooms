@@ -5,7 +5,7 @@ import {isNullOrUndefined} from "util";
 import {error} from "util";
 
 var JSZip = require('jszip');
-var parse5 = require('parse5');
+const parse5 = require('parse5');
 var request = require('request');
 
 
@@ -582,7 +582,7 @@ export default class InsightFacade implements IInsightFacade {
                                             } else {
                                                 each1["Year"] = Number(each1["Year"]);
                                             }
-                                        list.push(each1);
+                                            list.push(each1);
                                     }
                                 }
                             }
