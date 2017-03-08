@@ -11,6 +11,9 @@ import Log from "../src/Util";
 import InsightFacade from "../src/controller/InsightFacade";
 import {InsightResponse, QueryRequest} from "../src/controller/IInsightFacade";
 import fs = require('fs');
+var chai = require('chai')
+    , chaiHttp = require('chai-http');
+
 
 describe("EchoSpec", function () {
 
@@ -4160,4 +4163,18 @@ describe("EchoSpec", function () {
             expect(err.body).to.eql(response.body);
         })
     });
+    // it.only("PUT description", function () {
+    //     return chai.request(URL)
+    //         .put('/dataset/rooms')
+    //         .attach("body", fs.readFileSync("./310rooms.1.0.zip"), "310rooms.1.0.zip")
+    //         .then(function (res: any) {
+    //             Log.trace('then:');
+    //             // some assertions
+    //         })
+    //         .catch(function (err : any) {
+    //             Log.trace('catch:');
+    //             // some assertions
+    //             expect.fail();
+    //         });
+    // });
 })

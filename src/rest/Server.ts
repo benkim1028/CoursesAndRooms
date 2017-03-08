@@ -6,12 +6,19 @@
 import restify = require('restify');
 
 import Log from "../Util";
-import {InsightResponse} from "../controller/IInsightFacade";
+import {InsightResponse, QueryRequest} from "../controller/IInsightFacade";
+import InsightFacade from "../controller/InsightFacade";
+
+
+/**
+ * Created by rtholmes on 2016-06-14.
+ */
 
 /**
  * This configures the REST endpoints for the server.
  */
 export default class Server {
+    private static insightFacade = new InsightFacade;
 
     private port: number;
     private rest: restify.Server;
@@ -53,6 +60,7 @@ export default class Server {
                 that.rest = restify.createServer({
                     name: 'insightUBC'
                 });
+                that.rest.use(restify.bodyParser({mapParams: true, mapFiles: true}));
 
                 that.rest.get('/', function (req: restify.Request, res: restify.Response, next: restify.Next) {
                     res.send(200);
@@ -105,6 +113,83 @@ export default class Server {
         } else {
             return {code: 400, body: {error: 'Message not provided'}};
         }
+    }
+    public static  putDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
+
+        Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
+        try {
+            var id: string = req.params.id;
+            let facade = this.insightFacade;
+
+            // stream bytes from request into buffer and convert to base64
+            // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
+            let buffer: any = [];
+            req.on('data', function onRequestData(chunk: any) {
+                Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
+                buffer.push(chunk);
+            });
+
+
+            req.once('end', function () {
+                let concated = Buffer.concat(buffer);
+                req.body = concated.toString('base64');     // changed from base64 to req.body
+                Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
+
+                facade.addDataset(id, req.body).then(function (result) {
+                    res.json(result.code, result.body);
+                }).catch(function (error) {
+                    res.json(error.code, error.body);
+                });
+            });
+
+        } catch (err) {
+            Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
+            res.send(400, {error: err.message});
+        }
+        return next();
+    }
+
+    public static deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next){
+        Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
+        try {
+            var id: string = req.params.id;
+
+            Log.trace("Beginning deletion of " + id + ".");
+            let facade = this.insightFacade;
+
+            facade.removeDataset(id).then(function(result){
+                res.json(result.code, result.body);
+            }).catch (function (error) {
+                res.json(error.code, error.body);
+            });
+
+        } catch(err) {
+            Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
+            Log.trace("failure: status(400) - DELETE failed: " + err.message);
+            res.json(400, {error: err.message});
+        }
+        return next();
+    }
+
+    public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
+        try {
+            let query: QueryRequest = req.params;
+
+            let facade = this.insightFacade;
+
+            facade.performQuery(query).then(function(result) {
+                res.json(result.code, result.body);
+            }).catch(function (err) {
+                res.json(err.code, err.body);
+            });
+
+
+        } catch (err) {
+            Log.error('RouteHandler::postQuery(..) - ERROR: ' + err.message);
+            res.json(400, {error: err.message});
+        }
+        return next();
     }
 
 }
