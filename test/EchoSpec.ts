@@ -4105,6 +4105,51 @@ describe("EchoSpec", function () {
         })
     });
 
+    it.only("D3", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "GT": {
+                            "rooms_seats": 300
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "UP",
+                        "keys": ["maxSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [{
+                        "maxSeats": {
+                            "MAX": "rooms_seats"
+                        }
+                    }]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
     it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
@@ -4163,7 +4208,7 @@ describe("EchoSpec", function () {
             expect(err.body).to.eql(response.body);
         })
     });
-    // it.only("PUT description", function () {
+    // it("PUT description", function () {
     //     return chai.request(URL)
     //         .put('/dataset/rooms')
     //         .attach("body", fs.readFileSync("./310rooms.1.0.zip"), "310rooms.1.0.zip")

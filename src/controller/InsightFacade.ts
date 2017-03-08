@@ -396,32 +396,39 @@ class DoEveryThing {
 
         }
 
-
-        // else {
-        //     if (key.search("_") != -1) {
-        //         let indexOF_ = key.indexOf("_");
-        //         let id = key.substring(0, indexOF_);
-        //
-        //         if (id != "courses") {
-        //             this.fail_for_424 = true;
-        //             this.missingIds.push(id);
-        //             this.returnMessage = "provided key is missing id";
-        //             return this.returnMessage;
-        //         }
-        //         else {
-        //             this.fail_for_missingKey = true;
-        //             this.returnMessage = "provided key is missing key";
-        //             return this.returnMessage;
-        //         }
-        //     } else {
-        //         this.fail = true;
-        //         this.returnMessage = "provided key is not valid key";
-        //         return this.returnMessage;
-        //     }
-        //
-        //
-        // }
+        else {
+            return this.checkToken(key);
+        }
     }
+
+    checkToken(key:string):string {
+        let tokenTypes:string[] = ["max", "min", "avg", "sum", "count" ];
+        for (let eachTokenType of tokenTypes) {
+            let tokenLength:number = eachTokenType.length;
+            let realToken:string = key.substring(0, tokenLength)
+            // console.log("this is real token = " + realToken);
+            // console.log("this is eachTokenType = " + eachTokenType);
+            if (eachTokenType == realToken) {
+                let keyLength:number =  key.length;
+                let tokenData:string = key.substring(tokenLength, keyLength)
+                // console.log("this is token data = " + tokenData);
+                if (tokenData == "Seats") {
+                    return "rooms_seats";
+                }
+                else if (tokenData == "Lat") {
+                    return "rooms_lat";
+                }
+                else if (tokenData == "Lon") {
+                    return "rooms_lon";
+                }
+                else  {
+                    return "invalid token";
+                }
+            }
+        }
+    }
+
+
     createModifiedList(list: any, options: any) {
         if (this.fail == true)
             return this.returnMessage;
@@ -460,15 +467,20 @@ class DoEveryThing {
         }
         for (let i = 0; i < list.length; i++) {
             let element: any = {};
+            // console.log(columnsValue);
             for (let j = 0; j < columnsValue.length; j++) {
                 if (isNullOrUndefined(columnsValue[j])) {
                     this.fail = true;
                     this.returnMessage = "element in Columns is null or undefined"
                     return this.returnMessage;
                 }
+                // console.log(columnsValue[j]); //check column value
                 let key = this.findKey(columnsValue[j]);
                 element[columnsValue[j]] = list[i][key];
+                // console.log(this.checkToken(columnsValue[j]));
+                // console.log(list[i][key]);
             }
+            // console.log(element);
             newlist.push(element);
         }
 
@@ -483,17 +495,73 @@ class DoEveryThing {
 
             let order = Object.keys(options)[1];
             let orderValue = options[order];
-            if (!columnsValue.includes(orderValue)) {
-                this.fail = true;
-                this.returnMessage = "Order is not in Columns"
-                return this.returnMessage;
+            // console.log(orderValue["dir"]);
+            // console.log(orderValue["keys"]);
+
+            if (typeof orderValue === 'object') {
+                let dir:string = orderValue["dir"];
+                let keys:string[] = orderValue["keys"];
+
+
+                if (dir == "DOWN") {
+                    for (let key of keys) {
+                        let token_with_key = this.checkToken(key);
+                        // console.log("this is token_with_key = " + token_with_key);
+                        if (token_with_key == "invalid token" || !columnsValue.includes(key)) {
+                            this.fail = true;
+                            this.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
+                            return this.returnMessage;
+                        }
+                        else if (this.OrderValueChecker(token_with_key)) {
+                            console.log("this is key = " + key);
+                            newlist.sort(this.sort_by(key, true, parseFloat));
+                        }
+                        else {
+                            newlist.sort(this.sort_by(key, false, function (a: any) {
+                                return a.toUpperCase()
+                            }));
+                        }
+                    }
+                    console.log(newlist);
+
+                }
+                else if (dir == "UP") {
+                    for (let key of keys) {
+                        let token_with_key = this.checkToken(key);
+                        // console.log("this is token_with_key = " + token_with_key);
+                        if (token_with_key == "invalid token" || !columnsValue.includes(key)) {
+                            this.fail = true;
+                            this.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
+                            return this.returnMessage;
+                        }
+                        else if (this.OrderValueChecker(token_with_key)) {
+                            console.log("this is key = " + key);
+                            newlist.sort(this.sort_by(key, false, parseFloat));
+                        }
+                        else {
+                            newlist.sort(this.sort_by(key, false, function (a: any) {
+                                return a.toUpperCase()
+                            }));
+                        }
+                    }
+                    console.log(newlist);
+                }
+
             }
-            if (this.OrderValueChecker(orderValue)) {
-                newlist.sort(this.sort_by(orderValue, false, parseFloat));
-            } else {
-                newlist.sort(this.sort_by(orderValue, false, function (a: any) {
-                    return a.toUpperCase()
-                }));
+
+            if (typeof orderValue === 'string') {
+                if (!columnsValue.includes(orderValue)) {
+                    this.fail = true;
+                    this.returnMessage = "Order is not in Columns"
+                    return this.returnMessage;
+                }
+                if (this.OrderValueChecker(orderValue)) {
+                    newlist.sort(this.sort_by(orderValue, false, parseFloat));
+                } else {
+                    newlist.sort(this.sort_by(orderValue, false, function (a: any) {
+                        return a.toUpperCase()
+                    }));
+                }
             }
         }
 
@@ -517,6 +585,10 @@ class DoEveryThing {
         return function (a: any, b: any) {
             return a = key(a), b = key(b), reverse * (<any>(a > b) - <any>(b > a));
         }
+    }
+
+    transformation() {
+
     }
 
 }
