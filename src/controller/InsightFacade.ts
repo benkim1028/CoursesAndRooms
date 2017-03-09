@@ -18,6 +18,7 @@ class DoEveryThing {
     missingIds: string[];
     columsLists:string[];
     columsLists_for_Apply:string[];
+    orderDir:string;
 
     constructor() {
         Log.trace('Doeverything::init()');
@@ -27,6 +28,7 @@ class DoEveryThing {
         this.missingIds = [];
         this.columsLists = [];
         this.columsLists_for_Apply = [];
+        this.orderDir = "";
 
     }
     identifyID(){
@@ -504,11 +506,11 @@ class DoEveryThing {
             if (typeof orderValue === 'object') {
                 let dir:string = orderValue["dir"];
                 let keys:string[] = orderValue["keys"];
-
+                this.orderDir = dir;
                 sort(dir, keys, newlist);
             }
 
-            if (typeof orderValue === 'string') {
+            else if (typeof orderValue === 'string') {
                 if (!columnsValue.includes(orderValue)) {
                     this.fail = true;
                     this.returnMessage = "Order is not in Columns";
@@ -663,7 +665,7 @@ function sort(dir:string, keys:string[], collected_data:any[]) {
             // console.log("this is token_with_key = " + token_with_key);
             if (token_with_key == "invalid token" || !Doeverything.columsLists.includes(key)) {
                 Doeverything.fail = true;
-                Doeverything.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
+                Doeverything.returnMessage = "Order keys do not have valid key or Order is not in Columns "
                 return Doeverything.returnMessage;
             }
             else if (Doeverything.OrderValueChecker(token_with_key)) {
@@ -685,7 +687,7 @@ function sort(dir:string, keys:string[], collected_data:any[]) {
             // console.log("this is token_with_key = " + token_with_key);
             if (token_with_key == "invalid token" || !Doeverything.columsLists.includes(key)) {
                 Doeverything.fail = true;
-                Doeverything.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
+                Doeverything.returnMessage = "Order keys do not have valid key or Order is not in Columns "
                 return Doeverything.returnMessage;
             }
             else if (Doeverything.OrderValueChecker(token_with_key)) {
