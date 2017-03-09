@@ -4114,14 +4114,15 @@ describe("EchoSpec", function () {
                             "rooms_furniture": "*Tables*"
                         }
                     }, {
-                        "GT": {
-                            "rooms_seats": 300
+                        "LT": {
+                            "rooms_seats": 50
                         }
                     }]
                 },
                 "OPTIONS": {
                     "COLUMNS": [
                         "rooms_shortname",
+
                         "maxSeats"
                     ],
                     "ORDER": {
@@ -4138,6 +4139,42 @@ describe("EchoSpec", function () {
                         }
                     }]
                 }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("D3", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [{
+                        "IS": {
+                            "rooms_furniture": "*Tables*"
+                        }
+                    }, {
+                        "LT": {
+                            "rooms_seats": 50
+                        }
+                    }]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "rooms_name",
+                        "maxSeats"
+                    ],
+                    "ORDER": "",
+                    "FORM": "TABLE"
+                }
+
             }).then(value => {
             // expect.fail();
             Log.test('Value ' + value);

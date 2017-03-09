@@ -505,51 +505,7 @@ class DoEveryThing {
                 let dir:string = orderValue["dir"];
                 let keys:string[] = orderValue["keys"];
 
-
-                if (dir == "DOWN") {
-                    for (let key of keys) {
-                        let token_with_key = this.checkToken(key);
-                        // console.log("this is token_with_key = " + token_with_key);
-                        if (token_with_key == "invalid token" || !columnsValue.includes(key)) {
-                            this.fail = true;
-                            this.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
-                            return this.returnMessage;
-                        }
-                        else if (this.OrderValueChecker(token_with_key)) {
-                            // console.log("this is key = " + key);
-                            newlist.sort(this.sort_by(key, true, parseFloat));
-                        }
-                        else {
-                            newlist.sort(this.sort_by(key, false, function (a: any) {
-                                return a.toUpperCase()
-                            }));
-                        }
-                    }
-                    // console.log(newlist);
-
-                }
-                else if (dir == "UP") {
-                    for (let key of keys) {
-                        let token_with_key = this.checkToken(key);
-                        // console.log("this is token_with_key = " + token_with_key);
-                        if (token_with_key == "invalid token" || !columnsValue.includes(key)) {
-                            this.fail = true;
-                            this.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
-                            return this.returnMessage;
-                        }
-                        else if (this.OrderValueChecker(token_with_key)) {
-                            console.log("this is key = " + key);
-                            newlist.sort(this.sort_by(key, false, parseFloat));
-                        }
-                        else {
-                            newlist.sort(this.sort_by(key, false, function (a: any) {
-                                return a.toUpperCase()
-                            }));
-                        }
-                    }
-                    // console.log(newlist);
-                }
-
+                sort(dir, keys, newlist);
             }
 
             if (typeof orderValue === 'string') {
@@ -632,9 +588,6 @@ class DoEveryThing {
                     }
 
                 }
-                // console.log(all_keys_in_Trans);
-                // console.log(apply_obj_keys);
-
 
                 if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
                     // console.log(all_keys_in_Trans);
@@ -644,29 +597,40 @@ class DoEveryThing {
                     return this.returnMessage;
                 }
 
-                else {
-                    let output_after_Trans:any[] = []
-                    let sorted_data_lists:any[] = sorted_list["result"];
-                    for (let i:number = 0; i < sorted_data_lists.length; i++) {
-                        console.log(sorted_data_lists[i]);
-                        let sorted_kyes = Object.keys(sorted_data_lists[i]);
-                        // console.log(sorted_kyes);
-                    }
-
-                }
-
+            //     else {
+            //         let unique_sorted_list:any[] = [];
+            //         let sorted_data_lists:any[] = sorted_list["result"];
+            //         // console.log(sorted_data_lists);
+            //         // unique_sorted_list = array_unique(sorted_data_lists);
+            //         console.log(sorted_data_lists.includes({ rooms_shortname: 'LSC', maxSeats: 350 }));
+            //         unique_sorted_list = uniquefy_list(sorted_data_lists);
+            //         console.log(unique_sorted_list);
+            //
+            //
+            //     }
+            //
             }
-
-            // console.log(list);
-            let group:any = transformations[0];
-            let apply:any = transformations[1];
+            //
+            // // console.log(list);
+            // let group:any = transformations[0];
+            // let apply:any = transformations[1];
         }
     }
 
 }
 
-// function find_same_group(list:any[], )
 
+
+// function uniquefy_list(duplicates_contain_list:any, group_key:string) {
+//     var arr = {};
+//
+//     for ( var i=0, len=duplicates_contain_list.length; i < len; i++ )
+//         arr[duplicates_contain_list[i][group_key]] = things.thing[i];
+//
+//     things.thing = new Array();
+//     for ( var key in arr )
+//         things.thing.push(arr[key]);
+// }
 
 function isContain_same_element(list1:string[], list2:string[]) {
     console.log(list1.length);
@@ -689,6 +653,53 @@ function isContain_same_element(list1:string[], list2:string[]) {
         return false;
     }
 
+}
+
+function sort(dir:string, keys:string[], collected_data:any[]) {
+
+    if (dir == "DOWN") {
+        for (let key of keys) {
+            let token_with_key = Doeverything.checkToken(key);
+            // console.log("this is token_with_key = " + token_with_key);
+            if (token_with_key == "invalid token" || !Doeverything.columsLists.includes(key)) {
+                Doeverything.fail = true;
+                Doeverything.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
+                return Doeverything.returnMessage;
+            }
+            else if (Doeverything.OrderValueChecker(token_with_key)) {
+                // console.log("this is key = " + key);
+                collected_data.sort(Doeverything.sort_by(key, true, parseFloat));
+            }
+            else {
+                collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
+                    return a.toUpperCase()
+                }));
+            }
+        }
+
+
+    }
+    else if (dir == "UP") {
+        for (let key of keys) {
+            let token_with_key = Doeverything.checkToken(key);
+            // console.log("this is token_with_key = " + token_with_key);
+            if (token_with_key == "invalid token" || !Doeverything.columsLists.includes(key)) {
+                Doeverything.fail = true;
+                Doeverything.returnMessage = "Order kyes do not have valid key or Order is not in Columns "
+                return Doeverything.returnMessage;
+            }
+            else if (Doeverything.OrderValueChecker(token_with_key)) {
+                console.log("this is key = " + key);
+                collected_data.sort(Doeverything.sort_by(key, false, parseFloat));
+            }
+            else {
+                collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
+                    return a.toUpperCase()
+                }));
+            }
+        }
+        // console.log(newlist);
+    }
 }
 
 function getLatandLon(address: any){
@@ -1278,7 +1289,9 @@ export default class InsightFacade implements IInsightFacade {
             }
 
             let response = Doeverything.createModifiedList(list, options);
-            let finalOutput = Doeverything.processTransformations(response, transformations);
+            if (!isNullOrUndefined(transformations)) {
+                let finalOutput = Doeverything.processTransformations(response, transformations);
+            }
             if (Doeverything.fail) {
                 Doeverything.fail = false;
                 if (Doeverything.missingIds.length > 0) {
@@ -1310,7 +1323,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            // console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
