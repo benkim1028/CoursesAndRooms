@@ -16,6 +16,8 @@ class DoEveryThing {
     fail_for_missingKey: boolean;
     returnMessage: string;
     missingIds: string[];
+    columsLists:string[];
+    columsLists_for_Apply:string[];
 
     constructor() {
         Log.trace('Doeverything::init()');
@@ -23,6 +25,8 @@ class DoEveryThing {
         this.fail_for_424 = false;
         this.fail_for_missingKey = false;
         this.missingIds = [];
+        this.columsLists = [];
+        this.columsLists_for_Apply = [];
 
     }
     identifyID(){
@@ -409,6 +413,7 @@ class DoEveryThing {
             // console.log("this is real token = " + realToken);
             // console.log("this is eachTokenType = " + eachTokenType);
             if (eachTokenType == realToken) {
+                this.columsLists_for_Apply.push(key);
                 let keyLength:number =  key.length;
                 let tokenData:string = key.substring(tokenLength, keyLength)
                 // console.log("this is token data = " + tokenData);
@@ -460,6 +465,7 @@ class DoEveryThing {
         }
         output['render'] = options["FORM"];
         let columnsValue = options["COLUMNS"];
+        this.columsLists = columnsValue;
         if (columnsValue.length == 0) {
             this.fail = true;
             this.returnMessage = "Columns' length is 0"
@@ -467,7 +473,6 @@ class DoEveryThing {
         }
         for (let i = 0; i < list.length; i++) {
             let element: any = {};
-            // console.log(columnsValue);
             for (let j = 0; j < columnsValue.length; j++) {
                 if (isNullOrUndefined(columnsValue[j])) {
                     this.fail = true;
@@ -477,13 +482,11 @@ class DoEveryThing {
                 // console.log(columnsValue[j]); //check column value
                 let key = this.findKey(columnsValue[j]);
                 element[columnsValue[j]] = list[i][key];
-                // console.log(this.checkToken(columnsValue[j]));
-                // console.log(list[i][key]);
+
             }
-            // console.log(element);
             newlist.push(element);
         }
-
+        // console.log(this.columsLists);
         if (list.length == 0) {
             for (let j = 0; j < columnsValue.length; j++) {
                 let key = this.findKey(columnsValue[j]);
@@ -513,7 +516,7 @@ class DoEveryThing {
                             return this.returnMessage;
                         }
                         else if (this.OrderValueChecker(token_with_key)) {
-                            console.log("this is key = " + key);
+                            // console.log("this is key = " + key);
                             newlist.sort(this.sort_by(key, true, parseFloat));
                         }
                         else {
@@ -522,7 +525,7 @@ class DoEveryThing {
                             }));
                         }
                     }
-                    console.log(newlist);
+                    // console.log(newlist);
 
                 }
                 else if (dir == "UP") {
@@ -544,7 +547,7 @@ class DoEveryThing {
                             }));
                         }
                     }
-                    console.log(newlist);
+                    // console.log(newlist);
                 }
 
             }
@@ -552,7 +555,7 @@ class DoEveryThing {
             if (typeof orderValue === 'string') {
                 if (!columnsValue.includes(orderValue)) {
                     this.fail = true;
-                    this.returnMessage = "Order is not in Columns"
+                    this.returnMessage = "Order is not in Columns";
                     return this.returnMessage;
                 }
                 if (this.OrderValueChecker(orderValue)) {
@@ -587,8 +590,103 @@ class DoEveryThing {
         }
     }
 
-    transformation() {
+    processTransformations(sorted_list: any, transformations: any) {
+        let keys = Object.keys(transformations);
 
+        if (keys.length != 2) {
+            this.fail = true;
+            this.returnMessage = "tf's length is not 2";
+            return this.returnMessage;
+        }
+        if (keys.length == 2) {
+            if (keys[0] != "GROUP" || keys[1] != "APPLY") {
+                this.fail = true;
+                this.returnMessage = "at least one of keys in tf is not valid";
+                return this.returnMessage;
+            }
+            else {
+                let items_in_Group:string[] = transformations["GROUP"];
+                for (let item of items_in_Group) {
+                    if (item.search("_") == -1) {
+                        this.fail = true;
+                        this.returnMessage = "Group cannot contain apply keys";
+                        return this.returnMessage;
+                    }
+                }
+
+                let all_keys_in_Trans:string[] = items_in_Group;
+                let apply_obj_keys:string[] = []
+                for (let each_Apply_Obj of transformations["APPLY"]) {
+                    for (let each_apply_obj_key of Object.keys(each_Apply_Obj)) {
+                        let apply_obj_key:string = each_apply_obj_key;
+                        all_keys_in_Trans.push(apply_obj_key);
+                        apply_obj_keys.push(apply_obj_key);
+                        for (let apply_key_in_column of this.columsLists_for_Apply) {
+                            if (apply_key_in_column != apply_obj_key) {
+                                this.fail = true;
+                                this.returnMessage = "'"  + apply_key_in_column + "'" + " is not a valid key";
+                                return this.returnMessage;
+                            }
+                        }
+
+                    }
+
+                }
+                // console.log(all_keys_in_Trans);
+                // console.log(apply_obj_keys);
+
+
+                if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
+                    // console.log(all_keys_in_Trans);
+                    // console.log(this.columsLists);
+                    this.fail = true;
+                    this.returnMessage = "All COLUMNS keys need to be either in GROUP or in APPLY";
+                    return this.returnMessage;
+                }
+
+                else {
+                    let output_after_Trans:any[] = []
+                    let sorted_data_lists:any[] = sorted_list["result"];
+                    for (let i:number = 0; i < sorted_data_lists.length; i++) {
+                        console.log(sorted_data_lists[i]);
+                        let sorted_kyes = Object.keys(sorted_data_lists[i]);
+                        // console.log(sorted_kyes);
+                    }
+
+                }
+
+            }
+
+            // console.log(list);
+            let group:any = transformations[0];
+            let apply:any = transformations[1];
+        }
+    }
+
+}
+
+// function find_same_group(list:any[], )
+
+
+function isContain_same_element(list1:string[], list2:string[]) {
+    console.log(list1.length);
+    // console.log(list2.length);
+    if (list1.length == list2.length) {
+        console.log(list2.length);
+        for(let each_list1 of list1) {
+            if (!list2.includes(each_list1)) {
+                return false;
+            }
+        }
+        for (let each_list2 of list2) {
+            if (!list1.includes(each_list2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
     }
 
 }
@@ -1147,7 +1245,9 @@ export default class InsightFacade implements IInsightFacade {
             let filterValue = body[filterKey];
             let list: any = [];
             let options = query[names[1]];
-            ///////
+            let transformations = query[names[2]];
+            // console.log(transformations);
+
             try {
                 var id = identifyID(options);
                 Doeverything.id = id;
@@ -1178,6 +1278,7 @@ export default class InsightFacade implements IInsightFacade {
             }
 
             let response = Doeverything.createModifiedList(list, options);
+            let finalOutput = Doeverything.processTransformations(response, transformations);
             if (Doeverything.fail) {
                 Doeverything.fail = false;
                 if (Doeverything.missingIds.length > 0) {
