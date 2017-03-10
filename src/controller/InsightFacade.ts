@@ -40,6 +40,7 @@ class DoEveryThing {
         }
     }
 
+
     whatKindofFilter(key: any, value: any, preList: any = [], not: boolean = true) {
         if (this.fail == true)
             return this.returnMessage;
@@ -402,7 +403,6 @@ class DoEveryThing {
             }
 
         }
-
         else {
             return this.checkToken(key);
         }
@@ -440,8 +440,104 @@ class DoEveryThing {
         }
     }
 
+    createModifiedList(list: any, options: any) {
+        if (this.fail == true)
+            return this.returnMessage;
+        let output: any = {'render': '', 'result': []};
+        let newlist: any[] = [];
+        let optionsKey = Object.keys(options);
+        if (optionsKey.length == 3) {
+            if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "ORDER" || optionsKey[2] != "FORM") {
+                this.fail = true;
+                this.returnMessage = "Option is not valid option 3"
+                return this.returnMessage;
+            }
+        } else if (optionsKey.length == 2) {
+            if (optionsKey[0] != "COLUMNS" || optionsKey[1] != "FORM") {
+                this.fail = true;
+                this.returnMessage = "Option is not valid option 2"
+                return this.returnMessage;
+            }
+        } else {
+            this.fail = true;
+            this.returnMessage = "Option is not valid"
+            return this.returnMessage;
+        }
+        ;
+        if (options["FORM"] != "TABLE") {
+            this.fail = true;
+            this.returnMessage = "FORM is not valid"
+            return this.returnMessage;
+        }
+        output['render'] = options["FORM"];
+        let columnsValue = options["COLUMNS"];
+        if (columnsValue.length == 0) {
+            this.fail = true;
+            this.returnMessage = "Columns' length is 0"
+            return this.returnMessage;
+        }
+        for (let i = 0; i < list.length; i++) {
+            let element: any = {};
+            for (let j = 0; j < columnsValue.length; j++) {
+                if (isNullOrUndefined(columnsValue[j])) {
+                    this.fail = true;
+                    this.returnMessage = "element in Columns is null or undefined"
+                    return this.returnMessage;
+                }
+                let key = this.findKey(columnsValue[j]);
+                element[columnsValue[j]] = list[i][key];
+            }
+            newlist.push(element);
+        }
 
-    createModifiedList(list: any, options: any, transformations:any) {
+        if (list.length == 0) {
+            for (let j = 0; j < columnsValue.length; j++) {
+                let key = this.findKey(columnsValue[j]);
+
+            }
+        }
+
+        if (optionsKey.length == 3) {
+
+            let order = Object.keys(options)[1];
+            let orderValue = options[order];
+            if (!columnsValue.includes(orderValue)) {
+                this.fail = true;
+                this.returnMessage = "Order is not in Columns"
+                return this.returnMessage;
+            }
+            if (this.OrderValueChecker(orderValue)) {
+                newlist.sort(this.sort_by(orderValue, false, parseFloat));
+            } else {
+                newlist.sort(this.sort_by(orderValue, false, function (a: any) {
+                    return a.toUpperCase()
+                }));
+            }
+        }
+
+        for (let i = 0; i < newlist.length; i++)
+            output['result'].push(newlist[i]);
+        return output;
+    }
+
+    sort_by = function (field: any, reverse: any, primer: any) {
+
+        var key = primer ?
+            function (x: any) {
+                return primer(x[field])
+            } :
+            function (x: any) {
+                return x[field]
+            };
+
+        reverse = !reverse ? 1 : -1;
+
+        return function (a: any, b: any) {
+            return a = key(a), b = key(b), reverse * (<any>(a > b) - <any>(b > a));
+        }
+    }
+
+    createModifiedList2(list: any, options: any, transformations:any) {
         if (this.fail == true)
             return this.returnMessage;
         let output: any = {'render': '', 'result': []};
@@ -523,36 +619,6 @@ class DoEveryThing {
             let appliedList: any = this.applyQuery(groupedList, transformations["APPLY"], transformations["GROUP"], num_apply_column);
 
             newlist = appliedList;
-            console.log("passed here");
-        } else {
-            for (let i = 0; i < list.length; i++) {
-                let element: any = {};
-                for (let j = 0; j < columnsValue.length; j++) {
-                    if (isNullOrUndefined(columnsValue[j])) {
-                        this.fail = true;
-                        this.returnMessage = "element in Columns is null or undefined"
-                        return this.returnMessage;
-                    }  // fail
-                    let key = this.findKey(columnsValue[j]);
-                    element[columnsValue[j]] = list[i][key];
-
-                }
-
-                newlist.push(element);
-            }
-        }
-        if (columnsValue.length == 0) {
-            this.fail = true;
-            this.returnMessage = "Columns' length is 0"
-            return this.returnMessage;
-        }  // fail
-
-        if (!isNullOrUndefined(transformations)) {
-            let groupedList: any = this.createGroup(list, transformations["GROUP"]);
-
-            let appliedList: any = this.applyQuery(groupedList, transformations["APPLY"], transformations["GROUP"], num_apply_column);
-
-            newlist = appliedList;
         } else {
             for (let i = 0; i < list.length; i++) {
                 let element: any = {};
@@ -608,22 +674,6 @@ class DoEveryThing {
         return output;
     }
 
-    sort_by = function (field: any, reverse: any, primer: any) {
-
-        var key = primer ?
-            function (x: any) {
-                return primer(x[field])
-            } :
-            function (x: any) {
-                return x[field]
-            };
-
-        reverse = !reverse ? 1 : -1;
-
-        return function (a: any, b: any) {
-            return a = key(a), b = key(b), reverse * (<any>(a > b) - <any>(b > a));
-        }
-    }
 
     createGroup(data:any, group: any) {
         if (typeof group === "undefined") {
@@ -747,198 +797,7 @@ class DoEveryThing {
         return result;
     }
 
-//     processTransformations(sorted_list: any, transformations: any) {
-//         let keys = Object.keys(transformations);
-//
-//         if (keys.length != 2) {
-//             this.fail = true;
-//             this.returnMessage = "tf's length is not 2";
-//             return this.returnMessage;
-//         }
-//         if (keys.length == 2) {
-//             if (keys[0] != "GROUP" || keys[1] != "APPLY") {
-//                 this.fail = true;
-//                 this.returnMessage = "at least one of keys in tf is not valid";
-//                 return this.returnMessage;
-//             }
-//             else {
-//                 let items_in_Group:string[] = transformations["GROUP"];
-//                 for (let item of items_in_Group) {
-//                     if (item.search("_") == -1) {
-//                         this.fail = true;
-//                         this.returnMessage = "Group cannot contain apply keys";
-//                         return this.returnMessage;
-//                     }
-//                 }
-// processTransformations(sorted_list: any, transformations: any) {
-//         let keys = Object.keys(transformations);
-//
-//         if (keys.length != 2) {
-//             this.fail = true;
-//             this.returnMessage = "tf's length is not 2";
-//             return this.returnMessage;
-//         }
-//         if (keys.length == 2) {
-//             if (keys[0] != "GROUP" || keys[1] != "APPLY") {
-//                 this.fail = true;
-//                 this.returnMessage = "at least one of keys in tf is not valid";
-//                 return this.returnMessage;
-//             }
-//             else {
-//                 let items_in_Group:string[] = transformations["GROUP"];
-//                 for (let item of items_in_Group) {
-//                     if (item.search("_") == -1) {
-//                         this.fail = true;
-//                         this.returnMessage = "Group cannot contain apply keys";
-//                         return this.returnMessage;
-//                     }
-//                 }
-//
-//                 let all_keys_in_Trans:string[] = items_in_Group;
-//                 let apply_obj_keys:string[] = []
-//                 for (let each_Apply_Obj of transformations["APPLY"]) {
-//                     for (let each_apply_obj_key of Object.keys(each_Apply_Obj)) {
-//                         let apply_obj_key:string = each_apply_obj_key;
-//                         all_keys_in_Trans.push(apply_obj_key);
-//                         apply_obj_keys.push(apply_obj_key);
-//                         for (let apply_key_in_column of this.columsLists_for_Apply) {
-//                             if (apply_key_in_column != apply_obj_key) {
-//                                 this.fail = true;
-//                                 this.returnMessage = "'"  + apply_key_in_column + "'" + " is not a valid key";
-//                                 return this.returnMessage;
-//                             }
-//                         }
-//
-//                     }
-//
-//                 }
-//                 // console.log(transformations["APPLY"]);
-//                 // console.log(transformations["GROUP"]);
-//                 // console.log(this.createGroup(sorted_list, items_in_Group));
-//
-//                 // let a:any[] = this.applyQuery(, transformations["APPLY"], items_in_Group);
-//
-//                 // if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
-//                 //     // console.log(all_keys_in_Trans);
-//                 //     // console.log(this.columsLists);
-//                 //     this.fail = true;
-//                 //     this.returnMessage = "All COLUMNS keys need to be either in GROUP or in APPLY";
-//                 //     return this.returnMessage;
-//                 // }
-//
-//
-//
-//
-//             }
-//             //
-//             // // console.log(list);
-//             // let group:any = transformations[0];
-//             // let apply:any = transformations[1];
-//         }
-//     }    //unused
-// }
-//                 let all_keys_in_Trans:string[] = items_in_Group;
-//                 let apply_obj_keys:string[] = []
-//                 for (let each_Apply_Obj of transformations["APPLY"]) {
-//                     for (let each_apply_obj_key of Object.keys(each_Apply_Obj)) {
-//                         let apply_obj_key:string = each_apply_obj_key;
-//                         all_keys_in_Trans.push(apply_obj_key);
-//                         apply_obj_keys.push(apply_obj_key);
-//                         for (let apply_key_in_column of this.columsLists_for_Apply) {
-//                             if (apply_key_in_column != apply_obj_key) {
-//                                 this.fail = true;
-//                                 this.returnMessage = "'"  + apply_key_in_column + "'" + " is not a valid key";
-//                                 return this.returnMessage;
-//                             }
-//                         }
-//
-//                     }
-//
-//                 }
-//                 // console.log(transformations["APPLY"]);
-//                 // console.log(transformations["GROUP"]);
-//                 // console.log(this.createGroup(sorted_list, items_in_Group));
-//
-//                 // let a:any[] = this.applyQuery(, transformations["APPLY"], items_in_Group);
-//
-//                 // if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
-//                 //     // console.log(all_keys_in_Trans);
-//                 //     // console.log(this.columsLists);
-//                 //     this.fail = true;
-//                 //     this.returnMessage = "All COLUMNS keys need to be either in GROUP or in APPLY";
-//                 //     return this.returnMessage;
-//                 // }
-//
-//
-//
-//
-//             }
-//             //
-//             // // console.log(list);
-//             // let group:any = transformations[0];
-//             // let apply:any = transformations[1];
-//         }
-//     }    //unused
 }
-
-
-// function max_operator(duplicates_contain_list:any, group_key:any) {
-//     let uniqueNames:any[] = [];
-//     // console.log(group_key);
-//
-//     let keys = duplicates_contain_list.map(function(obj:any) { return obj[group_key]; });
-//
-//     keys = keys.filter(function(v:any, i:any) {
-//         if (keys.indexOf(v) == i) {
-//             uniqueNames.push(duplicates_contain_list[i][group_key]);
-//         }
-//     });
-//     return uniqueNames;
-// }
-
-
-// function checkAdult(group_key:any, uniqueNames:any[], dup_list:any[]) {
-//     // let keys = dup_list.map(function(obj:any) { return obj[group_key]; });
-//     for (let name of uniqueNames) {
-//         if (name == )
-//     }
-// }
-//
-// function uniquefy_list(duplicates_contain_list:any, group_key:any) {
-//     let unique_lists:any[] = [];
-//     var flags:any = {};
-//     var index:number;
-//     for (index = 0; index < duplicates_contain_list.length; index++) {
-//         if (!flags[duplicates_contain_list[index][group_key]]) {
-//             flags[duplicates_contain_list[index][group_key]] = true;
-//             unique_lists.push(duplicates_contain_list[index]);
-//         }
-//     }
-//     return unique_lists;
-// }
-
-// function isContain_same_element(list1:string[], list2:string[]) {
-//     console.log(list1.length);
-//     // console.log(list2.length);
-//     if (list1.length == list2.length) {
-//         console.log(list2.length);
-//         for(let each_list1 of list1) {
-//             if (!list2.includes(each_list1)) {
-//                 return false;
-//             }
-//         }
-//         for (let each_list2 of list2) {
-//             if (!list1.includes(each_list2)) {
-//                 return false;
-//             }
-//         }
-//         return true;
-//     }
-//     else {
-//         return false;
-//     }
-// }
-
 
 function sort(dir:string, keys:string[], collected_data:any[]) {
 
@@ -988,39 +847,7 @@ function sort(dir:string, keys:string[], collected_data:any[]) {
     }
 }
 
-function sort2(dir:string, keys:string[], collected_data:any[]) {
 
-    if (dir == "DOWN") {
-        for (let key of keys) {
-            let real_key = Doeverything.findKey(key);
-            if (Doeverything.OrderValueChecker(real_key)) {
-                collected_data.sort(Doeverything.sort_by(key, true, parseFloat));
-            }
-            else {
-                collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
-                    return a.toUpperCase()
-                }));
-            }
-        }
-
-
-    }
-    else if (dir == "UP") {
-        for (let key of keys) {
-            let real_key = Doeverything.findKey(key);
-            if (Doeverything.OrderValueChecker(real_key)) {
-                // console.log("this is key = " + key);
-                collected_data.sort(Doeverything.sort_by(key, false, parseFloat));
-            }
-            else {
-                collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
-                    return a.toUpperCase()
-                }));
-            }
-        }
-        // console.log(collected_data);
-    }
-}
 
 function getLatandLon(address: any){
     let res = encodeURI(address);
@@ -1109,7 +936,7 @@ export default class InsightFacade implements IInsightFacade {
                                             } else {
                                                 each1["Year"] = Number(each1["Year"]);
                                             }
-                                            list.push(each1);
+                                        list.push(each1);
                                     }
                                 }
                             }
@@ -1577,8 +1404,7 @@ export default class InsightFacade implements IInsightFacade {
             let list: any = [];
             let options = query[names[1]];
             let transformations = query[names[2]];
-            // console.log(transformations);
-
+            ///////
             try {
                 var id = identifyID(options);
                 Doeverything.id = id;
@@ -1608,10 +1434,16 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
-            let response = Doeverything.createModifiedList(list, options, transformations);
-            // if (!isNullOrUndefined(transformations)) {
-            //     let finalOutput = Doeverything.processTransformations(response, transformations);
-            // }
+            let response:any = []
+
+            if (isNullOrUndefined(transformations) || transformations.length != 2) {
+                response = Doeverything.createModifiedList(list, options);
+            }
+
+            else {
+                response = Doeverything.createModifiedList2(list, options, transformations);
+            }
+
             if (Doeverything.fail) {
                 Doeverything.fail = false;
                 if (Doeverything.missingIds.length > 0) {

@@ -4105,7 +4105,7 @@ describe("EchoSpec", function () {
         })
     });
 
-    it.only("D3", function () {
+    it("D3-1", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4122,7 +4122,6 @@ describe("EchoSpec", function () {
                 "OPTIONS": {
                     "COLUMNS": [
                         "rooms_shortname",
-
                         "maxSeats"
                     ],
                     "ORDER": {
@@ -4135,7 +4134,7 @@ describe("EchoSpec", function () {
                     "GROUP": ["rooms_shortname"],
                     "APPLY": [{
                         "maxSeats": {
-                            "MAX": "rooms_seats"
+                            "MIN": "rooms_seats"
                         }
                     }]
                 }
@@ -4151,30 +4150,49 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it("D3", function () {
+    it("D3-2", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
-                    "AND": [{
-                        "IS": {
-                            "rooms_furniture": "*Tables*"
+                    "AND": [
+                        {
+                            "IS": {
+                                "rooms_furniture": "*Tables*"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "rooms_seats": 300
+                            }
                         }
-                    }, {
-                        "LT": {
-                            "rooms_seats": 50
-                        }
-                    }]
+                    ]
                 },
                 "OPTIONS": {
                     "COLUMNS": [
                         "rooms_shortname",
-                        "rooms_name",
-                        "maxSeats"
-                    ],
-                    "ORDER": "",
-                    "FORM": "TABLE"
-                }
+                        "avgSeats"
 
+                    ],
+                    "ORDER": "avgSeats",
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": [
+                        "rooms_shortname"
+                    ],
+                    "APPLY": [
+                        {
+                            "avgSeats": {
+                                "AVG": "rooms_seats"
+                            }
+                        },
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        }
+                    ]
+                }
             }).then(value => {
             // expect.fail();
             Log.test('Value ' + value);
