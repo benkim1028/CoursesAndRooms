@@ -19,6 +19,7 @@ class DoEveryThing {
     columsLists:string[];
     columsLists_for_Apply:string[];
     orderDir:string;
+    keys_in_Trans:string[];
 
     constructor() {
         Log.trace('Doeverything::init()');
@@ -29,7 +30,7 @@ class DoEveryThing {
         this.columsLists = [];
         this.columsLists_for_Apply = [];
         this.orderDir = "";
-
+        this.keys_in_Trans = [];
     }
     identifyID(){
         if (this.id == "courses"){
@@ -408,35 +409,39 @@ class DoEveryThing {
     }
 
     checkToken(key:string):string {
-        let tokenTypes:string[] = ["max", "min", "avg", "sum", "count" ];
-        for (let eachTokenType of tokenTypes) {
-            let tokenLength:number = eachTokenType.length;
-            let realToken:string = key.substring(0, tokenLength)
-            // console.log("this is real token = " + realToken);
-            // console.log("this is eachTokenType = " + eachTokenType);
-            if (eachTokenType == realToken) {
-                this.columsLists_for_Apply.push(key);
-                let keyLength:number =  key.length;
-                let tokenData:string = key.substring(tokenLength, keyLength)
-                // console.log("this is token data = " + tokenData);
-                if (tokenData == "Seats") {
-                    return "rooms_seats";
-                }
-                else if (tokenData == "Lat") {
-                    return "rooms_lat";
-                }
-                else if (tokenData == "Lon") {
-                    return "rooms_lon";
-                }
-                else  {
-                    return "invalid token";
+        if (key.search("max") != -1 || key.search("min") != -1 || key.search("avg") != -1 || key.search("sum") != -1 || key.search("count") != -1) {
+            let tokenTypes:string[] = ["max", "min", "avg", "sum", "count" ];
+            for (let eachTokenType of tokenTypes) {
+                let tokenLength:number = eachTokenType.length;
+                let realToken:string = key.substring(0, tokenLength);
+                // console.log("this is real token = " + realToken);
+                // console.log("this is eachTokenType = " + eachTokenType);
+                if (eachTokenType == realToken) {
+                    let keyLength:number =  key.length;
+                    let tokenData:string = key.substring(tokenLength, keyLength)
+                    // console.log("this is token data = " + tokenData);
+                    if (tokenData == "Seats") {
+                        return "rooms_seats";
+                    }
+                    else if (tokenData == "Lat") {
+                        return "rooms_lat";
+                    }
+                    else if (tokenData == "Lon") {
+                        return "rooms_lon";
+                    }
+                    else  {
+                        return "invalid token";
+                    }
                 }
             }
+        }
+        else {
+            return "invalid key in checkToken";
         }
     }
 
 
-    createModifiedList(list: any, options: any) {
+    createModifiedList(list: any, options: any, transformations:any) {
         if (this.fail == true)
             return this.returnMessage;
         let output: any = {'render': '', 'result': []};
@@ -473,6 +478,15 @@ class DoEveryThing {
             this.returnMessage = "Columns' length is 0"
             return this.returnMessage;
         }
+        let apply_keys:string[] = [];
+        for (let j = 0; j < columnsValue.length; j++) {
+            let columnvalue:string = this.checkToken(columnsValue[j]);
+            if (columnvalue != "invalid token" && columnvalue != "invalid key in checkToken") {
+                apply_keys.push(columnsValue[j]);
+            }
+        }
+        let num_apply_column:number = apply_keys.length;
+
         for (let i = 0; i < list.length; i++) {
             let element: any = {};
             for (let j = 0; j < columnsValue.length; j++) {
@@ -482,13 +496,14 @@ class DoEveryThing {
                     return this.returnMessage;
                 }
                 // console.log(columnsValue[j]); //check column value
+
                 let key = this.findKey(columnsValue[j]);
                 element[columnsValue[j]] = list[i][key];
 
             }
             newlist.push(element);
         }
-        // console.log(this.columsLists);
+
         if (list.length == 0) {
             for (let j = 0; j < columnsValue.length; j++) {
                 let key = this.findKey(columnsValue[j]);
@@ -496,18 +511,78 @@ class DoEveryThing {
             }
         }
 
+        if (columnsValue.length == 0) {
+            this.fail = true;
+            this.returnMessage = "Columns' length is 0"
+            return this.returnMessage;
+        }  // fail
+
+        if (!isNullOrUndefined(transformations)) {
+            let groupedList: any = this.createGroup(list, transformations["GROUP"]);
+
+            let appliedList: any = this.applyQuery(groupedList, transformations["APPLY"], transformations["GROUP"], num_apply_column);
+
+            newlist = appliedList;
+            console.log("passed here");
+        } else {
+            for (let i = 0; i < list.length; i++) {
+                let element: any = {};
+                for (let j = 0; j < columnsValue.length; j++) {
+                    if (isNullOrUndefined(columnsValue[j])) {
+                        this.fail = true;
+                        this.returnMessage = "element in Columns is null or undefined"
+                        return this.returnMessage;
+                    }  // fail
+                    let key = this.findKey(columnsValue[j]);
+                    element[columnsValue[j]] = list[i][key];
+
+                }
+
+                newlist.push(element);
+            }
+        }
+        if (columnsValue.length == 0) {
+            this.fail = true;
+            this.returnMessage = "Columns' length is 0"
+            return this.returnMessage;
+        }  // fail
+
+        if (!isNullOrUndefined(transformations)) {
+            let groupedList: any = this.createGroup(list, transformations["GROUP"]);
+
+            let appliedList: any = this.applyQuery(groupedList, transformations["APPLY"], transformations["GROUP"], num_apply_column);
+
+            newlist = appliedList;
+        } else {
+            for (let i = 0; i < list.length; i++) {
+                let element: any = {};
+                for (let j = 0; j < columnsValue.length; j++) {
+                    if (isNullOrUndefined(columnsValue[j])) {
+                        this.fail = true;
+                        this.returnMessage = "element in Columns is null or undefined"
+                        return this.returnMessage;
+                    }  // fail
+                    let key = this.findKey(columnsValue[j]);
+                    element[columnsValue[j]] = list[i][key];
+
+                }
+                newlist.push(element);
+            }
+        }
+
+
         if (optionsKey.length == 3) {
 
             let order = Object.keys(options)[1];
             let orderValue = options[order];
-            // console.log(orderValue["dir"]);
-            // console.log(orderValue["keys"]);
+
 
             if (typeof orderValue === 'object') {
                 let dir:string = orderValue["dir"];
                 let keys:string[] = orderValue["keys"];
                 this.orderDir = dir;
                 sort(dir, keys, newlist);
+                // console.log(newlist);
             }
 
             else if (typeof orderValue === 'string') {
@@ -516,10 +591,12 @@ class DoEveryThing {
                     this.returnMessage = "Order is not in Columns";
                     return this.returnMessage;
                 }
-                if (this.OrderValueChecker(orderValue)) {
+                console.log(this.findKey(orderValue) + "order");
+                if (this.OrderValueChecker(this.findKey(orderValue))) {
                     newlist.sort(this.sort_by(orderValue, false, parseFloat));
                 } else {
                     newlist.sort(this.sort_by(orderValue, false, function (a: any) {
+
                         return a.toUpperCase()
                     }));
                 }
@@ -548,118 +625,325 @@ class DoEveryThing {
         }
     }
 
-    processTransformations(sorted_list: any, transformations: any) {
-        let keys = Object.keys(transformations);
-
-        if (keys.length != 2) {
-            this.fail = true;
-            this.returnMessage = "tf's length is not 2";
-            return this.returnMessage;
+    createGroup(data:any, group: any) {
+        if (typeof group === "undefined") {
+            // Log.info("Not doing GROUP query");
+            return data;
         }
-        if (keys.length == 2) {
-            if (keys[0] != "GROUP" || keys[1] != "APPLY") {
-                this.fail = true;
-                this.returnMessage = "at least one of keys in tf is not valid";
-                return this.returnMessage;
+        // Log.info("Started GROUP query");
+        let result:any = this.groupQueryHelper(data, function (item: any) {
+            let grouped: any = [];
+            for (let value of group) {
+                grouped.push(item[value]);
             }
-            else {
-                let items_in_Group:string[] = transformations["GROUP"];
-                for (let item of items_in_Group) {
-                    if (item.search("_") == -1) {
-                        this.fail = true;
-                        this.returnMessage = "Group cannot contain apply keys";
-                        return this.returnMessage;
-                    }
-                }
-
-                let all_keys_in_Trans:string[] = items_in_Group;
-                let apply_obj_keys:string[] = []
-                for (let each_Apply_Obj of transformations["APPLY"]) {
-                    for (let each_apply_obj_key of Object.keys(each_Apply_Obj)) {
-                        let apply_obj_key:string = each_apply_obj_key;
-                        all_keys_in_Trans.push(apply_obj_key);
-                        apply_obj_keys.push(apply_obj_key);
-                        for (let apply_key_in_column of this.columsLists_for_Apply) {
-                            if (apply_key_in_column != apply_obj_key) {
-                                this.fail = true;
-                                this.returnMessage = "'"  + apply_key_in_column + "'" + " is not a valid key";
-                                return this.returnMessage;
-                            }
-                        }
-
-                    }
-
-                }
-
-                if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
-                    // console.log(all_keys_in_Trans);
-                    // console.log(this.columsLists);
-                    this.fail = true;
-                    this.returnMessage = "All COLUMNS keys need to be either in GROUP or in APPLY";
-                    return this.returnMessage;
-                }
-
-            //     else {
-            //         let unique_sorted_list:any[] = [];
-            //         let sorted_data_lists:any[] = sorted_list["result"];
-            //         // console.log(sorted_data_lists);
-            //         // unique_sorted_list = array_unique(sorted_data_lists);
-            //         console.log(sorted_data_lists.includes({ rooms_shortname: 'LSC', maxSeats: 350 }));
-            //         unique_sorted_list = uniquefy_list(sorted_data_lists);
-            //         console.log(unique_sorted_list);
-            //
-            //
-            //     }
-            //
-            }
-            //
-            // // console.log(list);
-            // let group:any = transformations[0];
-            // let apply:any = transformations[1];
-        }
+            return grouped;
+        });
+        return result;
+    }
+    groupQueryHelper(data:any, f:any) {
+        let groups:any = {};
+        data.forEach(function(content:any) {
+            let group = JSON.stringify(f(content));
+            groups[group] = groups[group] || [];
+            groups[group].push(content);
+        });
+        return Object.keys(groups).map(function(group) {
+            return groups[group];
+        });
     }
 
+    applyQuery(data:any[], apply:any, group: any, num_apply_column:number):any {
+        if (typeof apply  === "undefined") {
+            Log.info("Not doing APPLY query and SHOULD NOT have done GROUP query");
+            return data;
+        }
+        Log.info("Started APPLY query");
+        let result:any[] = [];
+        // traverse through each group of data
+        data.forEach(function(content: any){
+            let jsonApply:any = {};
+
+            // set the apply queries
+            for (let i = 0; i < num_apply_column; i++) {
+                // console.log(apply[i])
+                // console.log(Object.keys(apply[i])[0]);
+                let applykey = Object.keys(apply[i])[0];
+                let applytoken = Object.keys(apply[i][applykey])[0];
+                let key: string = apply[i][applykey][applytoken];
+
+                let queryResult: any;
+                if (applytoken == "MAX")
+                {
+                    let max = content[0][key];
+                    for (let obj of content) {
+                        if (obj[key] > max) {
+                            max = obj[key];
+                        }
+                    }
+                    queryResult = max;
+                }
+                else if (applytoken == "MIN")
+                {
+                    let min = content[0][key];
+                    for (let obj of content) {
+                        if (obj[key] < min) {
+                            min = obj[key];
+                        }
+                    }
+                    queryResult = min;
+                }
+                else if (applytoken == "AVG")
+                {
+                    let sum = 0;
+                    let temp = 0;
+                    for (let obj of content) {
+                        temp = obj[key];
+                        temp = temp * 10;
+                        temp = Number(temp.toFixed(0))
+                        sum += temp;
+                    }
+                    queryResult = Number(((sum / content.length)/10).toFixed(2));
+                }
+                else if (applytoken == "SUM")
+                {
+                    let sum = 0;
+                    for (let obj of content){
+                        sum+=obj[key]
+                    }
+                    queryResult = Number(sum);
+                }
+                else if (applytoken == "COUNT")
+                {
+                    let values: any[] = [];
+                    for (let obj of content) {
+                        values.push(obj[key]);
+                    }
+
+                    values = values.filter(function (e, i, values) {
+                        return values.lastIndexOf(e) === i;
+                    });
+
+                    queryResult = values.length;
+                }
+
+                // save result as a json object
+                jsonApply[applykey] = queryResult;
+            }
+
+            // put into a JSON object
+            let jsonContent:any = {};
+            for (let key of group) {
+                jsonContent[key] = content[0][key];
+            }
+            Object.keys(jsonApply).forEach(function (key:any) {
+                jsonContent[key] = jsonApply[key];
+            });
+            // add to result array
+            result.push(jsonContent);
+        });
+
+        Log.info("Finished APPLY query");
+
+        return result;
+    }
+
+//     processTransformations(sorted_list: any, transformations: any) {
+//         let keys = Object.keys(transformations);
+//
+//         if (keys.length != 2) {
+//             this.fail = true;
+//             this.returnMessage = "tf's length is not 2";
+//             return this.returnMessage;
+//         }
+//         if (keys.length == 2) {
+//             if (keys[0] != "GROUP" || keys[1] != "APPLY") {
+//                 this.fail = true;
+//                 this.returnMessage = "at least one of keys in tf is not valid";
+//                 return this.returnMessage;
+//             }
+//             else {
+//                 let items_in_Group:string[] = transformations["GROUP"];
+//                 for (let item of items_in_Group) {
+//                     if (item.search("_") == -1) {
+//                         this.fail = true;
+//                         this.returnMessage = "Group cannot contain apply keys";
+//                         return this.returnMessage;
+//                     }
+//                 }
+// processTransformations(sorted_list: any, transformations: any) {
+//         let keys = Object.keys(transformations);
+//
+//         if (keys.length != 2) {
+//             this.fail = true;
+//             this.returnMessage = "tf's length is not 2";
+//             return this.returnMessage;
+//         }
+//         if (keys.length == 2) {
+//             if (keys[0] != "GROUP" || keys[1] != "APPLY") {
+//                 this.fail = true;
+//                 this.returnMessage = "at least one of keys in tf is not valid";
+//                 return this.returnMessage;
+//             }
+//             else {
+//                 let items_in_Group:string[] = transformations["GROUP"];
+//                 for (let item of items_in_Group) {
+//                     if (item.search("_") == -1) {
+//                         this.fail = true;
+//                         this.returnMessage = "Group cannot contain apply keys";
+//                         return this.returnMessage;
+//                     }
+//                 }
+//
+//                 let all_keys_in_Trans:string[] = items_in_Group;
+//                 let apply_obj_keys:string[] = []
+//                 for (let each_Apply_Obj of transformations["APPLY"]) {
+//                     for (let each_apply_obj_key of Object.keys(each_Apply_Obj)) {
+//                         let apply_obj_key:string = each_apply_obj_key;
+//                         all_keys_in_Trans.push(apply_obj_key);
+//                         apply_obj_keys.push(apply_obj_key);
+//                         for (let apply_key_in_column of this.columsLists_for_Apply) {
+//                             if (apply_key_in_column != apply_obj_key) {
+//                                 this.fail = true;
+//                                 this.returnMessage = "'"  + apply_key_in_column + "'" + " is not a valid key";
+//                                 return this.returnMessage;
+//                             }
+//                         }
+//
+//                     }
+//
+//                 }
+//                 // console.log(transformations["APPLY"]);
+//                 // console.log(transformations["GROUP"]);
+//                 // console.log(this.createGroup(sorted_list, items_in_Group));
+//
+//                 // let a:any[] = this.applyQuery(, transformations["APPLY"], items_in_Group);
+//
+//                 // if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
+//                 //     // console.log(all_keys_in_Trans);
+//                 //     // console.log(this.columsLists);
+//                 //     this.fail = true;
+//                 //     this.returnMessage = "All COLUMNS keys need to be either in GROUP or in APPLY";
+//                 //     return this.returnMessage;
+//                 // }
+//
+//
+//
+//
+//             }
+//             //
+//             // // console.log(list);
+//             // let group:any = transformations[0];
+//             // let apply:any = transformations[1];
+//         }
+//     }    //unused
+// }
+//                 let all_keys_in_Trans:string[] = items_in_Group;
+//                 let apply_obj_keys:string[] = []
+//                 for (let each_Apply_Obj of transformations["APPLY"]) {
+//                     for (let each_apply_obj_key of Object.keys(each_Apply_Obj)) {
+//                         let apply_obj_key:string = each_apply_obj_key;
+//                         all_keys_in_Trans.push(apply_obj_key);
+//                         apply_obj_keys.push(apply_obj_key);
+//                         for (let apply_key_in_column of this.columsLists_for_Apply) {
+//                             if (apply_key_in_column != apply_obj_key) {
+//                                 this.fail = true;
+//                                 this.returnMessage = "'"  + apply_key_in_column + "'" + " is not a valid key";
+//                                 return this.returnMessage;
+//                             }
+//                         }
+//
+//                     }
+//
+//                 }
+//                 // console.log(transformations["APPLY"]);
+//                 // console.log(transformations["GROUP"]);
+//                 // console.log(this.createGroup(sorted_list, items_in_Group));
+//
+//                 // let a:any[] = this.applyQuery(, transformations["APPLY"], items_in_Group);
+//
+//                 // if (!isContain_same_element(this.columsLists, all_keys_in_Trans)) {
+//                 //     // console.log(all_keys_in_Trans);
+//                 //     // console.log(this.columsLists);
+//                 //     this.fail = true;
+//                 //     this.returnMessage = "All COLUMNS keys need to be either in GROUP or in APPLY";
+//                 //     return this.returnMessage;
+//                 // }
+//
+//
+//
+//
+//             }
+//             //
+//             // // console.log(list);
+//             // let group:any = transformations[0];
+//             // let apply:any = transformations[1];
+//         }
+//     }    //unused
 }
 
 
-
-// function uniquefy_list(duplicates_contain_list:any, group_key:string) {
-//     var arr = {};
+// function max_operator(duplicates_contain_list:any, group_key:any) {
+//     let uniqueNames:any[] = [];
+//     // console.log(group_key);
 //
-//     for ( var i=0, len=duplicates_contain_list.length; i < len; i++ )
-//         arr[duplicates_contain_list[i][group_key]] = things.thing[i];
+//     let keys = duplicates_contain_list.map(function(obj:any) { return obj[group_key]; });
 //
-//     things.thing = new Array();
-//     for ( var key in arr )
-//         things.thing.push(arr[key]);
+//     keys = keys.filter(function(v:any, i:any) {
+//         if (keys.indexOf(v) == i) {
+//             uniqueNames.push(duplicates_contain_list[i][group_key]);
+//         }
+//     });
+//     return uniqueNames;
 // }
 
-function isContain_same_element(list1:string[], list2:string[]) {
-    console.log(list1.length);
-    // console.log(list2.length);
-    if (list1.length == list2.length) {
-        console.log(list2.length);
-        for(let each_list1 of list1) {
-            if (!list2.includes(each_list1)) {
-                return false;
-            }
-        }
-        for (let each_list2 of list2) {
-            if (!list1.includes(each_list2)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    else {
-        return false;
-    }
 
-}
+// function checkAdult(group_key:any, uniqueNames:any[], dup_list:any[]) {
+//     // let keys = dup_list.map(function(obj:any) { return obj[group_key]; });
+//     for (let name of uniqueNames) {
+//         if (name == )
+//     }
+// }
+//
+// function uniquefy_list(duplicates_contain_list:any, group_key:any) {
+//     let unique_lists:any[] = [];
+//     var flags:any = {};
+//     var index:number;
+//     for (index = 0; index < duplicates_contain_list.length; index++) {
+//         if (!flags[duplicates_contain_list[index][group_key]]) {
+//             flags[duplicates_contain_list[index][group_key]] = true;
+//             unique_lists.push(duplicates_contain_list[index]);
+//         }
+//     }
+//     return unique_lists;
+// }
+
+// function isContain_same_element(list1:string[], list2:string[]) {
+//     console.log(list1.length);
+//     // console.log(list2.length);
+//     if (list1.length == list2.length) {
+//         console.log(list2.length);
+//         for(let each_list1 of list1) {
+//             if (!list2.includes(each_list1)) {
+//                 return false;
+//             }
+//         }
+//         for (let each_list2 of list2) {
+//             if (!list1.includes(each_list2)) {
+//                 return false;
+//             }
+//         }
+//         return true;
+//     }
+//     else {
+//         return false;
+//     }
+// }
+
 
 function sort(dir:string, keys:string[], collected_data:any[]) {
 
     if (dir == "DOWN") {
+        console.log(keys);
         for (let key of keys) {
             let token_with_key = Doeverything.checkToken(key);
             // console.log("this is token_with_key = " + token_with_key);
@@ -700,7 +984,41 @@ function sort(dir:string, keys:string[], collected_data:any[]) {
                 }));
             }
         }
-        // console.log(newlist);
+        // console.log(collected_data);
+    }
+}
+
+function sort2(dir:string, keys:string[], collected_data:any[]) {
+
+    if (dir == "DOWN") {
+        for (let key of keys) {
+            let real_key = Doeverything.findKey(key);
+            if (Doeverything.OrderValueChecker(real_key)) {
+                collected_data.sort(Doeverything.sort_by(key, true, parseFloat));
+            }
+            else {
+                collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
+                    return a.toUpperCase()
+                }));
+            }
+        }
+
+
+    }
+    else if (dir == "UP") {
+        for (let key of keys) {
+            let real_key = Doeverything.findKey(key);
+            if (Doeverything.OrderValueChecker(real_key)) {
+                // console.log("this is key = " + key);
+                collected_data.sort(Doeverything.sort_by(key, false, parseFloat));
+            }
+            else {
+                collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
+                    return a.toUpperCase()
+                }));
+            }
+        }
+        // console.log(collected_data);
     }
 }
 
@@ -1290,10 +1608,10 @@ export default class InsightFacade implements IInsightFacade {
                 return;
             }
 
-            let response = Doeverything.createModifiedList(list, options);
-            if (!isNullOrUndefined(transformations)) {
-                let finalOutput = Doeverything.processTransformations(response, transformations);
-            }
+            let response = Doeverything.createModifiedList(list, options, transformations);
+            // if (!isNullOrUndefined(transformations)) {
+            //     let finalOutput = Doeverything.processTransformations(response, transformations);
+            // }
             if (Doeverything.fail) {
                 Doeverything.fail = false;
                 if (Doeverything.missingIds.length > 0) {
