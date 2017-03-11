@@ -660,12 +660,12 @@ class DoEveryThing {
         Log.info("Started APPLY query");
         let result:any[] = [];
         // traverse through each group of data
-        data.forEach(function(content: any){
+        for(let content of data){
             let jsonApply:any = {};
             for (let i = 0; i < apply.length; i++) {
                 let applykey = Object.keys(apply[i])[0];
                 let applytoken = Object.keys(apply[i][applykey])[0];
-                let key: string = apply[i][applykey][applytoken];
+                let key: string = this.findKey(apply[i][applykey][applytoken]);
 
                 let queryResult: any;
                 if (applytoken == "MAX")
@@ -729,14 +729,14 @@ class DoEveryThing {
             // put into a JSON object
             let jsonContent:any = {};
             for (let key of group) {
-                jsonContent[key] = content[0][key];
+                jsonContent[key] = content[0][this.findKey(key)];
             }
             Object.keys(jsonApply).forEach(function (key:any) {
                 jsonContent[key] = jsonApply[key];
             });
             // add to result array
             result.push(jsonContent);
-        });
+        }
 
         Log.info("Finished APPLY query");
         return result;

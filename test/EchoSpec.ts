@@ -4523,6 +4523,76 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     }); //added
+    it.only("produce all data of room", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    });
+    it.only("produce all data of courses", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_title",
+                        "maxAvg"
+                    ],
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["courses_title"],
+                    "APPLY": [
+                        {
+                            "maxAvg": {
+                                "MAX": "courses_avg"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    });
 
 
 
@@ -4584,19 +4654,5 @@ describe("EchoSpec", function () {
             expect(err.body).to.eql(response.body);
         })
     });
-    // it("PUT description", function () {
-    //     return chai.request(URL)
-    //         .put('/dataset/rooms')
-    //         .attach("body", fs.readFileSync("./310rooms.1.0.zip"), "310rooms.1.0.zip")
-    //         .then(function (res: any) {
-    //             Log.trace('then:');
-    //             // some assertions
-    //         })
-    //         .catch(function (err : any) {
-    //             Log.trace('catch:');
-    //             // some assertions
-    //             expect.fail();
-    //         });
-    // });
 })
 
