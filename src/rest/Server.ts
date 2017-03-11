@@ -62,6 +62,7 @@ export default class Server {
                 });
                 that.rest.use(restify.bodyParser({mapParams: true, mapFiles: true}));
 
+
                 that.rest.get('/', function (req: restify.Request, res: restify.Response, next: restify.Next) {
                     res.send(200);
                     return next();
@@ -70,6 +71,8 @@ export default class Server {
                 // provides the echo service
                 // curl -is  http://localhost:4321/echo/myMessage
                 that.rest.get('/echo/:msg', Server.echo);
+                that.rest.get('/square/:number', Server.square);
+                that.rest.get('/putDataset2/:id', Server.putDataset2);
 
                 // Other endpoints will go here
 
@@ -90,9 +93,20 @@ export default class Server {
         });
     }
 
+
+
     // The next two methods handle the echo service.
     // These are almost certainly not the best place to put these, but are here for your reference.
     // By updating the Server.echo function pointer above, these methods can be easily moved.
+
+    public static square(req: restify.Request, res: restify.Response, next: restify.Next) {
+        let number = req.params.number;
+        let squared_number = number * number;
+
+        let response_json = {"squared_number": squared_number};
+        res.json(200, response_json); // send respond to upstream
+	    return next();
+    }
 
     public static echo(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('Server::echo(..) - params: ' + JSON.stringify(req.params));
@@ -148,6 +162,46 @@ export default class Server {
         }
         return next();
     }
+
+    public static putDataset2(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
+        try {
+            var id: string = req.params.id;
+
+
+            // stream bytes from request into buffer and convert to base64
+            // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
+            let buffer: any = [];
+            req.on('data', function onRequestData(chunk: any) {
+                Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
+                buffer.push(chunk);
+            });
+
+
+            req.once('end', function () {
+                let concated = Buffer.concat(buffer);
+                let facade = this.insightFacade;
+                req.body = concated.toString('base64');
+                Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
+
+                return facade.addDataset(id, req.body).then(function (response: InsightResponse) {
+                    res.send(response.code);
+                    next();
+                }).catch(function (err: Error) {
+                    Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
+                    res.json(400, {error: 'invalid PUT'});
+                    next();
+                });
+            });
+
+        } catch (err) {
+            Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
+            res.send(400, {error: 'invalid PUT'});
+            return next();
+        }
+    }
+
+
 
     public static deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next){
         Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));

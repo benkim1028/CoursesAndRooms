@@ -4263,7 +4263,7 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("D3-4", function () {
+    it("D3-4", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4359,6 +4359,106 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     }); //added
+
+    it("D3-6", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {"EQ": {"rooms_lat": 49.26236}},
+                        {"GT": {"rooms_seats": 200}}
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "minLon",
+                        "rooms_lat",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["maxSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "rooms_name", "rooms_lat"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "minLon": {
+                                "MIN": "rooms_lon"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("D3-7", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {"EQ": {"rooms_lat": 49.26236}},
+                        {"GT": {"rooms_seats": 200}}
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "countRoom",
+                        "rooms_lat",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["maxSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "rooms_name", "rooms_lat"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "countRoom": {
+                                "COUNT": "rooms_name"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+
 
     it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
