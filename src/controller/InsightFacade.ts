@@ -460,9 +460,6 @@ class DoEveryThing {
                 applykeys_in_Trans.push(applykey_in_Trans[0]);
             }
 
-
-            // console.log(applykeys_in_Trans);
-
             // split elements in Columns into 2 parts, groupkeys and applykeys
             for (let i = 0; i < columnsValue.length; i++){
                 if (columnsValue[i].search("_") != -1)
@@ -612,7 +609,7 @@ class DoEveryThing {
         }
         return common_AO_lists;
     }
-
+    //
     find_Common_Group_Key(groupKey_lists:string[], groupKey_in_column:string[]) {
         let common_GroupKey_list:any[] = [];
         for (let i:number = 0; i < groupKey_lists.length; i++) {
@@ -665,11 +662,7 @@ class DoEveryThing {
         // traverse through each group of data
         data.forEach(function(content: any){
             let jsonApply:any = {};
-
-            // set the apply queries
             for (let i = 0; i < apply.length; i++) {
-                // console.log(apply[i])
-                // console.log(Object.keys(apply[i])[0]);
                 let applykey = Object.keys(apply[i])[0];
                 let applytoken = Object.keys(apply[i][applykey])[0];
                 let key: string = apply[i][applykey][applytoken];
@@ -756,19 +749,12 @@ function sort(dir:string, keys:string[], collected_data:any) {
     for (let key of keys) {
         for (let dataKey of dataKeys) {
             if (dataKey == key) {
-                // console.log(dataKey)
                 if (dir == "DOWN") {
-                    // console.log(dataKey)
                     if (typeof collected_data[0][key] == "number") {
-                        // console.log(dataKey)
-                        // console.log("this is key = " + key);
-
                         collected_data.sort(Doeverything.sort_by(key, true, parseFloat));
                     }
                     else {
-                        // console.log(dataKey)
                         collected_data.sort(Doeverything.sort_by(key, true, function (a: any) {
-                            // console.log("afdasfsf");
                             return a.toUpperCase()
                         }));
                     }
@@ -777,12 +763,10 @@ function sort(dir:string, keys:string[], collected_data:any) {
                 else if (dir == "UP") {
                     for (let key of keys) {
                         if (typeof collected_data[0][key] == "number") {
-                            console.log("this is key = " + key);
                             collected_data.sort(Doeverything.sort_by(key, false, parseFloat));
                         }
                         else {
                             collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
-
                                 return a.toUpperCase()
                             }));
                         }
@@ -1351,11 +1335,17 @@ export default class InsightFacade implements IInsightFacade {
             }
             /////////
             if(id in DataList){
-                list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList[id]);
+                if (isNullOrUndefined(filterKey))
+                    list = DataList[id];
+                else
+                    list = Doeverything.whatKindofFilter(filterKey, filterValue, DataList[id]);
             } else {
                 try {
                     let datalist = JSON.parse(fs.readFileSync(id+".json", 'utf8'));
-                    list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
+                    if (isNullOrUndefined(filterKey))
+                        list = datalist;
+                    else
+                        list = Doeverything.whatKindofFilter(filterKey, filterValue, datalist);
                 }catch(e){
                     reject({code: 424, body: {"missing":[id]}});
                 }

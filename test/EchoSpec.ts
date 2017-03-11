@@ -728,23 +728,23 @@ describe("EchoSpec", function () {
         expect(out.body).to.have.property('error');
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
-
-    it.only("PUT description", function () {
-        return chai.request("http://localhost:4321/")
-            .put('/dataset/rooms')
-            .attach("body", fs.readFileSync("courses.zip"), "courses.zip")
-            .then(function (res: InsightResponse) {
-                Log.trace('then:');
-                // some assertions
-                expect(res.code).to.be.equal(200);
-                console.log(res);
-            })
-            .catch(function (err:any) {
-                Log.trace('catch:');
-                // some assertions
-                expect.fail();
-            });
-    });
+    //
+    // it("PUT description", function () {
+    //     return chai.request("http://localhost:4321/")
+    //         .put('/dataset/rooms')
+    //         .attach("body", fs.readFileSync("courses.zip"), "courses.zip")
+    //         .then(function (res: InsightResponse) {
+    //             Log.trace('then:');
+    //             // some assertions
+    //             expect(res.code).to.be.equal(200);
+    //             console.log(res);
+    //         })
+    //         .catch(function (err:any) {
+    //             Log.trace('catch:');
+    //             // some assertions
+    //             expect.fail();
+    //         });
+    // });
     it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContentForCourses).then(function (value: any) {
             Log.test('Value ' + value);
@@ -1237,9 +1237,6 @@ describe("EchoSpec", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
-                    "IS": {
-                        "courses_dept": "aanb"
-                    }
                 },
                 "OPTIONS": {
                     "COLUMNS": [
@@ -4123,34 +4120,45 @@ describe("EchoSpec", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
-                    "AND": [{
-                        "IS": {
-                            "rooms_furniture": "*Tables*"
-                        }
-                    }, {
-                        "LT": {
-                            "rooms_seats": 50
-                        }
-                    }]
+                    "AND": [
+                        {"IS": {"rooms_furniture": "*Tables*"}},
+                        {"GT": {"rooms_seats": 300}}
+                    ]
                 },
                 "OPTIONS": {
                     "COLUMNS": [
+                        "rooms_name",
+                        "avgSeats",
                         "rooms_shortname",
-                        "maxSeats"
+                        "maxLat"
+
+
                     ],
-                    "ORDER": {
-                        "dir": "UP",
-                        "keys": ["maxSeats"]
-                    },
+                    "ORDER": "avgSeats",
                     "FORM": "TABLE"
                 },
                 "TRANSFORMATIONS": {
-                    "GROUP": ["rooms_shortname"],
-                    "APPLY": [{
-                        "maxSeats": {
-                            "MIN": "rooms_seats"
+                    "GROUP": [
+                        "rooms_shortname",
+                        "rooms_name"
+                    ],
+                    "APPLY": [
+                        {
+                            "maxLat": {
+                                "MAX": "rooms_lat"
+                            }
+                        },
+                        {
+                            "avgSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "avSeats": {
+                                "MAX": "rooms_seats"
+                            }
                         }
-                    }]
+                    ]
                 }
             }).then(value => {
             // expect.fail();
@@ -4472,30 +4480,25 @@ describe("EchoSpec", function () {
         })
     }); //added
 
-    it.only("D3-8", function () {
+    it("D3-8", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
-                    "AND": [
-                        {"LT": {"rooms_seats": 300}},
-                        {"GT": {"rooms_seats": 100}}
-                    ]
                 },
                 "OPTIONS": {
                     "COLUMNS": [
                         "rooms_shortname",
                         "countRoom",
-                        "rooms_lat",
                         "maxSeats"
                     ],
                     "ORDER": {
                         "dir": "DOWN",
-                            "keys": ["rooms_shortname", "maxSeats"]
+                            "keys": ["rooms_shortname"]
                     },
                     "FORM": "TABLE"
                 },
                 "TRANSFORMATIONS": {
-                    "GROUP": ["rooms_shortname", "rooms_lat"],
+                    "GROUP": ["rooms_shortname"],
                     "APPLY": [
                         {
                             "maxSeats": {
@@ -4596,3 +4599,4 @@ describe("EchoSpec", function () {
     //         });
     // });
 })
+
