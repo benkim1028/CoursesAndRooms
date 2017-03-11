@@ -489,10 +489,13 @@ class DoEveryThing {
                 }
             }
 
+            let valid_group_keys:string[] = this.find_Common_Group_Key(transformations["GROUP"], groupkeys);
+            // console.log(valid_group_keys);
+
             common_apply_objects = this.find_Common_Apply_Object(transformations["APPLY"], applykeys)
 
             let groupedList: any = this.createGroup(list, transformations["GROUP"]);
-            let appliedList: any = this.applyQuery(groupedList, common_apply_objects, groupkeys);
+            let appliedList: any = this.applyQuery(groupedList, common_apply_objects, valid_group_keys);
             newlist = appliedList;
         } else {
             for (let i = 0; i < list.length; i++) {
@@ -604,19 +607,27 @@ class DoEveryThing {
 
     find_Common_Apply_Object(apply_lists:any[], applyKey_in_column:string[]) {
         let common_AO_lists:any[] = [];
-        for (let i:number = 0; i < applyKey_in_column.length; i++) {
-            for (let apply_object of apply_lists) {
-                let keys = Object.keys(apply_object);
-                if (applyKey_in_column[i] == keys[0]) {
-                    common_AO_lists.push(apply_object);
-
-                    // let short_apply_key = Object.keys(apply_object[applyKey_in_column])[0]
+        for (let i:number = 0; i < apply_lists.length; i++) {
+            let keys = Object.keys(apply_lists[i]);
+            for (let applyKey of applyKey_in_column) {
+                if (keys[0] == applyKey) {
+                    common_AO_lists.push(apply_lists[i])
                 }
             }
         }
-        console.log(common_AO_lists);
         return common_AO_lists;
+    }
 
+    find_Common_Group_Key(groupKey_lists:string[], groupKey_in_column:string[]) {
+        let common_GroupKey_list:any[] = [];
+        for (let i:number = 0; i < groupKey_lists.length; i++) {
+            for (let key of groupKey_in_column) {
+                if(groupKey_lists[i] == key) {
+                    common_GroupKey_list.push(groupKey_lists[i]);
+                }
+            }
+        }
+        return common_GroupKey_list
     }
 
 

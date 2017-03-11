@@ -4205,6 +4205,161 @@ describe("EchoSpec", function () {
         })
     }); //added
 
+    it("D3-3", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {
+                            "IS": {
+                                "rooms_furniture": "*Tables*"
+                            }
+                        },
+                        {
+                            "GT": {
+                                "rooms_seats": 300
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+
+                        "rooms_name",
+                        "avgSeats"
+
+
+                    ],
+                    "ORDER": "avgSeats",
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": [
+                        "rooms_shortname",
+                        "rooms_name"
+                    ],
+                    "APPLY": [
+                        {
+                            "roomsname": {
+                                "AVG": "rooms_seats"
+                            }
+                        },
+                        {
+                            "avgSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it.only("D3-4", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {"IS": {"rooms_furniture": "*Tables*"}},
+                        {"GT": {"rooms_seats": 200}}
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_name",
+                        "avgSeats",
+                        "rooms_shortname",
+                        "maxLat"
+
+
+                    ],
+                    "ORDER": "avgSeats",
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": [
+                        "rooms_shortname",
+                        "rooms_name"
+                    ],
+                    "APPLY": [
+                        {
+                            "maxLat": {
+                                "MAX": "rooms_lat"
+                            }
+                        },
+                        {
+                            "avgSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "avSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it("D3-5", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {"EQ": {"rooms_lat": 49.26236}},
+                        {"GT": {"rooms_seats": 300}}
+                        ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "rooms_lat",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["maxSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "rooms_name", "rooms_lat"],
+                    "APPLY": [{
+                        "maxSeats": {
+                            "MAX": "rooms_seats"
+                        }
+                    }]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
     it("removeDataset with existing file", function () {
         return insightFacade.removeDataset('courses').then(value => {
             Log.test('Value ' + value);
