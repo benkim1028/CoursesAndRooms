@@ -480,8 +480,6 @@ class DoEveryThing {
             }
             //check if all the keys without _ belong to APPLY if not throw error
             for (let x = 0; x < applykeys.length; x ++) {
-                // console.log(applykeys[x]);
-                // console.log(transformations["APPLY"]);
                 if (!applykeys_in_Trans.includes(applykeys[x])){
                     this.fail = true;
                     this.returnMessage = "2Each Column value has to be in Group"
@@ -523,10 +521,9 @@ class DoEveryThing {
                 if (typeof orderValue === 'object') {
                     let dir:string = orderValue["dir"];
                     let keys:string[] = orderValue["keys"];
-                    if (dir == "DOWN")
-                        newlist.sort(Doeverything.sort_by(keys, true, parseFloat));
-                    if (dir == "UP")
-                        newlist.sort(Doeverything.sort_by(keys, false, parseFloat));
+                    console.log(keys);
+
+                    sort(dir, keys, newlist);
                 }
 
                 if (typeof orderValue === 'string') {
@@ -538,8 +535,6 @@ class DoEveryThing {
                     if (this.OrderValueChecker(this.findKey_in_Apply(apply, orderValue))) {
                         newlist.sort(this.sort_by(orderValue, false, parseFloat));
                     } else {
-                        // console.log(this.findKey_in_Apply(apply, orderValue));
-                        // console.log(orderValue);
                         newlist.sort(this.sort_by(orderValue, false, function (a: any) {
                             return a.toUpperCase()
                         }));
@@ -752,6 +747,49 @@ class DoEveryThing {
 
         Log.info("Finished APPLY query");
         return result;
+    }
+
+}
+
+function sort(dir:string, keys:string[], collected_data:any) {
+    let dataKeys:string[] = Object.keys(collected_data[0]);
+    for (let key of keys) {
+        for (let dataKey of dataKeys) {
+            if (dataKey == key) {
+                // console.log(dataKey)
+                if (dir == "DOWN") {
+                    // console.log(dataKey)
+                    if (typeof collected_data[0][key] == "number") {
+                        // console.log(dataKey)
+                        // console.log("this is key = " + key);
+
+                        collected_data.sort(Doeverything.sort_by(key, true, parseFloat));
+                    }
+                    else {
+                        // console.log(dataKey)
+                        collected_data.sort(Doeverything.sort_by(key, true, function (a: any) {
+                            // console.log("afdasfsf");
+                            return a.toUpperCase()
+                        }));
+                    }
+                }
+
+                else if (dir == "UP") {
+                    for (let key of keys) {
+                        if (typeof collected_data[0][key] == "number") {
+                            console.log("this is key = " + key);
+                            collected_data.sort(Doeverything.sort_by(key, false, parseFloat));
+                        }
+                        else {
+                            collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
+
+                                return a.toUpperCase()
+                            }));
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -84,7 +84,7 @@ export interface IInsightFacade {
      * Return codes:
      *
      * 200: the query was successfully answered. The result should be sent in JSON according in the response body.
-     * 400: the query failed; body should contain {"error": "my text"} providing extra detail.
+     * 400: the query failed; body should contai    n {"error": "my text"} providing extra detail.
      * 424: the query failed because it depends on a resource that has not been PUT. The body should contain {"missing": ["id1", "id2"...]}.
      *
      */

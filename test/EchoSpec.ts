@@ -729,17 +729,22 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("Should be able to handle a null echo message sensibly", function () {
-        let out = Server.performEcho(null); // return type : InsightResponse
-        Log.test(JSON.stringify(out));
-        console.log(out);
-        console.log(JSON.stringify(out));
-        sanityCheck(out);
-        expect(out.code).to.equal(400);
-        expect(out.body).to.have.property('error');
-        expect(out.body).to.deep.equal({error: 'Message not provided'});
+    it.only("PUT description", function () {
+        return chai.request("http://localhost:4321/")
+            .put('/dataset/rooms')
+            .attach("body", fs.readFileSync("courses.zip"), "courses.zip")
+            .then(function (res: InsightResponse) {
+                Log.trace('then:');
+                // some assertions
+                expect(res.code).to.be.equal(200);
+                console.log(res);
+            })
+            .catch(function (err:any) {
+                Log.trace('catch:');
+                // some assertions
+                expect.fail();
+            });
     });
-
     it("Create a new dataset with unique id ", function () {
         return insightFacade.addDataset("courses", zipContentForCourses).then(function (value: any) {
             Log.test('Value ' + value);
@@ -749,6 +754,15 @@ describe("EchoSpec", function () {
             };
             expect(value.code).to.equal(response.code);
         })
+    });
+
+    it("Should be able to ", function () {
+        let out = Server.performEcho(null);
+        Log.test(JSON.stringify(out));
+        sanityCheck(out);
+        expect(out.code).to.equal(400);
+        expect(out.body).to.have.property('error');
+        expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
     it("Create a new dataset with non-unique id", function () {
@@ -4414,8 +4428,8 @@ describe("EchoSpec", function () {
             {
                 "WHERE": {
                     "AND": [
-                        {"EQ": {"rooms_lat": 49.26236}},
-                        {"GT": {"rooms_seats": 200}}
+                        {"LT": {"rooms_seats": 300}},
+                        {"GT": {"rooms_seats": 100}}
                     ]
                 },
                 "OPTIONS": {
@@ -4427,12 +4441,61 @@ describe("EchoSpec", function () {
                     ],
                     "ORDER": {
                         "dir": "DOWN",
-                        "keys": ["maxSeats"]
+                        "keys": ["rooms_shortname", "maxSeats"]
                     },
                     "FORM": "TABLE"
                 },
                 "TRANSFORMATIONS": {
-                    "GROUP": ["rooms_shortname", "rooms_name", "rooms_lat"],
+                    "GROUP": ["rooms_shortname", "rooms_lat"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "countRoom": {
+                                "COUNT": "rooms_name"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    }); //added
+
+    it.only("D3-8", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                    "AND": [
+                        {"LT": {"rooms_seats": 300}},
+                        {"GT": {"rooms_seats": 100}}
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "countRoom",
+                        "rooms_lat",
+                        "maxSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                            "keys": ["rooms_shortname", "maxSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "rooms_lat"],
                     "APPLY": [
                         {
                             "maxSeats": {
