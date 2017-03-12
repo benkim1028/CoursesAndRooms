@@ -470,6 +470,11 @@ class DoEveryThing {
             let applykeys_in_Trans:any[] = [];
             let common_apply_objects:any[] = [];
             for (let k = 0; k < transformations["APPLY"].length; k++) {
+                if (Object.keys(transformations["APPLY"][k])[0].search("_") != -1){
+                    this.fail = true;
+                    this.returnMessage = "APPLY key cannot have _ ";
+                    return this.returnMessage;
+                }
                 let applykey_in_Trans = Object.keys(transformations["APPLY"][k]);
                 applykeys_in_Trans.push(applykey_in_Trans[0]);
             }
@@ -542,7 +547,7 @@ class DoEveryThing {
                             return this.returnMessage;
                         }
                     }
-                    this.sort(dir, keys, newlist);
+                    newlist = this.sort(dir, keys, newlist);
                 }
 
                 if (typeof orderValue === 'string') {
@@ -552,12 +557,12 @@ class DoEveryThing {
                         this.returnMessage = "Order is not in Columns";
                         return this.returnMessage;
                     }
-                    if (this.OrderValueChecker(this.findKey_in_Apply(apply, orderValue))) {
-                        this.sort_by(orderValue, false, parseFloat);
+                    if (this.OrderValueChecker(orderValue)) {
+                        newlist.sort(this.sort_by(orderValue, false, parseFloat));
                     } else {
-                        this.sort_by(orderValue, false, function (a: any) {
+                        newlist.sort(this.sort_by(orderValue, false, function (a: any) {
                             return a.toUpperCase()
-                        });
+                        }));
                     }
                 }
 
@@ -581,7 +586,7 @@ class DoEveryThing {
                             return this.returnMessage;
                         }
                     }
-                    this.sort(dir, keys, newlist);
+                    newlist = this.sort(dir, keys, newlist);
                 }
                 //if ORDER is NOT OBJECT, do normal sorting
                 if (typeof orderValue === 'string') {
@@ -592,11 +597,11 @@ class DoEveryThing {
                         return this.returnMessage;
                     }
                     if (this.OrderValueChecker(orderValue)) {
-                        this.sort_by(orderValue, false, parseFloat);
+                        newlist.sort(this.sort_by(orderValue, false, parseFloat));
                     } else {
-                        this.sort_by(orderValue, false, function (a: any) {
+                        newlist.sort(this.sort_by(orderValue, false, function (a: any) {
                             return a.toUpperCase()
-                        });
+                        }));
                     }
                 }
             }
@@ -798,36 +803,53 @@ class DoEveryThing {
         Log.info("Finished APPLY query");
         return result;
     }
-    sort(dir:string, keys:string[], collected_data:any) {
+    sort(dir:string, keys:string[], collected_data:any){
         let dataKeys:string[] = Object.keys(collected_data[0]);
-        for (let key of keys) {
-            for (let dataKey of dataKeys) {
-                if (dataKey == key) {
-                    if (dir == "DOWN") {
-                        if (typeof collected_data[0][key] == "number") {
-                            collected_data.sort(this.sort_by(key, true, parseFloat));
-                        }
-                        else {
-                            collected_data.sort(this.sort_by(key, true, function (a: any) {
-                                return a.toUpperCase()
-                            }));
-                        }
-                    }
+        console.log(dataKeys);
+        for (let i:number = keys.length - 1; i >= 0; i--) {
+            return this.mergeSort(collected_data, keys[i],dir);
+        }
+    }
+    mergeSort(data:any, key:string, dir:string):any[] {
+        if (data.length < 2) {
+            return data;
+        }
 
-                    else if (dir == "UP") {
-                        for (let key of keys) {
-                            if (typeof collected_data[0][key] == "number") {
-                                collected_data.sort(this.sort_by(key, false, parseFloat));
-                            }
-                            else {
-                                collected_data.sort(this.sort_by(key, false, function (a: any) {
-                                    return a.toUpperCase()
-                                }));
-                            }
-                        }
-                    }
+        let middle = Math.floor(data.length/2);
+        let left = data.slice(0,middle);
+        let right = data.slice(middle);
+
+        return this.merge(this.mergeSort(left, key, dir), this.mergeSort(right, key, dir), key, dir);
+    }
+    merge(left:any, right:any, key:string, dir:string):any[] {
+        let result:any[] = [];
+        let il =0;
+        let ir = 0;
+
+        while (il < left.length && ir < right.length) {
+            if (dir == "UP") {
+                if (left[il][key] <= right[ir][key]) {
+                    result.push(left[il]);
+                    il++;
+                } else {
+                    result.push(right[ir]);
+                    ir++;
+                }
+            } else if (dir == "DOWN") {
+                if (left[il][key] <= right[ir][key]) {
+                    result.push(right[ir]);
+                    ir++;
+                } else {
+                    result.push(left[il]);
+                    il++;
                 }
             }
+        }
+
+        if (dir == "UP") {
+            return result.concat(left.slice(il)).concat(right.slice(ir));
+        } else {
+            return result.concat(right.slice(ir)).concat(left.slice(il));
         }
     }
 }

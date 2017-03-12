@@ -4533,7 +4533,7 @@ describe("EchoSpec", function () {
 
 
 
-    it("produce all data of room when grouped by rooms_shortname", function () {
+    it.only("produce all data of room when grouped by rooms_shortname", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4570,28 +4570,17 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
-    it("D1/D2 style sorting should be supported (number)", function () {
+    it.only("D1/D2 style sorting should be supported (number)", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
                 },
                 "OPTIONS": {
                     "COLUMNS": [
-                        "rooms_shortname",
-                        "maxSeats"
+                        "rooms_shortname"
                     ],
-                    "ORDER": "maxSeats",
+                    "ORDER": "rooms_shortname",
                     "FORM": "TABLE"
-                },
-                "TRANSFORMATIONS": {
-                    "GROUP": ["rooms_shortname"],
-                    "APPLY": [
-                        {
-                            "maxSeats": {
-                                "MAX": "rooms_seats"
-                            }
-                        }
-                    ]
                 }
             }).then(value => {
             // expect.fail();
@@ -4604,7 +4593,7 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
-    it("D1/D2 style sorting should be supported (string)", function () {
+    it.only("D1/D2 style sorting should be supported (string)", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4638,7 +4627,7 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
-    it("produce all data of room", function () {
+    it.only("produce all data of room", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4664,7 +4653,7 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
-    it("apply keys are multiple", function () {
+    it.only("apply keys are multiple", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4677,7 +4666,7 @@ describe("EchoSpec", function () {
                     ],
                     "ORDER": {
                         "dir": "DOWN",
-                        "keys": ["maxSeats", "minSeats"]
+                        "keys": ["rooms_shortname", "maxSeats", "minSeats"]
                     },
                     "FORM": "TABLE"
                 },
@@ -4707,7 +4696,7 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
-    it("Empty apply should be valid", function () {
+    it.only("Empty apply should be valid", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4737,7 +4726,7 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid - dir is missing", function () {
+    it.only("fail if order is not valid - dir is missing", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4762,7 +4751,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid (transformation exists) - dir is missing", function () {
+    it.only("fail if order is not valid (transformation exists) - dir is missing", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4797,7 +4786,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid - keys is missing", function () {
+    it.only("fail if order is not valid - keys is missing", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4820,7 +4809,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid (transformation exists) - keys is missing", function () {
+    it.only("fail if order is not valid (transformation exists) - keys is missing", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4853,7 +4842,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid - keys is empty list", function () {
+    it.only("fail if order is not valid - keys is empty list", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4879,7 +4868,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid (transformation exists) - keys is empty list", function () {
+    it.only("fail if order is not valid (transformation exists) - keys is empty list", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4915,7 +4904,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid - order key should be included in columns", function () {
+    it.only("fail if order is not valid - order key should be included in columns", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4941,7 +4930,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if order is not valid (transformation exists) - order key should be included in columns", function () {
+    it.only("fail if order is not valid (transformation exists) - order key should be included in columns", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4977,7 +4966,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("invalid key in columns", function () {
+    it.only("invalid key in columns", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -5013,7 +5002,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if transformation is not valid - apply is missing", function () {
+    it.only("fail if transformation is not valid - apply is missing", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -5043,7 +5032,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if transformation is not valid - group is missing", function () {
+    it.only("fail if transformation is not valid - group is missing", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -5079,7 +5068,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
-    it("fail if transformation is not valid - group is empty list", function () {
+    it.only("fail if transformation is not valid - group is empty list", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -5100,6 +5089,43 @@ describe("EchoSpec", function () {
                     "APPLY": [
                         {
                             "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+    it.only("justtesting", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "max_Seats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "max_Seats"],
+                    "APPLY": [
+                        {
+                            "max_Seats": {
                                 "MAX": "rooms_seats"
                             }
                         }
