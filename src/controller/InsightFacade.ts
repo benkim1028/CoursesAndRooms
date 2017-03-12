@@ -157,11 +157,13 @@ class DoEveryThing {
         if(this.id == "courses"){
             if (orderValue.search("_") != -1) {
                 return orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit" || orderValue == "courses_year";
-            } else return true;
+            }else
+                return true;
         } if (this.id == "rooms"){
             if (orderValue.search("_") != -1) {
                 return orderValue == "rooms_lat" || orderValue == "rooms_lon" || orderValue == "rooms_seats";
-            } else return true;
+            }else
+                return true;
         }
     }
 
@@ -478,6 +480,11 @@ class DoEveryThing {
                 let applykey_in_Trans = Object.keys(transformations["APPLY"][k]);
                 applykeys_in_Trans.push(applykey_in_Trans[0]);
             }
+            if(this.hasDuplicates(applykeys_in_Trans)){
+                this.fail = true;
+                this.returnMessage = "Duplicates in Apply keys"
+                return this.returnMessage;
+            }
 
             // split elements in Columns into 2 parts, groupkeys and applykeys
             for (let i = 0; i < columnsValue.length; i++){
@@ -560,8 +567,7 @@ class DoEveryThing {
                     if (this.OrderValueChecker(orderValue)) {
                         newlist.sort(this.sort_by(orderValue, false, parseFloat));
                     } else {
-                        newlist.sort(this.sort_by(orderValue, false, function (a: any) {
-                            return a.toUpperCase()
+                        newlist.sort(this.sort_by(orderValue, false, function (a: any) {return a.toUpperCase()
                         }));
                     }
                 }
@@ -628,40 +634,51 @@ class DoEveryThing {
             return a = key(a), b = key(b), reverse * (<any>(a > b) - <any>(b > a));
         }
     }
-    fieldSorter(fields: any) {
-        return function (a: any, b: any) {
-            return fields
-                .map(function (o: any) {
-                    var dir = 1;
-                    if (o[0] === '-') {
-                        dir = -1;
-                        o = o.substring(1);
-                    }
-                    if (a[o] > b[o]) return dir;
-                    if (a[o] < b[o]) return -(dir);
-                    return 0;
-                })
-                .reduce(function firstNonZeroValue(p: any, n: any) {
-                    return p ? p : n;
-                }, 0);
-        };
-    }
-    findKey_in_Apply(apply_lists:any[], orderValue:string) {
-        // console.log(apply_lists);
-        if (orderValue.search("_") != -1) {
-            return orderValue;
+    hasDuplicates(array: any) {
+    var valuesSoFar = Object.create(null);
+    for (var i = 0; i < array.length; ++i) {
+        var value = array[i];
+        if (value in valuesSoFar) {
+            return true;
         }
-        else {
-            for (let apply_object of apply_lists) {
-                let keys = Object.keys(apply_object);
-                // console.log(apply_object);
-                if (orderValue == keys[0]) {
-                    let short_apply_key = Object.keys(apply_object[orderValue])[0]
-                    return apply_object[orderValue][short_apply_key];
-                }
-            }
-        }
+        valuesSoFar[value] = true;
     }
+    return false;
+}
+    // fieldSorter(fields: any) {
+    //     return function (a: any, b: any) {
+    //         return fields
+    //             .map(function (o: any) {
+    //                 var dir = 1;
+    //                 if (o[0] === '-') {
+    //                     dir = -1;
+    //                     o = o.substring(1);
+    //                 }
+    //                 if (a[o] > b[o]) return dir;
+    //                 if (a[o] < b[o]) return -(dir);
+    //                 return 0;
+    //             })
+    //             .reduce(function firstNonZeroValue(p: any, n: any) {
+    //                 return p ? p : n;
+    //             }, 0);
+    //     };
+    // }
+    // findKey_in_Apply(apply_lists:any[], orderValue:string) {
+    //     // console.log(apply_lists);
+    //     if (orderValue.search("_") != -1) {
+    //         return orderValue;
+    //     }
+    //     else {
+    //         for (let apply_object of apply_lists) {
+    //             let keys = Object.keys(apply_object);
+    //             // console.log(apply_object);
+    //             if (orderValue == keys[0]) {
+    //                 let short_apply_key = Object.keys(apply_object[orderValue])[0]
+    //                 return apply_object[orderValue][short_apply_key];
+    //             }
+    //         }
+    //     }
+    // }
     find_Common_Apply_Object(apply_lists:any[], applyKey_in_column:string[]) {
         let common_AO_lists:any[] = [];
         for (let i:number = 0; i < apply_lists.length; i++) {
@@ -732,6 +749,11 @@ class DoEveryThing {
                 let queryResult: any;
                 if (applytoken == "MAX")
                 {
+                    if(!this.OrderValueChecker(key)){
+                        this.fail = true;
+                        this.returnMessage = "MAX received non number"
+                        return this.returnMessage;
+                    }
                     let max = content[0][key];
                     for (let obj of content) {
                         if (obj[key] > max) {
@@ -742,6 +764,11 @@ class DoEveryThing {
                 }
                 else if (applytoken == "MIN")
                 {
+                    if(!this.OrderValueChecker(key)){
+                        this.fail = true;
+                        this.returnMessage = "MIN received non number"
+                        return this.returnMessage;
+                    }
                     let min = content[0][key];
                     for (let obj of content) {
                         if (obj[key] < min) {
@@ -752,6 +779,11 @@ class DoEveryThing {
                 }
                 else if (applytoken == "AVG")
                 {
+                    if(!this.OrderValueChecker(key)){
+                        this.fail = true;
+                        this.returnMessage = "AVG received non number"
+                        return this.returnMessage;
+                    }
                     let sum = 0;
                     let temp = 0;
                     for (let obj of content) {
@@ -764,6 +796,11 @@ class DoEveryThing {
                 }
                 else if (applytoken == "SUM")
                 {
+                    if(!this.OrderValueChecker(key)){
+                        this.fail = true;
+                        this.returnMessage = "SUM received non number"
+                        return this.returnMessage;
+                    }
                     let sum = 0;
                     for (let obj of content){
                         sum+=obj[key]
@@ -805,7 +842,7 @@ class DoEveryThing {
     }
     sort(dir:string, keys:string[], collected_data:any){
         let dataKeys:string[] = Object.keys(collected_data[0]);
-        console.log(dataKeys);
+        //console.log(dataKeys);
         for (let i:number = keys.length - 1; i >= 0; i--) {
             return this.mergeSort(collected_data, keys[i],dir);
         }
@@ -1473,7 +1510,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            console.log(response);
+            //console.log(response);
             fulfill({code: 200, body: response});
         })
     }

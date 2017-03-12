@@ -73,8 +73,17 @@ export default class Server {
                 // curl -is  http://localhost:4321/echo/myMessage
                 that.rest.get('/echo/:msg', Server.echo);
                 that.rest.get('/square/:number', Server.square);
-                that.rest.get('/putDataset/:id', Server.putDataset);
-                that.rest.get('/postQuery/:query', Server.postQuery);
+                // Sends a dataset. Is idempotent and can create or update a dataset id.
+                // curl localhost:4321/dataset/test --upload-file FNAME.zip
+                that.rest.put('/dataset/:id', Server.putDataset);
+
+                // Deletes a dataset.
+                that.rest.del('/dataset/:id', Server.deleteDataset);
+
+                // Receives queries. Although these queries never change the server (and thus could be GETs)
+                // they are formed by sending JSON bodies, which is not standard for normal GET requests.
+                // curl -is -X POST -d '{ "key": "value" }' http://localhost:4321/query
+                that.rest.post('/query', restify.bodyParser(), Server.postQuery);
 
                 // Other endpoints will go here
 
@@ -95,20 +104,20 @@ export default class Server {
         });
     }
 
-
-
-    // The next two methods handle the echo service.
-    // These are almost certainly not the best place to put these, but are here for your reference.
-    // By updating the Server.echo function pointer above, these methods can be easily moved.
-
     public static square(req: restify.Request, res: restify.Response, next: restify.Next) {
         let number = req.params.number;
         let squared_number = number * number;
 
         let response_json = {"squared_number": squared_number};
         res.json(200, response_json); // send respond to upstream
-	    return next();
+        return next();
     }
+
+
+    // The next two methods handle the echo service.
+    // These are almost certainly not the best place to put these, but are here for your reference.
+    // By updating the Server.echo function pointer above, these methods can be easily moved.
+
 
     public static echo(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('Server::echo(..) - params: ' + JSON.stringify(req.params));
@@ -134,28 +143,33 @@ export default class Server {
 
         Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
         try {
-            var id: string = req.params.id;
             let facade = this.insightFacade;
 
             // stream bytes from request into buffer and convert to base64
             // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
-            let buffer: any = [];
-            req.on('data', function onRequestData(chunk: any) {
-                Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
-                buffer.push(chunk);
+            let dataStr = new Buffer(req.params.body).toString('base64');
+            facade.addDataset(req.params.id, dataStr).then(function (result) {
+                res.json(result.code, result.body);
+            }).catch(function (error) {
+                res.json(error.code, error.body);
             });
-
-            req.once('end', function () {
-                let concated = Buffer.concat(buffer);
-                req.body = concated.toString('base64');     // changed from base64 to req.body
-                Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
-
-                facade.addDataset(id, req.body).then(function (result) {
-                    res.json(result.code, result.body);
-                }).catch(function (error) {
-                    res.json(error.code, error.body);
-                });
-            });
+            // let buffer: any = [];
+            // req.on('data', function onRequestData(chunk: any) {
+            //     Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
+            //     buffer.push(chunk);
+            // });
+            //
+            // req.once('end', function () {
+            //     let concated = Buffer.concat(buffer);
+            //     req.body = concated.toString('base64');     // changed from base64 to req.body
+            //     Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
+            //
+            //     facade.addDataset(id, req.body).then(function (result) {
+            //         res.json(result.code, result.body);
+            //     }).catch(function (error) {
+            //         res.json(error.code, error.body);
+            //     });
+            // });
 
         } catch (err) {
             Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
