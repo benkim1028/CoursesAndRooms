@@ -75,8 +75,8 @@ export default class Server {
                 that.rest.get('/square/:number', Server.square);
                 // Sends a dataset. Is idempotent and can create or update a dataset id.
                 // curl localhost:4321/dataset/test --upload-file FNAME.zip
-                that.rest.put('/dataset/:id', Server.putDataset);
-
+                // that.rest.put('/dataset/:id', Server.putDataset);
+                //
                 // Deletes a dataset.
                 that.rest.del('/dataset/:id', Server.deleteDataset);
 
@@ -139,44 +139,44 @@ export default class Server {
             return {code: 400, body: {error: 'Message not provided'}};
         }
     }
-    public static  putDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
-
-        Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
-        try {
-            let facade = this.insightFacade;
-
-            // stream bytes from request into buffer and convert to base64
-            // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
-            let dataStr = new Buffer(req.params.body).toString('base64');
-            facade.addDataset(req.params.id, dataStr).then(function (result) {
-                res.json(result.code, result.body);
-            }).catch(function (error) {
-                res.json(error.code, error.body);
-            });
-            // let buffer: any = [];
-            // req.on('data', function onRequestData(chunk: any) {
-            //     Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
-            //     buffer.push(chunk);
-            // });
-            //
-            // req.once('end', function () {
-            //     let concated = Buffer.concat(buffer);
-            //     req.body = concated.toString('base64');     // changed from base64 to req.body
-            //     Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
-            //
-            //     facade.addDataset(id, req.body).then(function (result) {
-            //         res.json(result.code, result.body);
-            //     }).catch(function (error) {
-            //         res.json(error.code, error.body);
-            //     });
-            // });
-
-        } catch (err) {
-            Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-            res.send(400, {error: err.message});
-        }
-        return next();
-    }
+    // public static  putDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
+    //
+    //     Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
+    //     try {
+    //         let facade = this.insightFacade;
+    //
+    //         // stream bytes from request into buffer and convert to base64
+    //         // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
+    //         let dataStr = new Buffer(req.params.body).toString('base64');
+    //         facade.addDataset(req.params.id, dataStr).then(function (result) {
+    //             res.json(result.code, result.body);
+    //         }).catch(function (error) {
+    //             res.json(error.code, error.body);
+    //         });
+    //         // let buffer: any = [];
+    //         // req.on('data', function onRequestData(chunk: any) {
+    //         //     Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
+    //         //     buffer.push(chunk);
+    //         // });
+    //         //
+    //         // req.once('end', function () {
+    //         //     let concated = Buffer.concat(buffer);
+    //         //     req.body = concated.toString('base64');     // changed from base64 to req.body
+    //         //     Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
+    //         //
+    //         //     facade.addDataset(id, req.body).then(function (result) {
+    //         //         res.json(result.code, result.body);
+    //         //     }).catch(function (error) {
+    //         //         res.json(error.code, error.body);
+    //         //     });
+    //         // });
+    //
+    //     } catch (err) {
+    //         Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
+    //         res.send(400, {error: err.message});
+    //     }
+    //     return next();
+    // }
 
 
 
