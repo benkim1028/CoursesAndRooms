@@ -29,6 +29,7 @@ class DoEveryThing {
         this.columsLists_for_Apply = [];
 
     }
+
     identifyID(){
         if (this.id == "courses"){
             return "id";
@@ -154,9 +155,13 @@ class DoEveryThing {
 
     OrderValueChecker(orderValue: any){
         if(this.id == "courses"){
-            return orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit" || orderValue == "courses_year";
+            if (orderValue.search("_") != -1) {
+                return orderValue == "courses_avg" || orderValue == "courses_pass" || orderValue == "courses_fail" || orderValue == "courses_audit" || orderValue == "courses_year";
+            } else return true;
         } if (this.id == "rooms"){
-            return orderValue == "rooms_lat" || orderValue =="rooms_lon" || orderValue == "rooms_seats";
+            if (orderValue.search("_") != -1) {
+                return orderValue == "rooms_lat" || orderValue == "rooms_lon" || orderValue == "rooms_seats";
+            } else return true;
         }
     }
 
@@ -449,8 +454,17 @@ class DoEveryThing {
             this.returnMessage = "Columns' length is 0"
             return this.returnMessage;
         }  // fail
-
         if (!isNullOrUndefined(transformations)) {
+            //fail if transformation is not valid
+            if (isNullOrUndefined(transformations["APPLY"]) || isNullOrUndefined(transformations["GROUP"])){
+                this.fail = true;
+                this.returnMessage = "transformations is not valid";
+                return this.returnMessage;
+            }else if(transformations["GROUP"].length == 0){
+                this.fail = true;
+                this.returnMessage = "GROUP is empty list";
+                return this.returnMessage;
+            }
             let groupkeys: any[] = [];
             let applykeys: any[] = [];
             let applykeys_in_Trans:any[] = [];
@@ -476,19 +490,17 @@ class DoEveryThing {
                 }
             }
             //check if all the keys without _ belong to APPLY if not throw error
-            for (let x = 0; x < applykeys.length; x ++) {
-                if (!applykeys_in_Trans.includes(applykeys[x])){
-                    this.fail = true;
-                    this.returnMessage = "2Each Column value has to be in Group"
-                    return this.returnMessage;
+            if (applykeys_in_Trans.length != 0 && applykeys.length != 0) {
+                for (let x = 0; x < applykeys.length; x++) {
+                    if (!applykeys_in_Trans.includes(applykeys[x])) {
+                        this.fail = true;
+                        this.returnMessage = "2Each Column value has to be in Group"
+                        return this.returnMessage;
+                    }
                 }
             }
-
             let valid_group_keys:string[] = this.find_Common_Group_Key(transformations["GROUP"], groupkeys);
-            // console.log(valid_group_keys);
-
             common_apply_objects = this.find_Common_Apply_Object(transformations["APPLY"], applykeys)
-
             let groupedList: any = this.createGroup(list, transformations["GROUP"]);
             let appliedList: any = this.applyQuery(groupedList, common_apply_objects, valid_group_keys);
             newlist = appliedList;
@@ -508,7 +520,6 @@ class DoEveryThing {
                 newlist.push(element);
             }
         }
-
         if (optionsKey.length == 3) {
             let order = Object.keys(options)[1];
             let orderValue = options[order];
@@ -518,41 +529,74 @@ class DoEveryThing {
                 if (typeof orderValue === 'object') {
                     let dir:string = orderValue["dir"];
                     let keys:string[] = orderValue["keys"];
-                    console.log(keys);
-
-                    sort(dir, keys, newlist);
+                    // fail if order is not valid
+                    if (isNullOrUndefined(dir) || isNullOrUndefined(keys) || keys.length == 0){
+                        this.fail = true;
+                        this.returnMessage = "Order(OBJECT) is not Valid";
+                        return this.returnMessage;
+                    }
+                    else for(let key of keys){
+                        if (!columnsValue.includes(key)){
+                            this.fail = true;
+                            this.returnMessage = "Order(OBJECT) is not Valid - key is not included in column";
+                            return this.returnMessage;
+                        }
+                    }
+                    this.sort(dir, keys, newlist);
                 }
 
                 if (typeof orderValue === 'string') {
+                    //fail if order is not valid
                     if (!columnsValue.includes(orderValue)) {
                         this.fail = true;
                         this.returnMessage = "Order is not in Columns";
                         return this.returnMessage;
                     }
                     if (this.OrderValueChecker(this.findKey_in_Apply(apply, orderValue))) {
-                        newlist.sort(this.sort_by(orderValue, false, parseFloat));
+                        this.sort_by(orderValue, false, parseFloat);
                     } else {
-                        newlist.sort(this.sort_by(orderValue, false, function (a: any) {
+                        this.sort_by(orderValue, false, function (a: any) {
                             return a.toUpperCase()
-                        }));
+                        });
                     }
                 }
 
             }
 
             else {
+                // if ORDER is OBJECT (e.g has dir and keys)
+                if (typeof orderValue === 'object') {
+                    let dir:string = orderValue["dir"];
+                    let keys:string[] = orderValue["keys"];
+                    // fail if order is not valid
+                    if (isNullOrUndefined(dir) || isNullOrUndefined(keys) || keys.length == 0){
+                        this.fail = true;
+                        this.returnMessage = "Order(OBJECT) is not Valid";
+                        return this.returnMessage;
+                    }
+                    else for(let key of keys){
+                        if (!columnsValue.includes(key)){
+                            this.fail = true;
+                            this.returnMessage = "Order(OBJECT) is not Valid - key is not included in column";
+                            return this.returnMessage;
+                        }
+                    }
+                    this.sort(dir, keys, newlist);
+                }
+                //if ORDER is NOT OBJECT, do normal sorting
                 if (typeof orderValue === 'string') {
+                    //fail if order is not valid
                     if (!columnsValue.includes(orderValue)) {
                         this.fail = true;
                         this.returnMessage = "Order is not in Columns";
                         return this.returnMessage;
                     }
                     if (this.OrderValueChecker(orderValue)) {
-                        newlist.sort(this.sort_by(orderValue, false, parseFloat));
+                        this.sort_by(orderValue, false, parseFloat);
                     } else {
-                        newlist.sort(this.sort_by(orderValue, false, function (a: any) {
+                        this.sort_by(orderValue, false, function (a: any) {
                             return a.toUpperCase()
-                        }));
+                        });
                     }
                 }
             }
@@ -579,7 +623,24 @@ class DoEveryThing {
             return a = key(a), b = key(b), reverse * (<any>(a > b) - <any>(b > a));
         }
     }
-
+    fieldSorter(fields: any) {
+        return function (a: any, b: any) {
+            return fields
+                .map(function (o: any) {
+                    var dir = 1;
+                    if (o[0] === '-') {
+                        dir = -1;
+                        o = o.substring(1);
+                    }
+                    if (a[o] > b[o]) return dir;
+                    if (a[o] < b[o]) return -(dir);
+                    return 0;
+                })
+                .reduce(function firstNonZeroValue(p: any, n: any) {
+                    return p ? p : n;
+                }, 0);
+        };
+    }
     findKey_in_Apply(apply_lists:any[], orderValue:string) {
         // console.log(apply_lists);
         if (orderValue.search("_") != -1) {
@@ -596,7 +657,6 @@ class DoEveryThing {
             }
         }
     }
-
     find_Common_Apply_Object(apply_lists:any[], applyKey_in_column:string[]) {
         let common_AO_lists:any[] = [];
         for (let i:number = 0; i < apply_lists.length; i++) {
@@ -609,7 +669,6 @@ class DoEveryThing {
         }
         return common_AO_lists;
     }
-    //
     find_Common_Group_Key(groupKey_lists:string[], groupKey_in_column:string[]) {
         let common_GroupKey_list:any[] = [];
         for (let i:number = 0; i < groupKey_lists.length; i++) {
@@ -621,8 +680,6 @@ class DoEveryThing {
         }
         return common_GroupKey_list
     }
-
-
     createGroup(data:any, group: any) {
         if (typeof group === "undefined") {
             Log.info("Not doing GROUP query");
@@ -741,34 +798,32 @@ class DoEveryThing {
         Log.info("Finished APPLY query");
         return result;
     }
-
-}
-
-function sort(dir:string, keys:string[], collected_data:any) {
-    let dataKeys:string[] = Object.keys(collected_data[0]);
-    for (let key of keys) {
-        for (let dataKey of dataKeys) {
-            if (dataKey == key) {
-                if (dir == "DOWN") {
-                    if (typeof collected_data[0][key] == "number") {
-                        collected_data.sort(Doeverything.sort_by(key, true, parseFloat));
-                    }
-                    else {
-                        collected_data.sort(Doeverything.sort_by(key, true, function (a: any) {
-                            return a.toUpperCase()
-                        }));
-                    }
-                }
-
-                else if (dir == "UP") {
-                    for (let key of keys) {
+    sort(dir:string, keys:string[], collected_data:any) {
+        let dataKeys:string[] = Object.keys(collected_data[0]);
+        for (let key of keys) {
+            for (let dataKey of dataKeys) {
+                if (dataKey == key) {
+                    if (dir == "DOWN") {
                         if (typeof collected_data[0][key] == "number") {
-                            collected_data.sort(Doeverything.sort_by(key, false, parseFloat));
+                            collected_data.sort(this.sort_by(key, true, parseFloat));
                         }
                         else {
-                            collected_data.sort(Doeverything.sort_by(key, false, function (a: any) {
+                            collected_data.sort(this.sort_by(key, true, function (a: any) {
                                 return a.toUpperCase()
                             }));
+                        }
+                    }
+
+                    else if (dir == "UP") {
+                        for (let key of keys) {
+                            if (typeof collected_data[0][key] == "number") {
+                                collected_data.sort(this.sort_by(key, false, parseFloat));
+                            }
+                            else {
+                                collected_data.sort(this.sort_by(key, false, function (a: any) {
+                                    return a.toUpperCase()
+                                }));
+                            }
                         }
                     }
                 }
@@ -777,6 +832,8 @@ function sort(dir:string, keys:string[], collected_data:any) {
     }
 }
 
+var Doeverything: DoEveryThing = null;
+var counter: boolean = true;
 function getLatandLon(address: any){
     let res = encodeURI(address);
     let path = "/api/v1/team35/"+res;
@@ -802,16 +859,19 @@ function getLatandLon(address: any){
         });
     });
 }
-
-var Doeverything: DoEveryThing = null;
-var counter: boolean = true;
+function identifyID(options: any): string{
+    let columnsValue = options["COLUMNS"];
+    if(columnsValue == 0){
+        throw error;
+    }
+    let indexOF_ = columnsValue[0].indexOf("_");
+    let id = columnsValue[0].substring(0, indexOF_);
+    return id;
+}
 export default class InsightFacade implements IInsightFacade {
-
     constructor() {
         Log.trace('InsightFacadeImpl::init()');
-
     }
-
     addDataset(id: string, content: string) : Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             let promiseList: Promise<any>[] = [];
@@ -1285,8 +1345,6 @@ export default class InsightFacade implements IInsightFacade {
 
         })
     }
-
-
     removeDataset(id: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
             if (!id || isNullOrUndefined(id)) {
@@ -1305,8 +1363,6 @@ export default class InsightFacade implements IInsightFacade {
             })
         })
     }
-
-
     performQuery(query: QueryRequest): Promise <InsightResponse> {
         return new Promise(function (fulfill, reject) {
             if (counter) {
@@ -1399,14 +1455,4 @@ export default class InsightFacade implements IInsightFacade {
             fulfill({code: 200, body: response});
         })
     }
-}
-
-function identifyID(options: any): string{
-    let columnsValue = options["COLUMNS"];
-    if(columnsValue == 0){
-        throw error;
-    }
-    let indexOF_ = columnsValue[0].indexOf("_");
-    let id = columnsValue[0].substring(0, indexOF_);
-    return id;
 }
