@@ -8,6 +8,7 @@ import restify = require('restify');
 import Log from "../Util";
 import {InsightResponse, QueryRequest} from "../controller/IInsightFacade";
 import InsightFacade from "../controller/InsightFacade";
+import fs = require('fs');
 
 
 /**
@@ -72,7 +73,8 @@ export default class Server {
                 // curl -is  http://localhost:4321/echo/myMessage
                 that.rest.get('/echo/:msg', Server.echo);
                 that.rest.get('/square/:number', Server.square);
-                that.rest.get('/putDataset2/:id', Server.putDataset2);
+                that.rest.get('/putDataset/:id', Server.putDataset);
+                that.rest.get('/postQuery/:query', Server.postQuery);
 
                 // Other endpoints will go here
 
@@ -143,7 +145,6 @@ export default class Server {
                 buffer.push(chunk);
             });
 
-
             req.once('end', function () {
                 let concated = Buffer.concat(buffer);
                 req.body = concated.toString('base64');     // changed from base64 to req.body
@@ -163,43 +164,7 @@ export default class Server {
         return next();
     }
 
-    public static putDataset2(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
-        try {
-            var id: string = req.params.id;
 
-
-            // stream bytes from request into buffer and convert to base64
-            // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
-            let buffer: any = [];
-            req.on('data', function onRequestData(chunk: any) {
-                Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
-                buffer.push(chunk);
-            });
-
-
-            req.once('end', function () {
-                let concated = Buffer.concat(buffer);
-                let facade = this.insightFacade;
-                req.body = concated.toString('base64');
-                Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
-
-                return facade.addDataset(id, req.body).then(function (response: InsightResponse) {
-                    res.send(response.code);
-                    next();
-                }).catch(function (err: Error) {
-                    Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-                    res.json(400, {error: 'invalid PUT'});
-                    next();
-                });
-            });
-
-        } catch (err) {
-            Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-            res.send(400, {error: 'invalid PUT'});
-            return next();
-        }
-    }
 
 
 
@@ -225,6 +190,7 @@ export default class Server {
         return next();
     }
 
+
     public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
         try {
@@ -245,5 +211,7 @@ export default class Server {
         }
         return next();
     }
+
+
 
 }
