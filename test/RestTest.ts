@@ -33,7 +33,7 @@ describe("RestTest", function () {
 
     });
 
-    it("PUT with addDataset(courses) returns 204", function () {
+    it.only("PUT with addDataset(courses) returns 204", function () {
         return chai.request(url)
             .put('/dataset/courses')
             .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
@@ -54,7 +54,8 @@ describe("RestTest", function () {
             });
     });
 
-    it("PUT with addDataset(rooms) returns 204", function () {
+    it(
+        "PUT with addDataset(rooms) returns 204", function () {
         return chai.request(url)
             .put('/dataset/rooms')
             .attach("body", fs.readFileSync("./rooms.zip"), "rooms.zip")
@@ -79,7 +80,7 @@ describe("RestTest", function () {
 
     it("post query1 for courses returns 201", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/')
             .query(
                 {
                     "WHERE": {
@@ -102,7 +103,7 @@ describe("RestTest", function () {
             )
             .end(function (err, res) {
                 expect(err).to.be.null;
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(201);
             });
     });
 
@@ -577,7 +578,54 @@ describe("RestTest", function () {
                 expect(res).to.have.status(424);
             });
     });
-
+    it.only("POST description", function () {
+        return chai.request(url)
+            .post('/query')
+            .send({
+                "WHERE": {
+                    "OR": [
+                        {
+                            "AND": [
+                                {
+                                    "GT": {
+                                        "courses_avg": 95
+                                    }
+                                },
+                                {
+                                    "IS": {
+                                        "courses_title": "*a*"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "GT": {
+                                "courses_fail": 5
+                            }
+                        }
+                    ]
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "courses_dept",
+                        "courses_id",
+                        "courses_avg",
+                        "courses_instructor"
+                    ],
+                    "ORDER": "courses_avg",
+                    "FORM": "TABLE"
+                }
+            })
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
+                expect(res).to.have.status(200);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
+            });
+    });
     it("post query14 for courses returns 400", function () {
         return chai.request(url)
             .post('/dataset/courses')

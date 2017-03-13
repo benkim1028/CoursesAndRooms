@@ -729,7 +729,6 @@ describe("EchoSpec", function () {
 
 
     it("Create a new courses dataset with unique id ", function () {
-        fs.unlinkSync("./courses.json");
         return insightFacade.addDataset("courses", zipContentForCourses).then(function (value: any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {

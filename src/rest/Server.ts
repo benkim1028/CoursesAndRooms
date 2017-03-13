@@ -77,7 +77,7 @@ export default class Server {
                 // curl localhost:4321/dataset/test --upload-file FNAME.zip
                 that.rest.put('/dataset/:id', Server.putDataset);
                 that.rest.del('/dataset/:id', Server.deleteDataset);
-                that.rest.post('/dataset/:query', Server.postQuery);
+                that.rest.post('/query', Server.postQuery);
 
 
 
