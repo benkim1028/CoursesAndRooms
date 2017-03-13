@@ -33,35 +33,56 @@ describe("RestTest", function () {
 
     });
 
-    it.only("PUT with addDataset(courses) returns 204", function () {
+    it("PUT with addDataset(courses) returns 204", function () {
         return chai.request(url)
             .put('/dataset/courses')
             .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(204);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
-
     });
 
     it("PUT with addDataset(courses) returns 201", function () {
         return chai.request(url)
             .put('/dataset/courses')
             .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
-            .end(function (err, res) {
-                expect(err).to.be.null;
-                expect(res).to.have.status(201);
-            });
+            // .end(function (err, res) {
+            //     expect(err).to.be.null;
+            //     expect(res).to.have.status(201);
+            // });
+        .then(function (res: any) {
+            Log.trace('then:' + JSON.stringify(res));
+            expect(res).to.have.status(201);
+        })
+        .catch(function (err) {
+            Log.trace('catch:' + err);
+            // some assertions
+            expect.fail();
+        });
     });
 
-    it(
-        "PUT with addDataset(rooms) returns 204", function () {
+    it("PUT with addDataset(rooms) returns 204", function () {
         return chai.request(url)
             .put('/dataset/rooms')
             .attach("body", fs.readFileSync("./rooms.zip"), "rooms.zip")
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            // .end(function (err, res) {
+            //     expect(err).to.be.null;
+            //     expect(res).to.have.status(204);
+            // });
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(204);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
 
     });
@@ -72,15 +93,24 @@ describe("RestTest", function () {
         return chai.request(url)
             .put('/dataset/rooms')
             .attach("body", fs.readFileSync("./rooms.zip"), "rooms.zip")
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            // .end(function (err, res) {
+            //     expect(err).to.be.null;
+            //     expect(res).to.have.status(201);
+            // });
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(201);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
     });
 
     it("post query1 for courses returns 201", function () {
         return chai.request(url)
-            .post('/')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -109,7 +139,7 @@ describe("RestTest", function () {
 
     it(" fsfdf apost query2 for courses returns 400", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -138,7 +168,7 @@ describe("RestTest", function () {
 
     it("post query3 for courses returns 200", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -161,7 +191,7 @@ describe("RestTest", function () {
 
     it("post query4 for courses returns 200", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -207,7 +237,7 @@ describe("RestTest", function () {
 
     it("post query5 for courses returns 400", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -237,7 +267,7 @@ describe("RestTest", function () {
 
     it("post query6 for courses returns 400", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -267,7 +297,7 @@ describe("RestTest", function () {
 
     it("post query7 for courses returns 400", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -297,7 +327,7 @@ describe("RestTest", function () {
 
     it("post query8 for courses returns 400", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -327,7 +357,7 @@ describe("RestTest", function () {
 
     it("post query9 for courses returns 200", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -386,7 +416,7 @@ describe("RestTest", function () {
 
     it("post query10 for courses returns 200", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -436,15 +466,24 @@ describe("RestTest", function () {
                     }
                 }
             )
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(200);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
+            // .end(function (err, res) {
+            //     expect(err).to.be.null;
+            //     expect(res).to.have.status(200);
+            // });
     });
 
     it("post query11 for courses returns 424", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -505,7 +544,7 @@ describe("RestTest", function () {
 
     it("post query12 for courses returns 424", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -535,7 +574,7 @@ describe("RestTest", function () {
 
     it("post query13 for courses returns 424", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -578,7 +617,7 @@ describe("RestTest", function () {
                 expect(res).to.have.status(424);
             });
     });
-    it.only("POST description", function () {
+    it("POST description", function () {
         return chai.request(url)
             .post('/query')
             .send({
@@ -628,7 +667,7 @@ describe("RestTest", function () {
     });
     it("post query14 for courses returns 400", function () {
         return chai.request(url)
-            .post('/dataset/courses')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -675,7 +714,7 @@ describe("RestTest", function () {
 
     it("post query1 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -720,7 +759,7 @@ describe("RestTest", function () {
 
     it("post query2 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -745,7 +784,7 @@ describe("RestTest", function () {
 
     it("post query3 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -792,7 +831,7 @@ describe("RestTest", function () {
 
     it("post query4 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -839,7 +878,7 @@ describe("RestTest", function () {
 
     it("post query5 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -880,7 +919,7 @@ describe("RestTest", function () {
 
     it("post query6 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -924,7 +963,7 @@ describe("RestTest", function () {
 
     it("post query7 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -940,15 +979,20 @@ describe("RestTest", function () {
                     }
                 }
             )
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(200);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
     });
 
     it("post query8 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -983,7 +1027,7 @@ describe("RestTest", function () {
 
     it("post query9 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1008,7 +1052,7 @@ describe("RestTest", function () {
 
     it("post query10 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1035,7 +1079,7 @@ describe("RestTest", function () {
 
     it("post query11 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1062,7 +1106,7 @@ describe("RestTest", function () {
 
     it("post query11 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1102,7 +1146,7 @@ describe("RestTest", function () {
 
     it("post query12 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1148,7 +1192,7 @@ describe("RestTest", function () {
 
     it("post query13 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1193,7 +1237,7 @@ describe("RestTest", function () {
 
     it("post query14 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1238,7 +1282,7 @@ describe("RestTest", function () {
 
     it("post query15 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1285,7 +1329,7 @@ describe("RestTest", function () {
 
     it("post query16 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1332,7 +1376,7 @@ describe("RestTest", function () {
 
     it("post query17 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1377,7 +1421,7 @@ describe("RestTest", function () {
 
     it("post query18 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1431,7 +1475,7 @@ describe("RestTest", function () {
 
     it("post query19 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1485,7 +1529,7 @@ describe("RestTest", function () {
 
     it("post query20 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1542,7 +1586,7 @@ describe("RestTest", function () {
 
     it("post query21 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1597,7 +1641,7 @@ describe("RestTest", function () {
 
     it("post query22 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1637,7 +1681,7 @@ describe("RestTest", function () {
 
     it("post query23 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1685,7 +1729,7 @@ describe("RestTest", function () {
 
     it("post query24 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1733,7 +1777,7 @@ describe("RestTest", function () {
 
     it("post query25 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1770,7 +1814,7 @@ describe("RestTest", function () {
 
     it("post query26 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1793,7 +1837,7 @@ describe("RestTest", function () {
 
     it("post query27 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1810,15 +1854,20 @@ describe("RestTest", function () {
                 }
 
             )
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(200);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
     });
 
     it("post query28 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1861,7 +1910,7 @@ describe("RestTest", function () {
 
     it("post query29 for rooms returns 200", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1891,7 +1940,7 @@ describe("RestTest", function () {
 
     it("post query30 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1928,7 +1977,7 @@ describe("RestTest", function () {
 
     it("post query31 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1969,7 +2018,7 @@ describe("RestTest", function () {
 
     it("post query32 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -1994,7 +2043,7 @@ describe("RestTest", function () {
 
     it("post query33 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2029,7 +2078,7 @@ describe("RestTest", function () {
 
     it("post query34 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2054,7 +2103,7 @@ describe("RestTest", function () {
 
     it("post query35 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2080,7 +2129,7 @@ describe("RestTest", function () {
 
     it("post query36 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2116,7 +2165,7 @@ describe("RestTest", function () {
 
     it("post query37 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2152,7 +2201,7 @@ describe("RestTest", function () {
 
     it("post query38 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2182,7 +2231,7 @@ describe("RestTest", function () {
 
     it("post query39 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2219,7 +2268,7 @@ describe("RestTest", function () {
 
     it("post query40 for rooms returns 400", function () {
         return chai.request(url)
-            .post('/dataset/rooms')
+            .post('/query')
             .query(
                 {
                     "WHERE": {
@@ -2261,9 +2310,16 @@ describe("RestTest", function () {
             return chai.request(url)
                 .put('/dataset/courses')
                 .attach("body", fs.readFileSync("./fake_courses.zip"), "fake_courses.zip")
-                .end(function (err, res) {
-                    expect(err).to.be.null;
-                    expect(res).to.have.status(400);
+                .then(function (res: any) {
+                    Log.trace('then:' + JSON.stringify(res));
+                    // expect(res).to.have.status(201);
+                    expect.fail();
+                })
+                .catch(function (err) {
+                    Log.trace('catch:' + err);
+                    // some assertions
+                    expect(err).to.have.status(400);
+                   
                 });
 
     });
@@ -2273,9 +2329,16 @@ describe("RestTest", function () {
         return chai.request(url)
             .put('/dataset/courses')
             .attach("body", fs.readFileSync("./README.md"), "nothing")
-            .end(function (err, res) {
-                expect(err).to.be.null;
-                expect(res).to.have.status(400);
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
+                // expect(res).to.have.status(201);
+                expect.fail();
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect(err).to.have.status(400);
+
             });
 
     });
@@ -2283,36 +2346,60 @@ describe("RestTest", function () {
     it("Del Dataset(courses) returns 204", function () {
         return chai.request(url)
             .del('/dataset/courses')
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(204);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
     });
 
     it("Del with addDataset(rooms) returns 204", function () {
         return chai.request(url)
             .del('/dataset/rooms')
-            .end(function (err, res) {
-                expect(err).to.be.null;
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
                 expect(res).to.have.status(204);
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect.fail();
             });
     });
 
     it("Del Dataset(courses) returns 404", function () {
         return chai.request(url)
             .del('/dataset/courses')
-            .end(function (err, res) {
-                expect(err).to.be.null;
-                expect(res).to.have.status(404);
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
+                // expect(res).to.have.status(201);
+                expect.fail();
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect(err).to.have.status(404);
+
             });
     });
 
     it("Del Dataset(rooms) returns 404", function () {
         return chai.request(url)
             .del('/dataset/rooms')
-            .end(function (err, res) {
-                expect(err).to.be.null;
-                expect(res).to.have.status(404);
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
+                // expect(res).to.have.status(201);
+                expect.fail();
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect(err).to.have.status(404);
+
             });
     });
 
@@ -2337,9 +2424,16 @@ describe("RestTest", function () {
                     }
                 }
             )
-            .end(function (err, res) {
-                expect(err).to.be.null;
-                expect(res).to.have.status(424);
+            .then(function (res: any) {
+                Log.trace('then:' + JSON.stringify(res));
+                // expect(res).to.have.status(201);
+                expect.fail();
+            })
+            .catch(function (err) {
+                Log.trace('catch:' + err);
+                // some assertions
+                expect(err).to.have.status(424);
+
             });
     });
 
