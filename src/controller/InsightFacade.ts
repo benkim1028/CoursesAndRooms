@@ -1316,9 +1316,11 @@ export default class InsightFacade implements IInsightFacade {
 
                                                                                                                                                                     // console.log(newdata);
                                                                                                                                                                     validData.push(newdata);
-                                                                                                                                                                }).catch(function(){
-                                                                                                                                                                    reject({code: 400, body: {"error": "this three"}});
-                                                                                                                                                                }))
+                                                                                                                                                                })
+                                                                                                                                                                    // .catch(function(){
+                                                                                                                                                                //     reject({code: 400, body: {"error": "this three"}});
+                                                                                                                                                                // })
+                                                                                                                                                                )
                                                                                                                                                             }
                                                                                                                                                         }
 

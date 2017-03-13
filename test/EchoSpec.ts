@@ -659,10 +659,11 @@ describe("EchoSpec", function () {
     }
     var insightFacade: InsightFacade = null; //added
 
-    var new_Server:Server = new Server(4321);
-    let url = 'http://localhost:4321';
+
+
     before(function () {
         Log.test('Before: ' + (<any>this).test.parent.title);
+
     });
 
     beforeEach(function () {
@@ -681,8 +682,8 @@ describe("EchoSpec", function () {
 
     after(function () {
         Log.test('After: ' + (<any>this).test.parent.title);
-        // new_Server.stop().then().catch();
-        new_Server.stop();
+
+
     });
 
     afterEach(function () {
@@ -725,114 +726,10 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    it("PUT description returns 201", function () {
-        // var chai = require('chai');
-        // fs.unlinkSync(".rooms.json");
-        new_Server.start();
-        return chai.request(url)
-            .put('/dataset/courses')
-            .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
-            .then(function (res: any) {
-                Log.trace('then:');
 
-                expect(res).to.have.status(201);
-                new_Server.stop();
-                // expect.fail();
-            })
-            .catch(function (err: any) {
-                Log.trace('catch:' + err);
-                // some assertions
-                // expect(err).to.have.status(201);
-                expect.fail();
-            });
-
-    });
-
-    it("PUT description returns 204", function () {
-        // var chai = require('chai');
-
-        new_Server.start();
-        fs.unlinkSync("./courses.json");
-        return chai.request(url)
-            .put('/dataset/courses')
-            .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
-            .then(function (res: any) {
-                Log.trace('then:');
-
-                expect(res).to.have.status(204);
-                new_Server.stop();
-                // expect.fail();
-            })
-            .catch(function (err: any) {
-                Log.trace('catch:' + err);
-                // some assertions
-                // expect(err).to.have.status(201);
-                expect.fail();
-            });
-
-    });
-
-    it("PUT description returns 400", function () {
-        // var chai = require('chai');
-
-        new_Server.start();
-        fs.unlinkSync("./courses.json");
-        return chai.request(url)
-            .put('/dataset/courses')
-            .attach("body", fs.readFileSync("./fake_courses.zip"), "fake_courses.zip")
-            .then(function (res: any) {
-                Log.trace('then:');
-                // expect(res).to.have.status(400);
-                expect.fail();
-            })
-            .catch(function (err: any) {
-                Log.trace('catch:' + err);
-                // some assertions
-                expect(err).to.have.status(400);
-                new_Server.stop();
-                // expect.fail();
-            });
-
-    });
-
-    // it("PUT description-1", function () {
-    //     return chai.request("http://localhost:4321")
-    //         .put('/dataset/rooms')
-    //         .attach("body", fs.readFileSync("./rooms.zip"), "rooms.zip")
-    //         .then(function (res: any) {
-    //             Log.trace('then:');
-    //             console.log(res)
-    //         })
-    //         .catch(function (err:any) {
-    //             Log.trace('catch:' + err);
-    //             // some assertions
-    //             expect.fail();
-    //         });
-    // });
-    //
-    // it("postQuery description", function () {
-    //     new_Server.start();
-    //     return chai.request("http://localhost:4321/postQuery")
-    //         .get('/' + query18)
-    //         .then(function (res: InsightResponse) {
-    //             Log.trace('then:');
-    //             // some assertions
-    //             expect(res).to.be.equal(200);
-    //
-    //             // console.log(res);
-    //             // expect.fail();
-    //         })
-    //         .catch(function (err:any) {
-    //             Log.trace('catch:');
-    //             expect.fail();
-    //             // some assertions
-    //             // expect(err).to.have.header('x-api-key');
-    //             // expect(err).to.be.equal(200);
-    //
-    //         });
-    // });
 
     it("Create a new courses dataset with unique id ", function () {
+        fs.unlinkSync("./courses.json");
         return insightFacade.addDataset("courses", zipContentForCourses).then(function (value: any) {
             Log.test('Value ' + value);
             var response: InsightResponse = {
@@ -5221,7 +5118,8 @@ describe("EchoSpec", function () {
         })
     }); //added
     it('test perfrom query after data is removed', function () {
-        return insightFacade.performQuery(           {
+        return insightFacade.performQuery(
+            {
             "WHERE": {
                 "IS": {
                     "rooms_furniture": "Classroom-Movable Tablets"

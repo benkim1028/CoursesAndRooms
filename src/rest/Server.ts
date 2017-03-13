@@ -76,7 +76,10 @@ export default class Server {
                 // Sends a dataset. Is idempotent and can create or update a dataset id.
                 // curl localhost:4321/dataset/test --upload-file FNAME.zip
                 that.rest.put('/dataset/:id', Server.putDataset);
-                //
+                that.rest.del('/dataset/:id', Server.deleteDataset);
+                that.rest.post('/dataset/:query', Server.postQuery);
+
+
 
 
                 // Receives queries. Although these queries never change the server (and thus could be GETs)
@@ -140,7 +143,7 @@ export default class Server {
     }
     public static  putDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
 
-        Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
+        // Log.trace('RouteHandler::putDataset(..) - params: ' + JSON.stringify(req.params));
 
         let facade = new InsightFacade();
         let dataStr = new Buffer(req.params.body).toString('base64');
@@ -154,31 +157,34 @@ export default class Server {
         });
     }
 
+    public static  deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
 
+        // Log.trace('RouteHandler::deleteDataset(..) - params: ' + JSON.stringify(req.params));
 
+        let facade = new InsightFacade();
 
-
-    public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
-        try {
-            let query: QueryRequest = req.params;
-
-            let facade = this.insightFacade;
-
-            facade.performQuery(query).then(function(result) {
-                res.json(result.code, result.body);
-            }).catch(function (err) {
-                res.json(err.code, err.body);
-            });
-
-
-        } catch (err) {
-            Log.error('RouteHandler::postQuery(..) - ERROR: ' + err.message);
-            res.json(400, {error: err.message});
-        }
-        return next();
+        return facade.removeDataset(req.params.id).then(function (result:any) {
+            res.json(result.code, result.body);
+            return next();
+        }).catch(function (err:any) {
+            res.json(err.code, err.body);
+            return next();
+        });
     }
 
+    public static  postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
 
+        // Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.body));
+
+        let facade = new InsightFacade();
+
+        return facade.performQuery(req.body).then(function (result:any) {
+            res.json(result.code, result.body);
+            return next();
+        }).catch(function (err:any) {
+            res.json(err.code, err.body);
+            return next();
+        });
+    }
 
 }
