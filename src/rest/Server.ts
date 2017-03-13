@@ -72,18 +72,17 @@ export default class Server {
                 // provides the echo service
                 // curl -is  http://localhost:4321/echo/myMessage
                 that.rest.get('/echo/:msg', Server.echo);
-                that.rest.get('/square/:number', Server.square);
+                // that.rest.get('/square/:number', Server.square);
                 // Sends a dataset. Is idempotent and can create or update a dataset id.
                 // curl localhost:4321/dataset/test --upload-file FNAME.zip
-                // that.rest.put('/dataset/:id', Server.putDataset);
+                that.rest.put('/dataset/:id', Server.putDataset);
                 //
-                // Deletes a dataset.
-                that.rest.del('/dataset/:id', Server.deleteDataset);
+
 
                 // Receives queries. Although these queries never change the server (and thus could be GETs)
                 // they are formed by sending JSON bodies, which is not standard for normal GET requests.
                 // curl -is -X POST -d '{ "key": "value" }' http://localhost:4321/query
-                that.rest.post('/query', restify.bodyParser(), Server.postQuery);
+                // that.rest.post('/query', restify.bodyParser(), Server.postQuery);
 
                 // Other endpoints will go here
 
@@ -139,70 +138,24 @@ export default class Server {
             return {code: 400, body: {error: 'Message not provided'}};
         }
     }
-    // public static  putDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
-    //
-    //     Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
-    //     try {
-    //         let facade = this.insightFacade;
-    //
-    //         // stream bytes from request into buffer and convert to base64
-    //         // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
-    //         let dataStr = new Buffer(req.params.body).toString('base64');
-    //         facade.addDataset(req.params.id, dataStr).then(function (result) {
-    //             res.json(result.code, result.body);
-    //         }).catch(function (error) {
-    //             res.json(error.code, error.body);
-    //         });
-    //         // let buffer: any = [];
-    //         // req.on('data', function onRequestData(chunk: any) {
-    //         //     Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
-    //         //     buffer.push(chunk);
-    //         // });
-    //         //
-    //         // req.once('end', function () {
-    //         //     let concated = Buffer.concat(buffer);
-    //         //     req.body = concated.toString('base64');     // changed from base64 to req.body
-    //         //     Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
-    //         //
-    //         //     facade.addDataset(id, req.body).then(function (result) {
-    //         //         res.json(result.code, result.body);
-    //         //     }).catch(function (error) {
-    //         //         res.json(error.code, error.body);
-    //         //     });
-    //         // });
-    //
-    //     } catch (err) {
-    //         Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-    //         res.send(400, {error: err.message});
-    //     }
-    //     return next();
-    // }
+    public static  putDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
 
-
-
-
-
-    public static deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next){
         Log.trace('RouteHandler::postDataset(..) - params: ' + JSON.stringify(req.params));
-        try {
-            var id: string = req.params.id;
 
-            Log.trace("Beginning deletion of " + id + ".");
-            let facade = this.insightFacade;
+        let facade = new InsightFacade();
+        let dataStr = new Buffer(req.params.body).toString('base64');
 
-            facade.removeDataset(id).then(function(result){
-                res.json(result.code, result.body);
-            }).catch (function (error) {
-                res.json(error.code, error.body);
-            });
-
-        } catch(err) {
-            Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-            Log.trace("failure: status(400) - DELETE failed: " + err.message);
-            res.json(400, {error: err.message});
-        }
-        return next();
+        return facade.addDataset(req.params.id, dataStr).then(function (result:any) {
+            res.json(result.code, result.body);
+            return next();
+        }).catch(function (err:any) {
+            res.json(err.code, err.body);
+            return next();
+        });
     }
+
+
+
 
 
     public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {

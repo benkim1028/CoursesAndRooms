@@ -11,9 +11,9 @@ import Log from "../src/Util";
 import InsightFacade from "../src/controller/InsightFacade";
 import {InsightResponse, QueryRequest} from "../src/controller/IInsightFacade";
 import fs = require('fs');
-import {App} from "../src/App";
-import {start} from "repl";
-var chai = require('chai')
+import chai = require('chai');
+import ChaiHttp = require('chai-http');
+chai.use(ChaiHttp);
 
 
 
@@ -658,10 +658,9 @@ describe("EchoSpec", function () {
         expect(response.code).to.be.a('number');
     }
     var insightFacade: InsightFacade = null; //added
-    var chai = require('chai')
-        , chaiHttp = require('chai-http');
-    chai.use(chaiHttp);
+
     var new_Server:Server = new Server(4321);
+    let url = 'http://localhost:4321';
     before(function () {
         Log.test('Before: ' + (<any>this).test.parent.title);
     });
@@ -682,6 +681,7 @@ describe("EchoSpec", function () {
 
     after(function () {
         Log.test('After: ' + (<any>this).test.parent.title);
+        // new_Server.stop().then().catch();
     });
 
     afterEach(function () {
@@ -723,24 +723,52 @@ describe("EchoSpec", function () {
         expect(out.body).to.deep.equal({error: 'Message not provided'});
     });
 
-    // it("PUT description", function () {
-    //     new_Server.start();
-    //     return chai.request("http://localhost:4321")
-    //         .put('/dataset/rooms')
-    //         .attach("body", fs.readFileSync("./rooms.zip"), "rooms.zip")
-    //         .then(function (res: InsightResponse) {
-    //             Log.trace('then:');
-    //             new_Server.stop();
-    //             expect(res).to.have.status(200);
-    //         })
-    //         .catch(function (err: any) {
-    //             console.log(err);
-    //             Log.trace('catch:' +err);
-    //             // some assertions
-    //             expect.fail();
-    //         });
-    //
-    // });
+    it.only("PUT description returns 201", function () {
+        // var chai = require('chai');
+        // fs.unlinkSync(".rooms.json");
+        new_Server.start();
+        return chai.request(url)
+            .put('/dataset/courses')
+            .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
+            .then(function (res: any) {
+                Log.trace('then:');
+
+                expect(res).to.have.status(201);
+                new_Server.stop();
+                // expect.fail();
+            })
+            .catch(function (err: any) {
+                Log.trace('catch:' + err);
+                // some assertions
+                // expect(err).to.have.status(201);
+                expect.fail();
+            });
+
+    });
+
+    it.only("PUT description2 returns 204", function () {
+        // var chai = require('chai');
+
+        new_Server.start();
+        fs.unlinkSync("./courese.json");
+        return chai.request(url)
+            .put('/dataset/courses')
+            .attach("body", fs.readFileSync("./courses.zip"), "courses.zip")
+            .then(function (res: any) {
+                Log.trace('then:');
+
+                expect(res).to.have.status(204);
+
+                // expect.fail();
+            })
+            .catch(function (err: any) {
+                Log.trace('catch:' + err);
+                // some assertions
+                // expect(err).to.have.status(201);
+                expect.fail();
+            });
+
+    });
     // it("PUT description-1", function () {
     //     return chai.request("http://localhost:4321")
     //         .put('/dataset/rooms')
