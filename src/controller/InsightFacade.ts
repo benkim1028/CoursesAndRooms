@@ -732,24 +732,23 @@ class DoEveryThing {
         });
     }
     applyQuery(data:any[], apply:any, group: any):any {
-        if (typeof apply  === "undefined") {
+        if (typeof apply === "undefined") {
             Log.info("Not doing APPLY query and SHOULD NOT have done GROUP query");
             return data;
         }
         Log.info("Started APPLY query");
-        let result:any[] = [];
+        let result: any[] = [];
         // traverse through each group of data
-        for(let content of data){
-            let jsonApply:any = {};
+        for (let content of data) {
+            let jsonApply: any = {};
             for (let i = 0; i < apply.length; i++) {
                 let applykey = Object.keys(apply[i])[0];
                 let applytoken = Object.keys(apply[i][applykey])[0];
                 let key: string = this.findKey(apply[i][applykey][applytoken]);
 
                 let queryResult: any;
-                if (applytoken == "MAX")
-                {
-                    if(!this.OrderValueChecker(key)){
+                if (applytoken == "MAX") {
+                    if (!this.OrderValueChecker(key)) {
                         this.fail = true;
                         this.returnMessage = "MAX received non number"
                         return this.returnMessage;
@@ -762,9 +761,8 @@ class DoEveryThing {
                     }
                     queryResult = max;
                 }
-                else if (applytoken == "MIN")
-                {
-                    if(!this.OrderValueChecker(key)){
+                else if (applytoken == "MIN") {
+                    if (!this.OrderValueChecker(key)) {
                         this.fail = true;
                         this.returnMessage = "MIN received non number"
                         return this.returnMessage;
@@ -777,9 +775,8 @@ class DoEveryThing {
                     }
                     queryResult = min;
                 }
-                else if (applytoken == "AVG")
-                {
-                    if(!this.OrderValueChecker(key)){
+                else if (applytoken == "AVG") {
+                    if (!this.OrderValueChecker(key)) {
                         this.fail = true;
                         this.returnMessage = "AVG received non number"
                         return this.returnMessage;
@@ -792,23 +789,21 @@ class DoEveryThing {
                         temp = Number(temp.toFixed(0))
                         sum += temp;
                     }
-                    queryResult = Number(((sum / content.length)/10).toFixed(2));
+                    queryResult = Number(((sum / content.length) / 10).toFixed(2));
                 }
-                else if (applytoken == "SUM")
-                {
-                    if(!this.OrderValueChecker(key)){
+                else if (applytoken == "SUM") {
+                    if (!this.OrderValueChecker(key)) {
                         this.fail = true;
                         this.returnMessage = "SUM received non number"
                         return this.returnMessage;
                     }
                     let sum = 0;
-                    for (let obj of content){
-                        sum+=obj[key]
+                    for (let obj of content) {
+                        sum += obj[key]
                     }
                     queryResult = Number(sum);
                 }
-                else if (applytoken == "COUNT")
-                {
+                else if (applytoken == "COUNT") {
                     let values: any[] = [];
                     for (let obj of content) {
                         values.push(obj[key]);
@@ -826,11 +821,11 @@ class DoEveryThing {
             }
 
             // put into a JSON object
-            let jsonContent:any = {};
+            let jsonContent: any = {};
             for (let key of group) {
                 jsonContent[key] = content[0][this.findKey(key)];
             }
-            Object.keys(jsonApply).forEach(function (key:any) {
+            Object.keys(jsonApply).forEach(function (key: any) {
                 jsonContent[key] = jsonApply[key];
             });
             // add to result array
@@ -840,12 +835,36 @@ class DoEveryThing {
         Log.info("Finished APPLY query");
         return result;
     }
-    sort(dir:string, keys:string[], collected_data:any){
-        let dataKeys:string[] = Object.keys(collected_data[0]);
-        //console.log(dataKeys);
-        for (let i:number = keys.length - 1; i >= 0; i--) {
-            return this.mergeSort(collected_data, keys[i],dir);
+
+    groupSort(data:any[], sortkey: any, dir: any):any {
+        Log.info("Started groupsort query");
+        let result: any[] = [];
+        // traverse through each group of data
+        for (let content of data) {
+            let sortedEachData = this.mergeSort(content, sortkey, dir);
+            for (let eachData of sortedEachData){
+                result.push(eachData);
+            }
         }
+        Log.info("Finished groupsort query");
+        return result;
+    }
+    sort(dir:string, keys:string[], collected_data:any){
+        let datalist = [];
+        let temp = [];
+        let keyslist = [];
+        for (let i = 0 ; i < keys.length; i ++){
+            if(i == 0){
+                datalist = this.mergeSort(collected_data, keys[0], dir);
+                keyslist.push(keys[0]);
+            }
+            else {
+                temp = this.createGroup(datalist, keyslist);
+                datalist = this.groupSort(temp, keys[i], dir);
+                keyslist.push(keys[i]);
+            }
+        }
+        return datalist;
     }
     mergeSort(data:any, key:string, dir:string):any[] {
         if (data.length < 2) {
@@ -970,13 +989,16 @@ export default class InsightFacade implements IInsightFacade {
                                     //let keys = Object.keys(element);  // keys = ["result", "rank"]
                                     var course_info = element["result"];  // course_info = value of result = [{....}]
                                     for (let each1 of course_info) {// each = each object in result
-                                        if (each1 != [])
-                                            if(each1["Section"] == "overall"){
+                                        if (each1 != []) {
+                                            if (each1["Section"] == "overall") {
                                                 each1["Year"] = 1900;
+                                                each1["id"] = each1["id"].toString();
                                             } else {
                                                 each1["Year"] = Number(each1["Year"]);
+                                                each1["id"] = each1["id"].toString();
                                             }
-                                        list.push(each1);
+                                            list.push(each1);
+                                        }
                                     }
                                 }
                             }
@@ -1228,6 +1250,8 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                             // console.log(item12);
                                                                                                                                             if (item12.tagName == 'tr') {
                                                                                                                                                 // console.log(item12);
+                                                                                                                                                let init = false;
+                                                                                                                                                let counter = 0;
                                                                                                                                                 for (let item13 of item12.childNodes) {
                                                                                                                                                     if (item13.tagName == 'td') {
                                                                                                                                                         // console.log(item13.childNodes);
@@ -1248,26 +1272,26 @@ export default class InsightFacade implements IInsightFacade {
                                                                                                                                                             }
                                                                                                                                                             else {
                                                                                                                                                                 // let i:number = 0 ;
+                                                                                                                                                                counter++;
+                                                                                                                                                                // console.log(item14['value'].trim()); // capacity furniture room_type
+                                                                                                                                                                if (counter == 3) {
 
-                                                                                                                                                                if (item14['value'].trim().length >= 1) {
-                                                                                                                                                                    // console.log(item14['value'].trim()); // capacity furniture room_type
-                                                                                                                                                                    if (item14['value'].trim().length < 4 && item14['value'].trim().search('TBD') == -1) {
+                                                                                                                                                                    rooms_seats = item14['value'].trim();
+                                                                                                                                                                    rooms_seats_list.push(rooms_seats);
+                                                                                                                                                                    // console.log(rooms_seats);
+                                                                                                                                                                }
+                                                                                                                                                                else if (counter == 5) {
+                                                                                                                                                                    rooms_type = item14['value'].trim();
+                                                                                                                                                                    if(isNullOrUndefined(rooms_type)){
+                                                                                                                                                                        rooms_type = "";
+                                                                                                                                                                    }
+                                                                                                                                                                    rooms_type_list.push(rooms_type);
+                                                                                                                                                                }
+                                                                                                                                                                else if (counter == 4){
 
-                                                                                                                                                                        rooms_seats = item14['value'].trim();
-                                                                                                                                                                        rooms_seats_list.push(rooms_seats);
-                                                                                                                                                                        // console.log(rooms_seats);
-                                                                                                                                                                    }
-                                                                                                                                                                    else  if (item14['value'].trim().length <= 18 || item14['value'].trim().search('Purpose') != -1 || item14['value'].trim().search('Group') != -1) {
-                                                                                                                                                                        // console.log(item14['value'].trim());
-                                                                                                                                                                        rooms_type = item14['value'].trim();
-                                                                                                                                                                        rooms_type_list.push(rooms_type);
-                                                                                                                                                                    }
-                                                                                                                                                                    else {
-
-                                                                                                                                                                        rooms_furniture = item14['value'].trim();
-                                                                                                                                                                        rooms_furniture_list.push(rooms_furniture);
-                                                                                                                                                                        // console.log(rooms_furniture);
-                                                                                                                                                                    }
+                                                                                                                                                                    rooms_furniture = item14['value'].trim();
+                                                                                                                                                                    rooms_furniture_list.push(rooms_furniture);
+                                                                                                                                                                    // console.log(rooms_furniture);
                                                                                                                                                                 }
                                                                                                                                                             }
 
@@ -1512,7 +1536,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            //console.log(response);
+            console.log(response);
             fulfill({code: 200, body: response});
         })
     }
