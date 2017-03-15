@@ -635,16 +635,16 @@ class DoEveryThing {
         }
     }
     hasDuplicates(array: any) {
-    var valuesSoFar = Object.create(null);
-    for (var i = 0; i < array.length; ++i) {
-        var value = array[i];
-        if (value in valuesSoFar) {
-            return true;
+        var valuesSoFar = Object.create(null);
+        for (var i = 0; i < array.length; ++i) {
+            var value = array[i];
+            if (value in valuesSoFar) {
+                return true;
+            }
+            valuesSoFar[value] = true;
         }
-        valuesSoFar[value] = true;
+        return false;
     }
-    return false;
-}
     // fieldSorter(fields: any) {
     //     return function (a: any, b: any) {
     //         return fields
@@ -1279,47 +1279,47 @@ export default class InsightFacade implements IInsightFacade {
 
 
                                                                                                                                                                 processList.push(getLatandLon(address).then(function (geoResponse: any){
-                                                                                                                                                                    var responselat: any = null;
-                                                                                                                                                                    var responselon: any = null;
-                                                                                                                                                                    let response = JSON.parse(geoResponse);
-                                                                                                                                                                    responselat = Number(response.lat);
-                                                                                                                                                                    responselon = Number(response.lon);
-                                                                                                                                                                    rooms_lat = responselat;
-                                                                                                                                                                    rooms_lon = responselon;
-                                                                                                                                                                    // console.log(rooms_number_list);
-                                                                                                                                                                    let rooms_number_index:number = rooms_number_list.length;
+                                                                                                                                                                        var responselat: any = null;
+                                                                                                                                                                        var responselon: any = null;
+                                                                                                                                                                        let response = JSON.parse(geoResponse);
+                                                                                                                                                                        responselat = Number(response.lat);
+                                                                                                                                                                        responselon = Number(response.lon);
+                                                                                                                                                                        rooms_lat = responselat;
+                                                                                                                                                                        rooms_lon = responselon;
+                                                                                                                                                                        // console.log(rooms_number_list);
+                                                                                                                                                                        let rooms_number_index:number = rooms_number_list.length;
 
-                                                                                                                                                                    let each_rooms_number:string = rooms_number_list[a];
-                                                                                                                                                                    let each_rooms_seats:number = Number(rooms_seats_list[a]);
-                                                                                                                                                                    let each_rooms_type:string = rooms_type_list[a];
-                                                                                                                                                                    let each_rooms_furniture:string = rooms_furniture_list[a];
-                                                                                                                                                                    let each_rooms_href:string = rooms_href_list[a];
+                                                                                                                                                                        let each_rooms_number:string = rooms_number_list[a];
+                                                                                                                                                                        let each_rooms_seats:number = Number(rooms_seats_list[a]);
+                                                                                                                                                                        let each_rooms_type:string = rooms_type_list[a];
+                                                                                                                                                                        let each_rooms_furniture:string = rooms_furniture_list[a];
+                                                                                                                                                                        let each_rooms_href:string = rooms_href_list[a];
 
-                                                                                                                                                                    if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
-                                                                                                                                                                        var newdata: any = {};
-                                                                                                                                                                        newdata["rooms_fullname"] =  rooms_fullname;
-                                                                                                                                                                        newdata["rooms_shortname"] =  rooms_shortname;
-                                                                                                                                                                        newdata["rooms_number"] = each_rooms_number;
-                                                                                                                                                                        newdata["rooms_name"] = rooms_shortname + "_" + each_rooms_number;
-                                                                                                                                                                        newdata["rooms_address"] = rooms_address;
-                                                                                                                                                                        newdata["rooms_lat"] = responselat;
-                                                                                                                                                                        newdata["rooms_lon"] = responselon;
-                                                                                                                                                                        newdata["rooms_seats"] = each_rooms_seats;
-                                                                                                                                                                        newdata["rooms_type"] = each_rooms_type;
-                                                                                                                                                                        newdata["rooms_furniture"] = each_rooms_furniture;
-                                                                                                                                                                        newdata["rooms_href"] = each_rooms_href;
-                                                                                                                                                                        if (a < rooms_number_index) {
-                                                                                                                                                                            a++;
+                                                                                                                                                                        if (rooms_number != '' && rooms_seats != 0 && rooms_type != "" && rooms_furniture != "" && rooms_href != "" ) {
+                                                                                                                                                                            var newdata: any = {};
+                                                                                                                                                                            newdata["rooms_fullname"] =  rooms_fullname;
+                                                                                                                                                                            newdata["rooms_shortname"] =  rooms_shortname;
+                                                                                                                                                                            newdata["rooms_number"] = each_rooms_number;
+                                                                                                                                                                            newdata["rooms_name"] = rooms_shortname + "_" + each_rooms_number;
+                                                                                                                                                                            newdata["rooms_address"] = rooms_address;
+                                                                                                                                                                            newdata["rooms_lat"] = responselat;
+                                                                                                                                                                            newdata["rooms_lon"] = responselon;
+                                                                                                                                                                            newdata["rooms_seats"] = each_rooms_seats;
+                                                                                                                                                                            newdata["rooms_type"] = each_rooms_type;
+                                                                                                                                                                            newdata["rooms_furniture"] = each_rooms_furniture;
+                                                                                                                                                                            newdata["rooms_href"] = each_rooms_href;
+                                                                                                                                                                            if (a < rooms_number_index) {
+                                                                                                                                                                                a++;
+                                                                                                                                                                            }
+
                                                                                                                                                                         }
 
-                                                                                                                                                                    }
-
-                                                                                                                                                                    // console.log(newdata);
-                                                                                                                                                                    validData.push(newdata);
-                                                                                                                                                                })
+                                                                                                                                                                        // console.log(newdata);
+                                                                                                                                                                        validData.push(newdata);
+                                                                                                                                                                    })
                                                                                                                                                                     // .catch(function(){
-                                                                                                                                                                //     reject({code: 400, body: {"error": "this three"}});
-                                                                                                                                                                // })
+                                                                                                                                                                    //     reject({code: 400, body: {"error": "this three"}});
+                                                                                                                                                                    // })
                                                                                                                                                                 )
                                                                                                                                                             }
                                                                                                                                                         }

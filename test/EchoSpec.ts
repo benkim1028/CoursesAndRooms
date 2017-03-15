@@ -4490,6 +4490,49 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     });
+    it("multiple sort", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "rooms_type",
+                        "maxSeats",
+                        "minSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname", "rooms_type", "maxSeats", "minSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "rooms_type"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "minSeats": {
+                                "MIN" : "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            // expect.fail();
+            Log.test('Value ' + value);
+            expect(value.code).to.equal(200);
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            expect.fail();
+            // expect(err.code).to.equal(400);
+        })
+    });
     it("min received invalid", function () {
         return insightFacade.performQuery(
             {
