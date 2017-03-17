@@ -2026,54 +2026,6 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(424);
         })
     }); //added
-    it("2Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-        return insightFacade.performQuery(
-            {
-                "WHERE": {
-                    "OR": [
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "inst adul educ"
-                                }
-                            }
-                        },
-
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "*a*"
-                                }
-                            }
-                        },
-
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "*b*"
-                                }
-                            }
-                        }
-                    ]
-                },
-                "OPTIONS": {
-                    "COLUMNS": [
-                        "courses_dept"
-                    ],
-                    "ORDER": "courses_dept",
-                    "FORM": "TABLE"
-                }
-            }).then(value => {
-            // expect.fail();
-            Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
-        }).catch(function (err: any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-            // expect(err.code).to.equal(400);
-        })
-    }); //added
     it("3Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
         return insightFacade.performQuery(
             {
@@ -4509,7 +4461,7 @@ describe("EchoSpec", function () {
                     "FORM": "TABLE"
                 },
                 "TRANSFORMATIONS": {
-                    "GROUP": ["rooms_shortname", "rooms_type"],
+                    "GROUP": ["rooms_shortname", "roomstype"],
                     "APPLY": [
                         {
                             "maxSeats": {
@@ -4533,7 +4485,86 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
+    it("should fail this query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "maxSeats",
+                        "minSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname", "maxSeats", "minSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "roomstype"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "minSeats": {
+                                "MIN" : "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
     it("min received invalid", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "minSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname", "minSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [
+                        {
+                            "minSeats": {
+                                "MIN": "roomsshortname"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+    it("min received invalid2", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
