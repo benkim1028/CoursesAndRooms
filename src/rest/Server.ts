@@ -63,11 +63,13 @@ export default class Server {
                 });
                 that.rest.use(restify.bodyParser({mapParams: true, mapFiles: true}));
 
+                that.rest.get("/public/.*", restify.serveStatic({
+                    directory: __dirname
+                }));
 
-                that.rest.get('/', function (req: restify.Request, res: restify.Response, next: restify.Next) {
-                    res.send(200);
-                    return next();
-                });
+                // Loads the homepage.
+                // curl -is  http://localhost:4321/
+                that.rest.get('/', Server.getHomepage);
 
                 // provides the echo service
                 // curl -is  http://localhost:4321/echo/myMessage
@@ -186,5 +188,19 @@ export default class Server {
             return next();
         });
     }
+    public static getHomepage(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RoutHandler::getHomepage(..)');
+        fs.readFile('./src/rest/views/index.html', 'utf8', function (err: Error, file: Buffer) {
+            if (err) {
+                res.send(500);
+                Log.error(JSON.stringify(err));
+                return next();
+            }
+            res.write(file);
+            res.end();
+            return next();
+        });
+    }
+
 
 }
