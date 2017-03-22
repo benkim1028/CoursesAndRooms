@@ -718,6 +718,12 @@ class DoEveryThing {
             // console.log(item);
             for (let value of group) {
                 let real_value = Doeverything.findKey(value);
+                if(real_value=="appliedKey"){
+                    Doeverything.fail=true;
+                    Doeverything.returnMessage = "group has invalud key"
+                    return Doeverything.returnMessage;
+                }
+
                 grouped.push(item[real_value]);
             }
             return grouped;

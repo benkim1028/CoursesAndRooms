@@ -4377,7 +4377,7 @@ describe("EchoSpec", function () {
                     "FORM": "TABLE"
                 },
                 "TRANSFORMATIONS": {
-                    "GROUP": ["rooms_shortname", "rooms_type"],
+                    "GROUP": ["rooms_shortname", "roomstype"],
                     "APPLY": [
                         {
                             "maxSeats": {
