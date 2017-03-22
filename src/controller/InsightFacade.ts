@@ -409,10 +409,6 @@ class DoEveryThing {
 
         }
         return "appliedKey";
-
-        // else {
-        //     return this.checkToken(key);
-        // }
     }
 
     createModifiedList(list: any, options: any, transformations: any) {
@@ -493,6 +489,14 @@ class DoEveryThing {
                 else
                     applykeys.push(columnsValue[i]);
             }
+            for (let i = 0; i < transformations["GROUP"].length; i++){
+                if (this.findKey(transformations["GROUP"][i]) == "appliedKey") {
+                    this.fail = true;
+                    this.returnMessage = "Group cannot contain appliedkey"
+                    return this.returnMessage;
+                }
+            }
+
             //check if all the keys with _ belong to GROUP if not throw error
             for (let x = 0; x < groupkeys.length; x ++) {
                 if (!transformations["GROUP"].includes(groupkeys[x])) {
@@ -748,7 +752,7 @@ class DoEveryThing {
 
                 let queryResult: any;
                 if (applytoken == "MAX") {
-                    if (!this.OrderValueChecker(key)) {
+                    if (!this.OrderValueChecker(key) || this.findKey(key) == "appliedKey") {
                         this.fail = true;
                         this.returnMessage = "MAX received non number"
                         return this.returnMessage;
@@ -762,7 +766,7 @@ class DoEveryThing {
                     queryResult = max;
                 }
                 else if (applytoken == "MIN") {
-                    if (!this.OrderValueChecker(key)) {
+                    if (!this.OrderValueChecker(key)|| this.findKey(key) == "appliedKey") {
                         this.fail = true;
                         this.returnMessage = "MIN received non number"
                         return this.returnMessage;
@@ -776,7 +780,7 @@ class DoEveryThing {
                     queryResult = min;
                 }
                 else if (applytoken == "AVG") {
-                    if (!this.OrderValueChecker(key)) {
+                    if (!this.OrderValueChecker(key)|| this.findKey(key) == "appliedKey") {
                         this.fail = true;
                         this.returnMessage = "AVG received non number"
                         return this.returnMessage;
@@ -792,7 +796,7 @@ class DoEveryThing {
                     queryResult = Number(((sum / content.length) / 10).toFixed(2));
                 }
                 else if (applytoken == "SUM") {
-                    if (!this.OrderValueChecker(key)) {
+                    if (!this.OrderValueChecker(key)|| this.findKey(key) == "appliedKey") {
                         this.fail = true;
                         this.returnMessage = "SUM received non number"
                         return this.returnMessage;
@@ -804,6 +808,11 @@ class DoEveryThing {
                     queryResult = Number(sum);
                 }
                 else if (applytoken == "COUNT") {
+                    if(this.findKey(key) == "appliedKey"){
+                        this.fail = true;
+                        this.returnMessage = "Count received appliedKey"
+                        return this.returnMessage;
+                    }
                     let values: any[] = [];
                     for (let obj of content) {
                         values.push(obj[key]);
@@ -1536,7 +1545,7 @@ export default class InsightFacade implements IInsightFacade {
             Doeverything.fail_for_missingKey = false;
             Doeverything.fail_for_424 = false;
             Doeverything.fail = false;
-            console.log(response);
+            //console.log(response);
             fulfill({code: 200, body: response});
         })
     }

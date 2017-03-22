@@ -285,32 +285,7 @@ describe("EchoSpec", function () {
             "FORM": "TABLE"
         }
     }
-    let query9: QueryRequest = {
-        "WHERE": {
-            "AND": [
-                {
-                    "GT": {
-                        "courses_avg": 90
-                    }
-                },
-                {
-                    "NOT": {
-                        "GT": {
-                            "courses_avg": 90
-                        }
-                    }
-                }
-            ]
-        },
-        "OPTIONS": {
-            "COLUMNS": [
-                "courses_avg",
-                "courses_instructor"
-            ],
-            "ORDER": "courses_avg",
-            "FORM": "TABLE"
-        }
-    };
+
     let query10: QueryRequest = {
         "WHERE": {
             "OR": [
@@ -893,17 +868,6 @@ describe("EchoSpec", function () {
     });
     it('query8', function () {
         return insightFacade.performQuery(query8).then(function (value: any) {
-            var response: InsightResponse = {
-                code: 200, body: {}
-            };
-            expect(value.code).to.equal(response.code);
-        }).catch(function (err: any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-        })
-    });
-    it('query9', function () {
-        return insightFacade.performQuery(query9).then(function (value: any) {
             var response: InsightResponse = {
                 code: 200, body: {}
             };
@@ -2026,54 +1990,6 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(424);
         })
     }); //added
-    it("2Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-        return insightFacade.performQuery(
-            {
-                "WHERE": {
-                    "OR": [
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "inst adul educ"
-                                }
-                            }
-                        },
-
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "*a*"
-                                }
-                            }
-                        },
-
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "*b*"
-                                }
-                            }
-                        }
-                    ]
-                },
-                "OPTIONS": {
-                    "COLUMNS": [
-                        "courses_dept"
-                    ],
-                    "ORDER": "courses_dept",
-                    "FORM": "TABLE"
-                }
-            }).then(value => {
-            // expect.fail();
-            Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
-        }).catch(function (err: any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-            // expect(err.code).to.equal(400);
-        })
-    }); //added
     it("3Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
         return insightFacade.performQuery(
             {
@@ -2162,54 +2078,6 @@ describe("EchoSpec", function () {
                         "courses_title"
                     ],
                     "ORDER": "courses_title",
-                    "FORM": "TABLE"
-                }
-            }).then(value => {
-            // expect.fail();
-            Log.test('Value ' + value);
-            expect(value.code).to.equal(200);
-            // expect(value.body).to.equal({});
-        }).catch(function (err: any) {
-            Log.test('Error: ' + err);
-            expect.fail();
-            // expect(err.code).to.equal(400);
-        })
-    }); //added
-    it("2Firetruck: Should be able to find all courses in a dept except some specific examples.", function () {
-        return insightFacade.performQuery(
-            {
-                "WHERE": {
-                    "OR": [
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "inst adul educ"
-                                }
-                            }
-                        },
-
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_uuid": "1342"
-                                }
-                            }
-                        },
-
-                        {
-                            "NOT": {
-                                "IS": {
-                                    "courses_dept": "*b*"
-                                }
-                            }
-                        }
-                    ]
-                },
-                "OPTIONS": {
-                    "COLUMNS": [
-                        "courses_dept"
-                    ],
-                    "ORDER": "courses_dept",
                     "FORM": "TABLE"
                 }
             }).then(value => {
@@ -2984,7 +2852,7 @@ describe("EchoSpec", function () {
             expect(err.code).to.equal(400);
         })
     }); //added
-    it("rooms test4", function () {
+    it( "rooms test4", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {
@@ -4533,7 +4401,86 @@ describe("EchoSpec", function () {
             // expect(err.code).to.equal(400);
         })
     });
+    it("should fail this query", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "maxSeats",
+                        "minSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname", "maxSeats", "minSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname", "roomstype"],
+                    "APPLY": [
+                        {
+                            "maxSeats": {
+                                "MAX": "rooms_seats"
+                            }
+                        },
+                        {
+                            "minSeats": {
+                                "MIN" : "rooms_seats"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
     it("min received invalid", function () {
+        return insightFacade.performQuery(
+            {
+                "WHERE": {
+                },
+                "OPTIONS": {
+                    "COLUMNS": [
+                        "rooms_shortname",
+                        "minSeats"
+                    ],
+                    "ORDER": {
+                        "dir": "DOWN",
+                        "keys": ["rooms_shortname", "minSeats"]
+                    },
+                    "FORM": "TABLE"
+                },
+                "TRANSFORMATIONS": {
+                    "GROUP": ["rooms_shortname"],
+                    "APPLY": [
+                        {
+                            "minSeats": {
+                                "MIN": "roomsshortname"
+                            }
+                        }
+                    ]
+                }
+            }).then(value => {
+            expect.fail();
+            // Log.test('Value ' + value);
+            // expect(value.code).to.equal(200);
+            // expect(value.body).to.equal({});
+        }).catch(function (err: any) {
+            Log.test('Error: ' + err);
+            // expect.fail();
+            expect(err.code).to.equal(400);
+        })
+    });
+    it("min received invalid2", function () {
         return insightFacade.performQuery(
             {
                 "WHERE": {

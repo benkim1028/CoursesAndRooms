@@ -2302,27 +2302,6 @@ describe("RestTest", function () {
                 expect(res).to.have.status(400);
             });
     });
-    
-
-
-    it("PUT with addDataset(courses, invalid zip file) returns 400", function () {
-            // var chai = require('chai');
-            return chai.request(url)
-                .put('/dataset/courses')
-                .attach("body", fs.readFileSync("./fake_courses.zip"), "fake_courses.zip")
-                .then(function (res: any) {
-                    Log.trace('then:' + JSON.stringify(res));
-                    // expect(res).to.have.status(201);
-                    expect.fail();
-                })
-                .catch(function (err) {
-                    Log.trace('catch:' + err);
-                    // some assertions
-                    expect(err).to.have.status(400);
-                   
-                });
-
-    });
 
     it("PUT with addDataset(course, non-zip.file) returns 400", function () {
         // var chai = require('chai');
@@ -2342,21 +2321,6 @@ describe("RestTest", function () {
             });
 
     });
-
-    it("Del Dataset(courses) returns 204", function () {
-        return chai.request(url)
-            .del('/dataset/courses')
-            .then(function (res: any) {
-                Log.trace('then:' + JSON.stringify(res));
-                expect(res).to.have.status(204);
-            })
-            .catch(function (err) {
-                Log.trace('catch:' + err);
-                // some assertions
-                expect.fail();
-            });
-    });
-
     it("Del with addDataset(rooms) returns 204", function () {
         return chai.request(url)
             .del('/dataset/rooms')
@@ -2402,40 +2366,5 @@ describe("RestTest", function () {
 
             });
     });
-
-    it("post query for rooms returns 424 after rooms dataset removed", function () {
-        return chai.request(url)
-            .post('/dataset/rooms')
-            .query(
-                {
-                    "WHERE": {
-                        "IS": {
-                            "rooms_furniture": "Classroom-Movable Tablets"
-                        }
-                    },
-                    "OPTIONS": {
-                        "COLUMNS": [
-                            "rooms_fullname",
-                            "rooms_name",
-                            "rooms_furniture"
-                        ],
-                        "ORDER": "rooms_name",
-                        "FORM": "TABLE"
-                    }
-                }
-            )
-            .then(function (res: any) {
-                Log.trace('then:' + JSON.stringify(res));
-                // expect(res).to.have.status(201);
-                expect.fail();
-            })
-            .catch(function (err) {
-                Log.trace('catch:' + err);
-                // some assertions
-                expect(err).to.have.status(424);
-
-            });
-    });
-
 
 })
